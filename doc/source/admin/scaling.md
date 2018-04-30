@@ -193,7 +193,7 @@ uwsgi:
     # fix up signal handling
     die-on-term: true
     hook-master-start: unix_signal:2 gracefully_kill_them_all
-    hook-master-start: unix_signal:5 gracefully_kill_them_all
+    hook-master-start: unix_signal:15 gracefully_kill_them_all
 
     # listening options
     
@@ -231,7 +231,7 @@ To use the native uWSGI protocol, set the `socket` option:
 
 ```yaml
     # listening options
-    socket: unix:///srv/galaxy/var/uwsgi.sock
+    socket: /srv/galaxy/var/uwsgi.sock
 ```
 
 Here we've used a UNIX domain socket because there's less overhead than a TCP socket and it can be secured by filesystem
