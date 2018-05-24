@@ -183,7 +183,7 @@ def add_composite_file(dataset, output_path, files_path):
                 isurl = dp.find('://') != -1  # todo fixme
                 if isurl:
                     try:
-                        temp_name = sniff.stream_to_file(urlopen(dp), prefix='url_paste')
+                        temp_name = sniff.stream_to_file(urlopen(dp), prefix='url_paste', dir='/data/1/galaxy_db/tmp/')
                     except Exception as e:
                         raise UploadProblemException('Unable to fetch %s\n%s' % (dp, str(e)))
                     dataset.path = temp_name
