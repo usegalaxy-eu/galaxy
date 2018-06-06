@@ -54,13 +54,9 @@ var DatasetAssociation = Backbone.Model.extend(BASE_MVC.LoggableMixin).extend(
                 this._setUpListeners();
             },
 
-            _getDatasetId: function() {
-                return this.get("id");
-            },
-
             /** returns misc. web urls for rendering things like re-run, display, etc. */
             _generateUrls: function() {
-                const id = this._getDatasetId();
+                var id = this.get("id");
                 if (!id) {
                     return {};
                 }
