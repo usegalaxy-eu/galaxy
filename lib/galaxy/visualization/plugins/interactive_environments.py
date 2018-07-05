@@ -50,7 +50,7 @@ class InteractiveEnvironmentRequest(object):
         self.attr.galaxy_root_dir = os.path.abspath(self.attr.galaxy_config.root)
         self.attr.root = web.url_for("/")
         self.attr.app_root = self.attr.root + "static/plugins/interactive_environments/" + self.attr.viz_id + "/static/"
-        self.attr.import_volume = True
+        self.attr.import_volume = False
 
         plugin_path = os.path.abspath(plugin.path)
 
@@ -272,6 +272,7 @@ class InteractiveEnvironmentRequest(object):
         return conf
 
     def _get_import_volume_for_run(self):
+        return ''
         if self.use_volumes and self.attr.import_volume:
             return '{temp_dir}:/import/'.format(temp_dir=self.temp_dir)
         return ''
@@ -310,7 +311,7 @@ class InteractiveEnvironmentRequest(object):
             name +
             _flag_opts('-e', ['='.join(map(str, t)) for t in env.items()]) +
             ['-d', '-P'] +
-            _flag_opts('-v', map(str, volumes)) +
+            #_flag_opts('-v', map(str, volumes)) +
             [image]
         )
 
@@ -349,6 +350,10 @@ class InteractiveEnvironmentRequest(object):
             volumes.append(import_volume_def)
         env = self._get_command_inject_env()
         env.update(self._get_env_for_run(env_override))
+        # UGH
+        if 'DATASET_HID' in env:
+            del env['DATASET_HID']
+
         args = {
             'image': image,
             'environment': env,
@@ -364,6 +369,7 @@ class InteractiveEnvironmentRequest(object):
         return args
 
     def _ids_to_volumes(self, ids):
+        return []
         if len(ids.strip()) == 0:
             return []
 
@@ -371,7 +377,7 @@ class InteractiveEnvironmentRequest(object):
         ids = ids.split(',')
 
         # Next we need to turn these into volumes
-        volumes = []
+        volumes = []   
         for id in ids:
             decoded_id = self.trans.security.decode_id(id)
             dataset = self.trans.sa_session.query(model.HistoryDatasetAssociation).get(decoded_id)
@@ -400,7 +406,7 @@ class InteractiveEnvironmentRequest(object):
     def _launch_legacy(self, image, env_override, volumes):
         """Legacy launch method for use when the container interface is not enabled
         """
-        raw_cmd = self.docker_cmd(image, env_override=env_override, volumes=volumes)
+        raw_cmd = self.docker_cmd(image, env_override=env_override, volumes=[])
         redacted_command = raw_cmd
         if self.attr.redact_username_in_logs:
             def make_safe(param):
@@ -453,7 +459,7 @@ class InteractiveEnvironmentRequest(object):
     def _launch_container_interface(self, image, env_override, volumes):
         """Launch method for use when the container interface is enabled
         """
-        run_args = self.container_run_args(image, env_override, volumes)
+        run_args = self.container_run_args(image, env_override, [])
         container = self.attr.container_interface.run_in_container(None, **run_args)
         container_port = container.map_port(self.attr.docker_connect_port)
         if not container_port:
@@ -506,13 +512,13 @@ class InteractiveEnvironmentRequest(object):
             raise Exception("Attempting to launch disallowed image! %s not in list of allowed images [%s]"
                             % (image, ', '.join(self.allowed_images)))
 
-        if additional_ids is not None:
-            volumes += self._ids_to_volumes(additional_ids)
+        #if additional_ids is not None:
+        #    volumes += self._ids_to_volumes(additional_ids)
 
         if self.attr.container_interface is None:
-            self._launch_legacy(image, env_override, volumes)
+            self._launch_legacy(image, env_override, [])
         else:
-            self._launch_container_interface(image, env_override, volumes)
+            self._launch_container_interface(image, env_override, [])
 
     def inspect_container(self, container_id):
         """Runs docker inspect on a container and returns json response as python dictionary inspect_data.
