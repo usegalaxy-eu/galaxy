@@ -32,11 +32,8 @@ else:
 # Add all environment variables collected from Galaxy's IE infrastructure
 ie_request.launch(
     image=trans.request.params.get('image_tag', None),
-    additional_ids=additional_ids if ie_request.use_volumes else None,
     env_override={
         'notebook_password': PASSWORD,
-        'dataset_hid': DATASET_HID,
-        'additional_ids': additional_ids if not ie_request.use_volumes else None,
     }
 )
 
@@ -51,7 +48,7 @@ notebook_keepalive_url = ie_request.url_template('${PROXY_URL}/ipython/tree')
 <head>
 ${ ie.load_default_js() }
 </head>
-<body>
+<body style="margin: 0px">
 
 <script type="text/javascript">
 ${ ie.default_javascript_variables() }
