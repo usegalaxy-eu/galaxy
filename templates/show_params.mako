@@ -271,6 +271,37 @@ ${ job.command_line | h }</pre>
     %endfor
 %endif
 
+%if trans.user_is_admin():
+<h3>Destination Parameters</h3>
+    <table class="tabletip">
+        <thead>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr><td>Runner</td><td>${ job.job_runner_name }</td></tr>
+            <tr><td>Runner Job ID</td><td>${ job.job_runner_external_id }</td></tr>
+            <tr><td>Handler</td><td>${ job.handler }</td></tr>
+            %if job.destination_params:
+            %for (k, v) in job.destination_params.items():
+                <tr><td>${ k | h }</td>
+                    <td>
+                        %if str(k) in ('nativeSpecification', 'rank', 'requirements'):
+                        <pre style="white-space: pre-wrap; word-wrap: break-word;">${ v | h }</pre>
+                        %else:
+                        ${ v | h }
+                        %endif
+                    </td>
+                </tr>
+            %endfor
+            %endif
+
+        </tbody>
+    </table>
+%endif
+
 %if job and job.dependencies:
 <h3>Job Dependencies</h3>
     <table class="tabletip">
@@ -279,6 +310,7 @@ ${ job.command_line | h }</pre>
             <th>Dependency</th>
             <th>Dependency Type</th>
             <th>Version</th>
+            <th>Path</th>
         </tr>
         </thead>
         <tbody>
@@ -287,6 +319,11 @@ ${ job.command_line | h }</pre>
                 <tr><td>${ dependency['name'] | h }</td>
                     <td>${ dependency['dependency_type'] | h }</td>
                     <td>${ dependency['version'] | h }</td>
+                    %if 'environment_path' in dependency:
+                    <td>${ dependency['environment_path'] | h }</td>
+                    %elif 'path' in dependency:
+                    <td>${ dependency['path'] | h }</td>
+                    %endif
                 </tr>
             %endfor
 
