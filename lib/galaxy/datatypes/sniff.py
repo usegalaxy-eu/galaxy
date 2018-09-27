@@ -45,9 +45,9 @@ def get_test_fname(fname):
     return full_path
 
 
-def stream_url_to_file(path):
+def stream_url_to_file(path, dir=None):
     page = urlopen(path)  # page will be .close()ed in stream_to_file
-    temp_name = stream_to_file(page, prefix='url_paste', source_encoding=util.get_charset_from_http_headers(page.headers))
+    temp_name = stream_to_file(page, prefix='url_paste', source_encoding=util.get_charset_from_http_headers(page.headers), dir=dir)
     return temp_name
 
 
