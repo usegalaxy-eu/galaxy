@@ -124,9 +124,9 @@ class SDF(GenericMolFile):
                         line.endswith(' V3000')):
                     return False
             elif not m_end_found:
-                if line == 'M  END':
+                if line.startswith('M  END'):
                     m_end_found = True
-            elif line == '$$$$':
+            elif m_end_found and line.startswith('$$$$'):
                 return True
             if idx == limit:
                 break
