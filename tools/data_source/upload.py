@@ -102,7 +102,7 @@ def add_file(dataset, registry, output_path):
         try:
             dataset.path = sniff.stream_url_to_file(dataset.path, dir='/data/dnb01/galaxy_db/tmp/')
         except Exception as e:
-            raise UploadProblemException('Unable to fetch %s\n%s' % (dataset.path, str(e)))
+            raise UploadProblemException('.Unable to fetch %s\n%s' % (dataset.path, str(e)))
 
     # See if we have an empty file
     if not os.path.exists(dataset.path):
