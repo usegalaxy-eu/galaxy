@@ -29,8 +29,8 @@ def get_by_id(random_id, webhook):
 
     # urls look like
     # http://phdcomics.com/comics/archive/phd092017s.gif
-    comic_src = comic_src.replace('http://phdcomics.com', 'https://galaxy.uni-freiburg.de/external/phdcomics')
-    comic_src = comic_src.replace('http://www.phdcomics.com', 'https://galaxy.uni-freiburg.de/external/phdcomics')
+    comic_src = comic_src.replace('http://phdcomics.com', 'https://usegalaxy.eu/external/phdcomics')
+    comic_src = comic_src.replace('http://www.phdcomics.com', 'https://usegalaxy.eu/external/phdcomics')
     return comic_src
 
 
