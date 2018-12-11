@@ -15,7 +15,7 @@ password_auth = True
 # additional parameters. This command string is re-used for a `docker inspect`
 # command and will likely cause errors if it is extensively modified, past the
 # usual group/sudo changes.
-#command = docker {docker_args}
+command = docker -H tcp://glxdk1:4243 {docker_args}
 
 # The image argument was moved to "allowed_images.yml.sample"
 
@@ -29,7 +29,7 @@ password_auth = True
 
 # The Docker hostname. It can be useful to run the Docker daemon on a different
 # host than Galaxy.
-#docker_hostname = localhost
+docker_hostname = glxdk1
 
 # Try to set the tempdirectory to world execute - this can fix the issue 
 # where 'sudo docker' is not able to mount the folder otherwise.
@@ -49,7 +49,7 @@ password_auth = True
 
 # Set the following value to false if Docker volumes between Galaxy server and Docker
 # container cannot or should not be used.
-#use_volumes = True
+use_volumes = False
 
 # To run containers in Docker Swarm mode on (an existing swarm), set the
 # following option to True *and*:
