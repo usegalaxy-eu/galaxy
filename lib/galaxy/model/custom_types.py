@@ -99,7 +99,10 @@ class JSONType(sqlalchemy.types.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if value is not None:
-            value = json_decoder.decode(unicodify(_sniffnfix_pg9_hex(value)))
+            try:
+                value = json_decoder.decode(unicodify(_sniffnfix_pg9_hex(value)))
+            except ValueError:
+                value = unicodify(_sniffnfix_pg9_hex(value))
         return value
 
     def load_dialect_impl(self, dialect):
