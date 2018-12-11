@@ -1,6 +1,11 @@
 """
 Condor helper utilities.
 """
+
+import logging
+import time
+import random
+
 from subprocess import (
     CalledProcessError,
     check_call,
@@ -17,12 +22,16 @@ DEFAULT_QUERY_CLASSAD = dict(
     notification='NEVER',
 )
 
+log = logging.getLogger(__name__)
+
 PROBLEM_RUNNING_CONDOR_SUBMIT = \
     "Problem encountered while running condor_submit."
 PROBLEM_PARSING_EXTERNAL_ID = \
     "Failed to find job id from condor_submit"
 
 SUBMIT_PARAM_PREFIX = "submit_"
+
+
 
 
 def submission_params(prefix=SUBMIT_PARAM_PREFIX, **kwds):
@@ -68,22 +77,35 @@ def build_submit_description(executable, output, error, user_log, query_params):
     return '\n'.join(submit_description)
 
 
-def condor_submit(submit_file):
+def _condor_submit(submit_file):
     """
     Submit a condor job described by the given file. Parse an external id for
     the submission or return None and a reason for the failure.
     """
     external_id = None
     try:
-        submit = Popen(('condor_submit', submit_file), stdout=PIPE, stderr=STDOUT)
+        submit = Popen(('condor_submit', '-verbose', '-debug', submit_file), stdout=PIPE, stderr=STDOUT)
         message, _ = submit.communicate()
+        log.debug("condor_submit failed: message %s - %s" % (message, submit.returncode))
         if submit.returncode == 0:
             external_id = parse_external_id(message, type='condor')
+            log.debug("condor external id: %s" % external_id)
         else:
-            message = PROBLEM_PARSING_EXTERNAL_ID
+            #message = PROBLEM_PARSING_EXTERNAL_ID
+            log.debug("condor_submit failed (non 0 return code): message %s - %s" % (message, submit.returncode))
     except Exception as e:
         message = str(e)
     return external_id, message
+
+
+def condor_submit(submit_file):
+    for i in range(5):
+        ext_id, message = _condor_submit(submit_file)
+        if ext_id:
+            return ext_id, message
+        log.debug("[%s/5] submit failed, ext_id=%s, sleeping for %s" % (i + 1, ext_id, i))
+        time.sleep(random.randint(i, i * 2))
+    return None, PROBLEM_PARSING_EXTERNAL_ID
 
 
 def condor_stop(external_id):
