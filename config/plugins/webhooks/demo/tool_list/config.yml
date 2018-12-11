@@ -1,7 +1,7 @@
 id: tool_list
 type:
   - masthead
-activate: true
+activate: false
 
 icon: fa-list
 tooltip: Generate tool list
