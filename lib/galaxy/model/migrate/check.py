@@ -33,7 +33,7 @@ def create_or_verify_database(url, galaxy_config_file, engine_options=None, app=
     """
     # Create the base database if it doesn't yet exist.
     engine_options = engine_options or {}
-    new_database = not database_exists(url)
+    new_database = False  # not database_exists(url)
     if new_database:
         template = app and getattr(app.config, "database_template", None)
         encoding = app and getattr(app.config, "database_encoding", None)
