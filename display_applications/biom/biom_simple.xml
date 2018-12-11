@@ -10,6 +10,6 @@
         <url>https://usegalaxy.eu/phinch/index.html?biomURL=${biom_file.url}</url>
         <param type="data" name="biom_file" url="galaxy_${DATASET_HASH}.biom" />
     </link>
-    
+
 </display>
 

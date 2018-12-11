@@ -7,13 +7,13 @@ pages = [
         'title': 'Galactic News',
         'weight': 0.5,
     },
-    {
-        # TODO: need to self-host
-        'src': 'http://teacheng.illinois.edu/SequenceAlignment/',
-        'height': 1000,
-        'title': 'Sequence Alignment: The Game!',
-        'weight': 0.0,
-    },
+    # {
+    #     # TODO: need to self-host
+    #     'src': 'http://teacheng.illinois.edu/SequenceAlignment/',
+    #     'height': 1000,
+    #     'title': 'Sequence Alignment: The Game!',
+    #     'weight': 0.0,
+    # },
     {
         'src': 'https://stats.galaxyproject.eu/dashboard-solo/db/galaxy?refresh=1m&orgId=1&from=now-3h&to=now&panelId=38',
         'height': 1000,
@@ -51,3 +51,4 @@ def weighted_choice(choices):
 
 def main(trans, webhook, params):
     return weighted_choice(weighted_pages)
+
