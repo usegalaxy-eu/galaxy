@@ -132,14 +132,19 @@ class CondorJobRunner(AsynchronousJobRunner):
 
         log.debug("(%s) submitting file %s" % (galaxy_id_tag, executable))
 
-        external_job_id, message = condor_submit(submit_file)
-        if external_job_id is None:
-            log.debug("condor_submit failed for job %s: %s" % (job_wrapper.get_id_tag(), message))
-            if self.app.config.cleanup_job == "always":
-                os.unlink(submit_file)
-                cjs.cleanup()
-            job_wrapper.fail("condor_submit failed", exception=True)
-            return
+        for i in range(5):
+            external_job_id, message = condor_submit(submit_file)
+            if external_job_id is None:
+                log.debug("condor_submit failed for job %s: %s" % (job_wrapper.get_id_tag(), message))
+                time.sleep(i)
+                continue
+
+                if self.app.config.cleanup_job == "always":
+                    os.unlink(submit_file)
+                    cjs.cleanup()
+                job_wrapper.fail("condor_submit failed", exception=True)
+                #return
+            break
 
         os.unlink(submit_file)
 
