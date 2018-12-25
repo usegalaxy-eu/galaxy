@@ -347,6 +347,7 @@ def populate_api_routes(webapp, app):
     webapp.mapper.resource_with_deleted('history', 'histories', path_prefix='/api')
     webapp.mapper.connect('/api/histories/{history_id}/citations', action='citations', controller="histories")
     webapp.mapper.connect('/api/histories/{id}/sharing', action='sharing', controller="histories", conditions=dict(method=["GET", "POST"]))
+    webapp.mapper.connect('/api/workflows/get_tool_predictions', action='get_tool_predictions', controller="workflows", conditions=dict(method=["POST"]))
     webapp.mapper.connect(
         'dynamic_tool_confs',
         '/api/configuration/dynamic_tool_confs',

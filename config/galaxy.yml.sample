@@ -1763,6 +1763,9 @@ galaxy:
   # persistent_communication_rooms is a comma-separated list of rooms
   # that should be always available.
   #persistent_communication_rooms: null
+  
+  # Galaxy tool recommendation settings
+  #enable_tool_recommendation: false
 
   # Allow disabling pbkdf2 hashing of passwords for legacy situations.
   # This should normally be left enabled unless there is a specific

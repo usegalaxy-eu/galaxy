@@ -59,6 +59,7 @@ class ConfigSerializer(base.ModelSerializer):
             'communication_server_port'         : _defaults_to(None),
             'communication_server_host'         : _defaults_to(None),
             'persistent_communication_rooms'    : _defaults_to(None),
+            'enable_tool_recommendation'        : _defaults_to(False),
             'allow_user_impersonation'          : _defaults_to(False),
             'allow_user_creation'               : _defaults_to(False),
             'use_remote_user'                   : _defaults_to(None),

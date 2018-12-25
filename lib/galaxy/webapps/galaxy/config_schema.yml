@@ -2728,6 +2728,13 @@ mapping:
         desc: |
           persistent_communication_rooms is a comma-separated list of rooms that should be always available.
 
+      enable_tool_recommendation:
+        type: bool
+        default: false
+        required: false
+        desc: |
+          Galaxy tool recommendation settings.
+
       use_pbkdf2:
         type: bool
         default: true

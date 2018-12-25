@@ -8,6 +8,7 @@ import Node from "mvc/workflow/workflow-node";
 import WorkflowIcons from "mvc/workflow/workflow-icons";
 import FormWrappers from "mvc/workflow/workflow-forms";
 import Ui from "mvc/ui/ui-misc";
+import Modal from "mvc/ui/ui-modal";
 import async_save_text from "utils/async-save-text";
 import "ui/editable-text";
 
@@ -799,6 +800,108 @@ export default Backbone.View.extend({
         parent = this.ext_to_type[parent];
         return this.type_to_type[child] && parent in this.type_to_type[child];
     },
+    
+        get_workflow_path: function(wf_steps, current_node_id, current_node_name) {
+        let steps = {};
+        let step_names = {};
+        for (let stp_idx in wf_steps.steps) {
+            let step = wf_steps.steps[stp_idx];
+            let input_connections = step.input_connections;
+            step_names[step.id] = this.getToolId(step.content_id);
+            for (let ic_idx in input_connections) {
+                let ic = input_connections[ic_idx];
+                if(ic !== null && ic !== undefined) {
+                    let prev_conn = [];
+                    for (let conn of ic) {
+                        prev_conn.push(conn.id.toString());
+                    }
+                    steps[step.id.toString()] = prev_conn;
+                }
+            }
+        }
+        // recursive call to determine path
+        function read_paths(node_id, ph) {
+            for (let st in steps) {
+                if (parseInt(st) === parseInt(node_id)) {
+                    let parent_id = parseInt(steps[st][0]);
+                    if (parent_id !== undefined && parent_id !== null) {
+                        ph.push(parent_id);
+                        if (steps[parent_id] !== undefined && steps[parent_id] !== null) {
+                            read_paths(parent_id, ph);
+                        }
+                    }
+                }
+            }
+            return ph;
+        }
+        let ph = [];
+        let step_names_list = [];
+        ph.push(current_node_id);
+        ph = read_paths(current_node_id, ph);
+        for (let s_idx of ph) {
+            let s_name = step_names[s_idx.toString()];
+            if (s_name !== undefined && s_name !== null) {
+                step_names_list.push(s_name);
+            }
+        }
+        return step_names_list.join(",");
+    },
+    
+    getToolId: function(toolId) {
+        if (toolId !== undefined && toolId.indexOf("/") > -1) {
+            let toolIdSlash = toolId.split("/");
+            toolId = toolIdSlash[toolIdSlash.length - 2];
+        }
+        return toolId;
+    },
+    
+    getToolRecommendations: function(node, toolId) {
+        let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId);
+        // remove ui-modal if present
+        let $modal = $(".modal-tool-recommendation");
+        if ($modal.length > 0) {
+            $modal.remove();
+        }
+        // create new modal
+        let modal = new Modal.View({
+            title: "Recommended tools for '" + node.name + "'",
+            body: "<div> Loading tools ... </div>",
+            height: "200",
+            width: "300",
+            closing_events: true,
+            title_separator: true          
+        });
+        modal.$el.addClass("modal-tool-recommendation");
+        modal.show();
+        // fetch recommended tools
+        Utils.request({
+            type: "POST",
+            url: `${Galaxy.root}api/workflows/get_tool_predictions`,
+            data: {"tool_sequence": tool_sequence},
+            success: function(data) {
+                let predTemplate = "<div>";
+                let predicted_data = data.predicted_data;
+                let predicted_data_children = predicted_data.children;
+                if (predicted_data_children.length > 0) {
+                    predTemplate += "<ul>";            
+                    for (const [index, name_obj] of predicted_data_children.entries()) {
+                        predTemplate += "<li><a href='#' class='pred-tool panel-header-button' id="+ name_obj["tool_id"] +">" + name_obj["name"];
+                        predTemplate += "</a></li>";
+                    }
+                    predTemplate += "</ul>";
+                }
+                else {
+                    predTemplate += "No tool recommendations"; 
+                }
+                predTemplate += "</div>";
+                modal.$body.html(predTemplate);
+                $(".pred-tool").click(e => {
+                    workflow_globals.app.add_node_for_tool(e.target.id, e.target.id);
+                    modal.hide();
+                });
+            }
+        });
+    },
 
     prebuildNode: function(type, title_text, content_id) {
         var self = this;
@@ -825,6 +928,20 @@ export default Backbone.View.extend({
                     .addClass("fa-icon-button fa fa-files-o node-clone")
                     .click(e => {
                         node.clone();
+                    })
+            );
+        }
+        let enable_tool_recommendation = window.Galaxy.config.enable_tool_recommendation;
+        if (node.content_id !== undefined && (enable_tool_recommendation === true || enable_tool_recommendation === 'true')) {
+            let toolId = self.getToolId(node.content_id);
+            buttons.append(
+                $("<a/>")
+                    .addClass("panel-header-button")
+                    .attr('href', '#')
+                    .attr('title', 'Show recommended tools')
+                    .html('<span class="fa-icon-button fa fa-arrow-right"></span>')
+                    .click(e => {
+                        self.getToolRecommendations(node, toolId);
                     })
             );
         }

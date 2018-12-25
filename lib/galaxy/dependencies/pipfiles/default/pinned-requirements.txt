@@ -64,6 +64,7 @@ jmespath==0.9.3
 jsonpatch==1.23; python_version != '3.3.*'
 jsonpointer==2.0; python_version != '3.3.*'
 jsonschema==2.6.0
+keras==2.2.4
 keystoneauth1==3.10.0
 kombu==4.2.1
 mako==1.0.7
@@ -145,6 +146,7 @@ subprocess32==3.5.2; python_version < '3.0'
 svgwrite==1.1.12
 tempita==0.5.2
 tenacity==4.12.0; python_version >= '2.6'
+tensorflow==1.10.0
 typing==3.6.6; python_version < '3.5'
 tzlocal==1.5.1
 unicodecsv==0.14.1; python_version < '3.0'
