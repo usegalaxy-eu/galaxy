@@ -879,7 +879,7 @@ export default Backbone.View.extend({
             type: "POST",
             url: `${Galaxy.root}api/workflows/get_tool_predictions`,
             data: {"tool_sequence": tool_sequence},
-            success: function(data) {
+            success: data => {
                 let predTemplate = "<div>";
                 if (data !== null && data.predicted_data.children.length > 0) {
                     let recommended_tools = data.predicted_data.children;
