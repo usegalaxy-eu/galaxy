@@ -563,39 +563,37 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         POST /api/workflows/get_tool_predictions
         Fetch predicted tools for a workflow
         """
-        trained_model_path = "https://github.com/anuprulez/download_store/blob/tool_recommendation_model/tool_recommendation_model/trained_model.hdf5?raw=true"
+        trained_model_path = trans.app.config.model_path
         tool_sequence = payload.get('tool_sequence', "")
-        r = requests.get(trained_model_path)
-        tmp_file_path = "/tmp/trained_model.hdf5"
-        if os.path.exists(tmp_file_path):
-            hf_file = h5py.File(tmp_file_path, 'r')
-        else:
-            with open(tmp_file_path, 'wb') as fl:
-                fl.write(r.content)
-            hf_file = h5py.File(tmp_file_path, 'r')
-        toolbx = trans.app.toolbox.to_dict(trans, in_panel=True)
-        all_tools = dict()
-        for category in toolbx:
-            if 'elems' in category:
-                for item in category['elems']:
-                    if "name" in item and "id" in item:
-                        all_tools[item["id"]] = item["name"]
-        if 'tool_sequence' not in payload:
+        if 'tool_sequence' not in payload or trained_model_path is None:
             return
         else:
+            r_file = requests.get(trained_model_path)
+            model_save_path = os.path.join(os.getcwd(), "database/trained_model.hdf5")
+            if not os.path.exists(model_save_path):
+                with open(model_save_path, 'wb') as fl:
+                    fl.write(r_file.content)
+            m_file = h5py.File(model_save_path, 'r')
+            toolbx = trans.app.toolbox.to_dict(trans, in_panel=True)
+            all_tools = dict()
+            for category in toolbx:
+                if 'elems' in category:
+                    for item in category['elems']:
+                        if "name" in item and "id" in item:
+                            all_tools[item["id"]] = item["name"]
             K.clear_session()
             # retrieve all datasets for creating model and prediction
-            model_config = json.loads(hf_file.get('model_config').value)
-            dictionary = json.loads(hf_file.get('data_dictionary').value)
+            model_config = json.loads(m_file.get('model_config').value)
+            dictionary = json.loads(m_file.get('data_dictionary').value)
             reverse_dictionary = dict((v,k) for k,v in dictionary.items())
-            compatibile_tools = json.loads(hf_file.get('compatible_tools').value)
+            compatibile_tools = json.loads(m_file.get('compatible_tools').value)
             loaded_model = model_from_json(model_config)
             model_weights = list()
             weight_ctr = 0
             while True:
                 try:
                     d_key = "weight_" + str(weight_ctr)
-                    weights = hf_file.get(d_key).value
+                    weights = m_file.get(d_key).value
                     model_weights.append(weights)
                     weight_ctr += 1
                 except Exception as exception:

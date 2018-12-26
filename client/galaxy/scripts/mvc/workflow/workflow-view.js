@@ -801,7 +801,7 @@ export default Backbone.View.extend({
         return this.type_to_type[child] && parent in this.type_to_type[child];
     },
     
-        get_workflow_path: function(wf_steps, current_node_id, current_node_name) {
+    get_workflow_path: function(wf_steps, current_node_id, current_node_name) {
         let steps = {};
         let step_names = {};
         for (let stp_idx in wf_steps.steps) {
@@ -856,7 +856,6 @@ export default Backbone.View.extend({
     },
     
     getToolRecommendations: function(node, toolId) {
-        let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId);
         // remove ui-modal if present
         let $modal = $(".modal-tool-recommendation");
         if ($modal.length > 0) {
@@ -873,6 +872,8 @@ export default Backbone.View.extend({
         });
         modal.$el.addClass("modal-tool-recommendation");
         modal.show();
+        
+        let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId);
         // fetch recommended tools
         Utils.request({
             type: "POST",
@@ -880,22 +881,20 @@ export default Backbone.View.extend({
             data: {"tool_sequence": tool_sequence},
             success: function(data) {
                 let predTemplate = "<div>";
-                let predicted_data = data.predicted_data;
-                let predicted_data_children = predicted_data.children;
-                if (predicted_data_children.length > 0) {
+                if (data !== null && data.predicted_data.children.length > 0) {
+                    let recommended_tools = data.predicted_data.children;
                     predTemplate += "<ul>";            
-                    for (const [index, name_obj] of predicted_data_children.entries()) {
-                        predTemplate += "<li><a href='#' class='pred-tool panel-header-button' id="+ name_obj["tool_id"] +">" + name_obj["name"];
-                        predTemplate += "</a></li>";
+                    for (const [index, name_obj] of recommended_tools.entries()) {
+                        predTemplate += "<li><a href='#' class='tool-link' id="+ name_obj["tool_id"] +">" + name_obj["name"] + "</a></li>";
                     }
                     predTemplate += "</ul>";
                 }
                 else {
-                    predTemplate += "No tool recommendations"; 
+                    predTemplate += "No tool recommendations";
                 }
                 predTemplate += "</div>";
                 modal.$body.html(predTemplate);
-                $(".pred-tool").click(e => {
+                modal.$body.find('a').click(e => {
                     workflow_globals.app.add_node_for_tool(e.target.id, e.target.id);
                     modal.hide();
                 });
