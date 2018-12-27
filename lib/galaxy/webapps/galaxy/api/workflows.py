@@ -665,13 +665,15 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                         c_dict["tool_id"] = t_id
                         break
                 prediction_data["children"].append(c_dict)
-            if len(tool_sequence) == 1:
-                r_name = prediction_data["name"]
+            r_name = prediction_data["name"].split(",")
+            full_name = list()
+            for seq_id in r_name:
+                # get tool name
                 for t_id in all_tools:
-                    # get tool name
-                    if t_id.find(r_name) > -1:
-                        prediction_data["name"] = all_tools[t_id]
+                    if t_id.find(seq_id) > -1:
+                        full_name.append(all_tools[t_id])
                         break
+            prediction_data["name"] = ",".join(full_name)
             return prediction_data
 
         except Exception as exp:

@@ -872,9 +872,8 @@ export default Backbone.View.extend({
         });
         modal.$el.addClass("modal-tool-recommendation");
         modal.show();
-        
-        let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId);
         // fetch recommended tools
+        let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId);
         Utils.request({
             type: "POST",
             url: `${Galaxy.root}api/workflows/get_tool_predictions`,
@@ -885,14 +884,14 @@ export default Backbone.View.extend({
                     let recommended_tools = data.predicted_data.children;
                     predTemplate += "<ul>";            
                     for (const [index, name_obj] of recommended_tools.entries()) {
-                        predTemplate += "<li><a href='#' class='tool-link' id="+ name_obj["tool_id"] +">" + name_obj["name"] + "</a></li>";
+                        predTemplate += "<li><a href='#' class='tool-link' id="+ name_obj["tool_id"] + ">" + name_obj["name"] + "</a></li>";
                     }
                     predTemplate += "</ul>";
                 }
                 else {
                     predTemplate += "No tool recommendations";
                 }
-                predTemplate += "</div>";
+                predTemplate += "</div>";            
                 modal.$body.html(predTemplate);
                 modal.$body.find('a').click(e => {
                     workflow_globals.app.add_node_for_tool(e.target.id, e.target.id);
