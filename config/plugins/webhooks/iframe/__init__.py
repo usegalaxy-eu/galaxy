@@ -51,4 +51,3 @@ def weighted_choice(choices):
 
 def main(trans, webhook, params):
     return weighted_choice(weighted_pages)
-
