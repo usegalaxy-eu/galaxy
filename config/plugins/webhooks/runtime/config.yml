@@ -1,4 +1,4 @@
 id: runtime
 type:
   - tool
-activate: true
+activate: false
