@@ -4,7 +4,7 @@ import random
 def main(trans, webhook, params):
     return random.choice([
         {
-            'src': 'https://usegalaxy-eu.github.io/galaxy/gxnews/',
+            'src': 'https://usegalaxy-eu.github.io/galaxy/news.html',
             'height': 1000,
             'title': 'Galactic News',
         },
@@ -14,7 +14,7 @@ def main(trans, webhook, params):
             'title': 'Galaxy Queue (past 3 hours)',
         },
         {
-            'src': 'https://usegalaxy-eu.github.io/galaxy/gxevents/',
+            'src': 'https://usegalaxy-eu.github.io/galaxy/events.html',
             'height': 1000,
             'title': 'Upcoming Events',
         }
