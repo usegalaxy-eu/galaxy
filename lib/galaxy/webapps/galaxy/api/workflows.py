@@ -556,7 +556,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             'config_form'       : module.get_config_form(),
             'post_job_actions'  : module.get_post_job_actions(inputs)
         }
-        
+
     @expose_api
     def get_tool_predictions(self, trans, topk=10, max_seq_len=25, payload={}):
         """
@@ -577,7 +577,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         trained_model = h5py.File(model_path, 'r')
         model_config = json.loads(trained_model.get('model_config').value)
         dictionary = json.loads(trained_model.get('data_dictionary').value)
-        reverse_dictionary = dict((v,k) for k,v in dictionary.items())
+        reverse_dictionary = dict((v, k) for k, v in dictionary.items())
         compatibile_tools = json.loads(trained_model.get('compatible_tools').value)
         loaded_model = model_from_json(model_config)
         model_weights = list()
@@ -610,7 +610,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
     #
     # -- Helper methods --
     #
-    
+
     def __compute_tool_prediction(self, tool_sequence, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatible_tools, all_tools=None):
         prediction_data = dict()
         prediction_data["name"] = ",".join(tool_sequence)
@@ -652,7 +652,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 c_dict["tool_id"] = child
                 for t_id in all_tools:
                     # update the name and tool id if it is installed in Galaxy
-                    if t_id.find(child) > -1: 
+                    if t_id.find(child) > -1:
                         c_dict["name"] = all_tools[t_id]
                         c_dict["tool_id"] = t_id
                         break
@@ -670,7 +670,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
 
         except Exception as exp:
             return prediction_data
-    
+
     def __api_import_from_archive(self, trans, archive_data, source=None):
         try:
             data = json.loads(archive_data)
