@@ -1769,7 +1769,7 @@ galaxy:
   
   # Trained model (HDF5 file) path for tool recommendation.
   # It is required to be set if 'enable_tool_recommendation' property is enabled and set to true.
-  #model_path: 'https://github.com/anuprulez/download_store/blob/tool_recommendation_model/tool_recommendation_model/trained_model.hdf5?raw=true'
+  #model_path: 'database/trained_model.hdf5'
 
   # Allow disabling pbkdf2 hashing of passwords for legacy situations.
   # This should normally be left enabled unless there is a specific
