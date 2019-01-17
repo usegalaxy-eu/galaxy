@@ -567,53 +567,45 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         tool_sequence = payload.get('tool_sequence', "")
         if 'tool_sequence' not in payload or trained_model_path is None:
             return
-        else:
-            r_file = requests.get(trained_model_path)
-            model_save_path = os.path.join(os.getcwd(), "database/trained_model.hdf5")
-            if not os.path.exists(model_save_path):
-                with open(model_save_path, 'wb') as fl:
-                    fl.write(r_file.content)
-            m_file = h5py.File(model_save_path, 'r')
-            toolbx = trans.app.toolbox.to_dict(trans, in_panel=True)
-            all_tools = dict()
-            for category in toolbx:
-                if 'elems' in category:
-                    for item in category['elems']:
-                        if "name" in item and "id" in item:
-                            all_tools[item["id"]] = item["name"]
-            K.clear_session()
-            # retrieve all datasets for creating model and prediction
-            model_config = json.loads(m_file.get('model_config').value)
-            dictionary = json.loads(m_file.get('data_dictionary').value)
-            reverse_dictionary = dict((v,k) for k,v in dictionary.items())
-            compatibile_tools = json.loads(m_file.get('compatible_tools').value)
-            loaded_model = model_from_json(model_config)
-            model_weights = list()
-            weight_ctr = 0
-            while True:
-                try:
-                    d_key = "weight_" + str(weight_ctr)
-                    weights = m_file.get(d_key).value
-                    model_weights.append(weights)
-                    weight_ctr += 1
-                except Exception as exception:
-                    break
-            # set the model weights
-            loaded_model.set_weights(model_weights)
-            tool_sequence = tool_sequence.split(",")
-            tool_sequence = list(reversed(tool_sequence))
-            recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatibile_tools, all_tools)
-            # get more robust predictions
-            if len(tool_sequence) > 1:
-                lst_tool = [tool_sequence[-1]]
-                last_pred_tools = self.__compute_tool_prediction(lst_tool, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatibile_tools, all_tools)
-                recommended_tools["children"].extend(last_pred_tools["children"])
-                recommended_tools["children"] = recommended_tools["children"][:topk]
-                recommended_tools["children"] = [dict(t) for t in {tuple(d.items()) for d in recommended_tools["children"]}]
-            return {
-                "current_tool": tool_sequence,
-                "predicted_data": recommended_tools
-            }
+        model_path = os.path.join(os.getcwd(), trained_model_path)
+        all_tools = dict()
+        # collect ids and names of all the installed tools
+        for tool_id, tool in trans.app.toolbox.tools():
+            all_tools[tool_id] = tool.name
+        K.clear_session()
+        # retrieve all datasets for re-creating the trained model and making predictions
+        trained_model = h5py.File(model_path, 'r')
+        model_config = json.loads(trained_model.get('model_config').value)
+        dictionary = json.loads(trained_model.get('data_dictionary').value)
+        reverse_dictionary = dict((v,k) for k,v in dictionary.items())
+        compatibile_tools = json.loads(trained_model.get('compatible_tools').value)
+        loaded_model = model_from_json(model_config)
+        model_weights = list()
+        weight_ctr = 0
+        while True:
+            try:
+                d_key = "weight_" + str(weight_ctr)
+                weights = trained_model.get(d_key).value
+                model_weights.append(weights)
+                weight_ctr += 1
+            except Exception as exception:
+                break
+        # set the model weights
+        loaded_model.set_weights(model_weights)
+        tool_sequence = tool_sequence.split(",")
+        tool_sequence = list(reversed(tool_sequence))
+        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatibile_tools, all_tools)
+        # get more robust predictions
+        if len(tool_sequence) > 1:
+            lst_tool = [tool_sequence[-1]]
+            last_pred_tools = self.__compute_tool_prediction(lst_tool, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatibile_tools, all_tools)
+            recommended_tools["children"].extend(last_pred_tools["children"])
+            recommended_tools["children"] = recommended_tools["children"][:topk]
+            recommended_tools["children"] = [dict(t) for t in {tuple(d.items()) for d in recommended_tools["children"]}]
+        return {
+            "current_tool": tool_sequence,
+            "predicted_data": recommended_tools
+        }
 
     #
     # -- Helper methods --
