@@ -15,7 +15,6 @@ from sqlalchemy.orm import joinedload
 import numpy as np
 import h5py
 from keras.models import model_from_json
-from keras import backend as K
 
 from galaxy import (
     exceptions,
@@ -52,6 +51,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.history_manager = histories.HistoryManager(app)
         self.workflow_manager = workflows.WorkflowsManager(app)
         self.workflow_contents_manager = workflows.WorkflowContentsManager(app)
+        self.loaded_model = None
 
     def __get_full_shed_url(self, url):
         for name, shed_url in self.app.tool_shed_registry.tool_sheds.items():
@@ -572,14 +572,14 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         # collect ids and names of all the installed tools
         for tool_id, tool in trans.app.toolbox.tools():
             all_tools[tool_id] = tool.name
-        K.clear_session()
         # retrieve all datasets for re-creating the trained model and making predictions
         trained_model = h5py.File(model_path, 'r')
         model_config = json.loads(trained_model.get('model_config').value)
+        if self.loaded_model is None:
+            self.loaded_model = model_from_json(model_config)
         dictionary = json.loads(trained_model.get('data_dictionary').value)
-        reverse_dictionary = dict((v, k) for k, v in dictionary.items())
         compatibile_tools = json.loads(trained_model.get('compatible_tools').value)
-        loaded_model = model_from_json(model_config)
+        reverse_dictionary = dict((v, k) for k, v in dictionary.items())
         model_weights = list()
         weight_ctr = 0
         while True:
@@ -591,14 +591,14 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             except Exception as exception:
                 break
         # set the model weights
-        loaded_model.set_weights(model_weights)
+        self.loaded_model.set_weights(model_weights)
         tool_sequence = tool_sequence.split(",")
         tool_sequence = list(reversed(tool_sequence))
-        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatibile_tools, all_tools)
+        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, max_seq_len, dictionary, reverse_dictionary, compatibile_tools, all_tools)
         # get more robust predictions
         if len(tool_sequence) > 1:
             lst_tool = [tool_sequence[-1]]
-            last_pred_tools = self.__compute_tool_prediction(lst_tool, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatibile_tools, all_tools)
+            last_pred_tools = self.__compute_tool_prediction(lst_tool, topk, max_seq_len, dictionary, reverse_dictionary, compatibile_tools, all_tools)
             recommended_tools["children"].extend(last_pred_tools["children"])
             recommended_tools["children"] = recommended_tools["children"][:topk]
             recommended_tools["children"] = [dict(t) for t in {tuple(d.items()) for d in recommended_tools["children"]}]
@@ -611,7 +611,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
     # -- Helper methods --
     #
 
-    def __compute_tool_prediction(self, tool_sequence, topk, max_seq_len, loaded_model, dictionary, reverse_dictionary, compatible_tools, all_tools=None):
+    def __compute_tool_prediction(self, tool_sequence, topk, max_seq_len, dictionary, reverse_dictionary, compatible_tools, all_tools=None):
         prediction_data = dict()
         prediction_data["name"] = ",".join(tool_sequence)
         prediction_data["children"] = list()
@@ -628,7 +628,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             sample = np.reshape(sample, (1, max_seq_len))
 
             # predict next tools for a test path
-            prediction = loaded_model.predict(sample, verbose=0)
+            prediction = self.loaded_model.predict(sample, verbose=0)
             prediction = np.reshape(prediction, (prediction.shape[1],))
             prediction_pos = np.argsort(prediction, axis=-1)
 
