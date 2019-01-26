@@ -43,12 +43,12 @@ from sqlalchemy.schema import UniqueConstraint
 
 import galaxy.model.metadata
 import galaxy.model.orm.now
+import galaxy.security
 import galaxy.security.passwords
 import galaxy.util
 from galaxy.managers import tags
 from galaxy.model.item_attrs import UsesAnnotations
 from galaxy.model.util import pgcalc
-from galaxy.security import get_permitted_actions
 from galaxy.util import (directory_hash_id, ready_name_for_url,
                          unicodify, unique_id)
 from galaxy.util.bunch import Bunch
@@ -1957,7 +1957,7 @@ class Dataset(StorableObject, RepresentById):
                                 ERROR="error",
                                 OK="ok")
 
-    permitted_actions = get_permitted_actions(filter='DATASET')
+    permitted_actions = galaxy.security.get_permitted_actions(filter='DATASET')
     file_path = "/tmp/"
     object_store = None  # This get initialized in mapping.py (method init) by app.py
     engine = None
@@ -2879,7 +2879,7 @@ class HistoryDatasetAssociationSubset(RepresentById):
 
 
 class Library(Dictifiable, HasName, RepresentById):
-    permitted_actions = get_permitted_actions(filter='LIBRARY')
+    permitted_actions = galaxy.security.get_permitted_actions(filter='LIBRARY')
     dict_collection_visible_keys = ['id', 'name']
     dict_element_visible_keys = ['id', 'deleted', 'name', 'description', 'synopsis', 'root_folder_id', 'create_time']
 
