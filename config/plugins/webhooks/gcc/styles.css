@@ -13,20 +13,20 @@
 
 #iframe-name {
     color: #fff;
-    padding-bottom: 10px;
     padding-left: 30px;
     font-size: 28px;
     float: left;
 }
 
 #vote-button {
-    padding-left: 30px;
-    float: left;
+    padding-right: 30px;
+    float: right;
 }
 
 #vote-button a {
     font-size: 18px;
-    color: #ff8;
+    color: #b1e7b1;
+    text-decoration: none;
 }
 
 .clearfix{

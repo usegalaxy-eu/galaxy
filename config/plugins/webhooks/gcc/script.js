@@ -12,7 +12,7 @@ $(document).ready(function() {
 		iframeTemplate: _.template(
 			'<div id="iframe-header">' +
 				'<div id="iframe-name"><%= title %></div>' +
-				'<div id="vote-button"><a href="https://goo.gl/forms/lcPoMt4iZ8hwcdM12?refresh=1m&orgId=1&from=now-3h&to=now&panelId=38">Vote for your favorite training topic NOW!</a></div>' +
+				'<div id="vote-button"><a href="https://goo.gl/forms/lcPoMt4iZ8hwcdM12?refresh=1m&orgId=1&from=now-3h&to=now&panelId=38">Vote for your favorite trainings <em>HERE & NOW</em>!</a></div>' +
 				'<div class="clearfix"></div>' +
 			'</div>' +
 			'<iframe id="webhook-iframe" src="<%= src %>" style="width: 100%; height: <%= height %>px; border: none;">'
