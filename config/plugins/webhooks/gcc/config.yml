@@ -1,0 +1,5 @@
+id: gcc
+type:
+  - tool
+  - workflow
+activate: true
