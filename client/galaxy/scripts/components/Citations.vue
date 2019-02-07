@@ -43,8 +43,18 @@
         </pre>
     </b-card>
     <div v-else-if="citations.length">
-      <h5>Citations</h5>
-      <p v-html="formattedReferences"></p>
+      <b-btn
+        v-b-toggle="id"
+        variant="primary"
+      >Citations</b-btn>
+      <b-collapse
+        :id="id"
+        class="mt-2"
+      >
+        <b-card>
+          <p v-html="formattedReferences"></p>
+        </b-card>
+      </b-collapse>
     </div>
   </div>
 </template>
@@ -85,7 +95,8 @@ export default {
         return {
             citations: [],
             content: "",
-            errors: []
+            errors: [],
+            showCollapse: false
         };
     },
     computed: {
