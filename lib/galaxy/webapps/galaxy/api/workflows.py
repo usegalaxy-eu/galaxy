@@ -567,7 +567,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         tool_sequence = payload.get('tool_sequence', "")
         if 'tool_sequence' not in payload or trained_model_path is None:
             return
-        model_path = os.path.join(os.getcwd(), trained_model_path)
+        model_path = trained_model_path if trained_model_path.startswith('/') else os.path.join(os.getcwd(), trained_model_path)
         all_tools = dict()
         # collect ids and names of all the installed tools
         for tool_id, tool in trans.app.toolbox.tools():
