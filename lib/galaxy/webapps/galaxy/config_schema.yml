@@ -2728,6 +2728,21 @@ mapping:
         desc: |
           persistent_communication_rooms is a comma-separated list of rooms that should be always available.
 
+      enable_tool_recommendation:
+        type: bool
+        default: false
+        required: false
+        desc: |
+          Galaxy tool recommendation settings.
+          
+      model_path:
+        type: str
+        default: "database/trained_model.hdf5"
+        required: false
+        desc: |
+          Trained model (HDF5 file) path for tool recommendation.
+          It is required to be set if 'enable_tool_recommendation' property is set to true.
+
       use_pbkdf2:
         type: bool
         default: true

@@ -5,6 +5,7 @@ import Ui from "mvc/ui/ui-misc";
 import Modal from "mvc/ui/ui-modal";
 import ToolFormBase from "mvc/tool/tool-form-base";
 import Webhooks from "mvc/webhooks";
+import ToolRecommendation from "mvc/tool-recommendation";
 var View = Backbone.View.extend({
     initialize: function(options) {
         var self = this;
@@ -222,6 +223,14 @@ var View = Backbone.View.extend({
                 callback && callback();
                 self.$el.children().hide();
                 self.$el.append(self._templateSuccess(response, job_def));
+                let enable_tool_recommendation = window.Galaxy.config.enable_tool_recommendation;
+                if (enable_tool_recommendation === true || enable_tool_recommendation === 'true') {
+                    // show tool recommendations
+                    self.$el.append($("<div/>", { id: "tool-recommendation-view" }));
+                    var toolRecommendation = new ToolRecommendation.ToolRecommendationView({
+                        toolId: job_def.tool_id
+                    });
+                }
                 // Show Webhook if job is running
                 if (response.jobs && response.jobs.length > 0) {
                     self.$el.append($("<div/>", { id: "webhook-view" }));
