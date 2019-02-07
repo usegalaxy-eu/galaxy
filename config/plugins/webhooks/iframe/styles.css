@@ -13,39 +13,22 @@
 
 #iframe-name {
     color: #fff;
-    padding-bottom: 10px;
+    padding-left: 30px;
+    font-size: 28px;
+    float: left;
 }
 
-#iframe-header button {
-    color: #fff;
-    font-size: 14px;
-    background-color: #768fa5;
-    border: none;
-    border-radius: 7px;
-    box-shadow: 0 5px #5c768c;
-    padding: 5px 10px;
+#announcement {
+    padding-right: 30px;
+    float: right;
 }
 
-#iframe-header button:focus {
-    outline: 0;
+#announcement a {
+    font-size: 18px;
+    color: #b1e7b1;
+    text-decoration: none;
 }
 
-#iframe-header button:hover {
-    background-color: #67839b;
-}
-
-#iframe-header button:active {
-    background-color: #67839b;
-    box-shadow: 0 0 #5c768c;
-    transform: translateY(5px);
-}
-
-#iframe-img {
-    background: #fff;
-}
-
-#iframe-img img {
-    padding: 10px;
-    max-width: 100%;
-    margin-bottom: -4px;
+.clearfix{
+    clear: both;
 }
