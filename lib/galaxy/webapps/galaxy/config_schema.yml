@@ -2737,7 +2737,7 @@ mapping:
           
       model_path:
         type: str
-        default: "https://github.com/anuprulez/download_store/blob/tool_recommendation_model/tool_recommendation_model/trained_model.hdf5?raw=true"
+        default: "database/trained_model.hdf5"
         required: false
         desc: |
           Trained model (HDF5 file) path for tool recommendation.
