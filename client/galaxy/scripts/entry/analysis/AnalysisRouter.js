@@ -219,6 +219,8 @@ export const getAnalysisRouter = Galaxy =>
         },
 
         show_tools_view: function() {
+            this.page.panels.left.hide();
+            this.page.panels.right.hide();
             this._display_vue_helper(ToolsView);
         },
 
