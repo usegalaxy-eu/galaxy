@@ -9,7 +9,6 @@ import socket
 from datetime import datetime
 
 import six
-import yaml
 from markupsafe import escape
 from sqlalchemy import (
     and_,
@@ -279,15 +278,7 @@ class UserAPIController(BaseAPIController, UsesTagsMixin, CreatesUsersMixin, Cre
         Reads the file user_preferences_extra_conf.yml to display
         admin defined user informations
         """
-        path = trans.app.config.user_preferences_extra_config_file
-        try:
-            with open(path, 'r') as stream:
-                config = yaml.safe_load(stream)
-        except Exception:
-            log.warning('Config file (%s) could not be found or is malformed.' % path)
-            return {}
-
-        return config['preferences'] if config else {}
+        return trans.app.config.user_preferences_extra['preferences']
 
     def _build_extra_user_pref_inputs(self, preferences, user):
         """
