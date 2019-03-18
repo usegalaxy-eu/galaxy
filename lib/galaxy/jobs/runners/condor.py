@@ -12,6 +12,7 @@ it at this time.
 """
 import logging
 import os
+import time
 
 from galaxy import model
 from galaxy.jobs.runners import (
