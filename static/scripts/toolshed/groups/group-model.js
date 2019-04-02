@@ -1,0 +1,1 @@
+define(["exports","backbone","onload/loadConfig"],function(e,o,t){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var l,u=(l=o)&&l.__esModule?l:{default:l};var a=u.default.Model.extend({urlRoot:"".concat((0,t.getAppRoot)(),"api/groups")}),d=u.default.Collection.extend({url:"".concat((0,t.getAppRoot)(),"api/groups"),model:a});e.default={Group:a,Groups:d}});

@@ -1,0 +1,1 @@
+define(["exports"],function(e){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.serverPath=function(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:window.location.href;return new URL(e).pathname}});

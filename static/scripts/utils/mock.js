@@ -1,0 +1,1 @@
+define(["exports"],function(e){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var t=function(){return null};e.mock=function(n){return Object.keys(n).filter(function(e){return"function"==typeof n[e]}).reduce(function(e,n){return e[n]=t,e},{})}});

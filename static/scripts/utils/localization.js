@@ -1,0 +1,1 @@
+define([],function(){"use strict";define(["i18n!nls/locale"],function(o){o.hasOwnProperty("__root")&&(locale=sessionStorage.getItem("currentLocale"),locale&&(o=o["__"+locale]||o["__"+locale.split("-")[0]]||o.__root));var e=function(e){return o[e]||e};return e.cacheNonLocalized=!1,e})});
