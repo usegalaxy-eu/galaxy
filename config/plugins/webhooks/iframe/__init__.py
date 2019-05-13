@@ -13,7 +13,7 @@ pages = [
         'weight': 0.5,
     },
     {
-        'src': 'https://stats.usegalaxy.eu/dashboard-solo/db/galaxy?refresh=1m&orgId=1&from=now-3h&to=now&panelId=38',
+        'src': 'https://stats.galaxyproject.eu/dashboard-solo/db/galaxy?refresh=1m&orgId=1&from=now-3h&to=now&panelId=38',
         'height': 1000,
         'title': 'Galaxy Queue (past 3 hours)',
         'weight': 0.5,
@@ -28,14 +28,14 @@ pages = [
         'src': 'https://galaxyproject.org/events/gcc2019/',
         'height': 1000,
         'title': 'Galaxy Community Conference 2019 - Freiburg, Germany',
-        'announcement': gcc_announcement,
+        # 'announcement': gcc_announcement,
         'weight': 1,
     },
     {
         'src': 'https://galaxyproject.org/events/gcc2019/training/#training-at-gcc2019',
         'height': 1000,
         'title': 'Galaxy Community Conference 2019 - Training Topics',
-        'announcement': gcc_announcement,
+        # 'announcement': gcc_announcement,
         'weight': 1,
     }
 ]
