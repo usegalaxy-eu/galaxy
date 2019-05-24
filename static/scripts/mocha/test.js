@@ -1,0 +1,1 @@
+define(["mocha/tests/rules_tests"],function(e){"use strict";var s;(s=e)&&s.__esModule});

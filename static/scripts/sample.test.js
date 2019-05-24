@@ -1,0 +1,1 @@
+define([],function(){"use strict";describe("Sample Test",function(){it("hey look, tests run",function(){assert.equal(1,1)}),it("prove I can use a Proxy",function(){var e={},o=new Proxy(e,{});o.foo=232,assert.equal(e.foo,o.foo)})})});

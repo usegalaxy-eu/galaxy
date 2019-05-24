@@ -1,0 +1,1 @@
+define([],function(){"use strict";var e=require.context("./",!0,/\.test\.js$/);e.keys().forEach(e)});

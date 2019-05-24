@@ -1,0 +1,1 @@
+define(["jquery"],function(t){"use strict";var e,n=(e=t)&&e.__esModule?e:{default:e};var o=n.default;n.default.fn.extend({hoverhighlight:function(n,u){return n=n||"body",this.length&&o(this).each(function(){var t=o(this),e=t.data("target");e&&t.mouseover(function(t){o(e,n).css({background:u})}).mouseout(function(t){o(e).css({background:""})})}),this}})});
