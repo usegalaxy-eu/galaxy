@@ -31,7 +31,7 @@
                     </b-card>
                 </b-form>
                 <div v-for="idp in oidc_idps" :key="idp" style="margin:0.5em">
-                    <span v-if="oidc_idps_icons[idp]">
+                    <span v-if="oidc_idps_icons[idp]" @click="submitOIDCLogin(idp)">
                         <img v-bind:src="oidc_idps_icons[idp]" height="45" v-bind:alt="idp" />
                     </span>
                     <span v-else>
