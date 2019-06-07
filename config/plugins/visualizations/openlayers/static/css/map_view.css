@@ -1,0 +1,23 @@
+.body-map-view {
+    height: 100%;
+    width: 100%;
+}
+
+.map-options {
+    margin: 0.5%;
+    color: #212529;
+}
+
+#geometry-type {
+    width: 18%;
+    display: inline;
+}
+
+#export-png {
+    background-color: #fff;
+    color: black;
+}
+
+#export-png i {
+    padding-right: 8px;
+}
