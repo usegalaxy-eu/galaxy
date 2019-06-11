@@ -75,6 +75,7 @@ jmespath==0.9.4
 jsonpatch==1.23
 jsonpointer==2.0
 jsonschema==2.6.0
+keras==2.2.4
 keystoneauth1==3.14.0
 kombu==4.5.0
 lockfile==0.12.2
@@ -173,6 +174,7 @@ subprocess32==3.5.3 ; python_version < '3.0'
 svgwrite==1.2.1
 tempita==0.5.2
 tenacity==4.12.0
+tensorflow==1.12.2
 typing-extensions==3.7.2
 typing==3.6.6 ; python_version < '3.5'
 tzlocal==1.5.1
