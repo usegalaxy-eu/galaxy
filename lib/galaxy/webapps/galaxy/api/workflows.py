@@ -13,6 +13,10 @@ from markupsafe import escape
 from sqlalchemy import desc, false, or_, true
 from sqlalchemy.orm import joinedload
 
+import numpy as np
+import h5py
+from keras.models import model_from_json
+
 from galaxy import (
     exceptions,
     model,
@@ -52,6 +56,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.history_manager = histories.HistoryManager(app)
         self.workflow_manager = workflows.WorkflowsManager(app)
         self.workflow_contents_manager = workflows.WorkflowContentsManager(app)
+        self.loaded_model = None
 
     def __get_full_shed_url(self, url):
         for name, shed_url in self.app.tool_shed_registry.tool_sheds.items():
@@ -596,6 +601,137 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             'config_form'       : module.get_config_form(),
             'post_job_actions'  : module.get_post_job_actions(inputs)
         }
+
+    @expose_api
+    def get_tool_predictions(self, trans, topk=20, to_show=10, max_seq_len=25, payload={}):
+        """
+        POST /api/workflows/get_tool_predictions
+        Fetch predicted tools for a workflow
+        """
+        trained_model_path = trans.app.config.model_path
+        tool_sequence = payload.get('tool_sequence', "")
+        if 'tool_sequence' not in payload or trained_model_path is None:
+            return
+        model_path = os.path.join(os.getcwd(), trained_model_path)
+        all_tools = dict()
+        # collect ids and names of all the installed tools
+        for tool_id, tool in trans.app.toolbox.tools():
+            all_tools[tool_id] = tool.name
+        # retrieve all datasets for re-creating the trained model and making predictions
+        trained_model = h5py.File(model_path, 'r')
+        model_config = json.loads(trained_model.get('model_config').value)
+        if self.loaded_model is None:
+            self.loaded_model = model_from_json(model_config)
+        dictionary = json.loads(trained_model.get('data_dictionary').value)
+        compatibile_tools = json.loads(trained_model.get('compatible_tools').value)
+        tool_weights = json.loads(trained_model.get('class_weights').value)
+
+        tool_weights_sorted = dict()
+        tool_pos_sorted = [int(key) for key in tool_weights.keys()]
+        for k in tool_pos_sorted:
+            tool_weights_sorted[k] = tool_weights[str(k)]
+        reverse_dictionary = dict((v, k) for k, v in dictionary.items())
+        model_weights = list()
+        weight_ctr = 0
+        while True:
+            try:
+                d_key = "weight_" + str(weight_ctr)
+                weights = trained_model.get(d_key).value
+                model_weights.append(weights)
+                weight_ctr += 1
+            except Exception as exception:
+                break
+        # set the model weights
+        self.loaded_model.set_weights(model_weights)
+        tool_sequence = tool_sequence.split(",")
+        tool_sequence = list(reversed(tool_sequence))
+        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, to_show, max_seq_len, dictionary, reverse_dictionary, compatibile_tools, tool_weights_sorted, all_tools)
+
+        return {
+            "current_tool": tool_sequence,
+            "predicted_data": recommended_tools
+        }
+
+    #
+    # -- Helper methods --
+    #
+
+    def __compute_tool_prediction(self, tool_sequence, topk, to_show, max_seq_len, dictionary, reverse_dictionary, compatible_tools, tool_weights, all_tools=None):
+        prediction_data = dict()
+        prediction_data["name"] = ",".join(tool_sequence)
+        prediction_data["children"] = list()
+        try:
+            sample = np.zeros(max_seq_len)
+
+            last_tool_name = tool_sequence[-1]
+            last_compatible_tools = compatible_tools[last_tool_name]
+
+            for idx, tool_name in enumerate(tool_sequence):
+                if tool_name.find("/") > -1:
+                    tool_name = tool_name.split("/")[-2]
+                sample[idx] = int(dictionary[tool_name])
+            sample = np.reshape(sample, (1, max_seq_len))
+
+            # predict next tools for a test path
+            prediction = self.loaded_model.predict(sample, verbose=0)
+            prediction = np.reshape(prediction, (prediction.shape[1],))
+
+            # get the predicted weights of tools
+            weight_values = list(tool_weights.values())
+            weight_values = np.reshape(weight_values, (len(weight_values),))
+
+            # normalize the predicted scores with max and sort the predictions
+            prediction = prediction * weight_values
+            max_prediction = float(np.max(prediction))
+            if max_prediction == 0.0:
+                max_prediction = 1.0
+            prediction = prediction / max_prediction
+            prediction_pos = np.argsort(prediction, axis=-1)
+
+            # get topk prediction
+            topk_prediction_pos = prediction_pos[-topk:]
+
+            # read tool names using reverse dictionary
+            pred_tool_ids = [reverse_dictionary[int(tool_pos)] for tool_pos in topk_prediction_pos]
+            actual_next_tool_ids = list(set(pred_tool_ids).intersection(set(last_compatible_tools.split(","))))
+            predicted_scores = [int(prediction[pos] * 100) for pos in topk_prediction_pos]
+
+            pred_tool_ids = list()
+            for tool_pos in topk_prediction_pos:
+                tool_name = reverse_dictionary[int(tool_pos)]
+                if tool_name in actual_next_tool_ids and tool_name not in last_tool_name:
+                    pred_tool_ids.append(tool_name)
+            pred_tool_ids_rev = list(reversed(pred_tool_ids))
+            pred_tool_ids_rev = pred_tool_ids_rev[:to_show - 1]
+
+            predicted_scores_rev = list(reversed(predicted_scores))
+            predicted_scores_rev = predicted_scores_rev[:to_show - 1]
+
+            # get the predicted tools
+            for child, score in zip(pred_tool_ids_rev, predicted_scores_rev):
+                c_dict = dict()
+                c_dict["name"] = child + " (" + str(score) + "%)"
+                c_dict["tool_id"] = child
+                for t_id in all_tools:
+                    # update the name and tool id if it is installed in Galaxy
+                    if t_id.find(child) > -1:
+                        c_dict["name"] = all_tools[t_id] + " (" + str(score) + "%)"
+                        c_dict["tool_id"] = t_id
+                        break
+                prediction_data["children"].append(c_dict)
+            r_name = prediction_data["name"].split(",")
+            full_name = list()
+            for seq_id in r_name:
+                # get tool name
+                for t_id in all_tools:
+                    if t_id.find(seq_id) > -1:
+                        full_name.append(all_tools[t_id])
+                        break
+            prediction_data["name"] = ",".join(full_name)
+            return prediction_data
+
+        except Exception as exp:
+            return prediction_data
 
     #
     # -- Helper methods --
