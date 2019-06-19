@@ -242,7 +242,7 @@ var FolderRowView = Backbone.View.extend({
     templateRowFolder: function() {
         return _.template(
             [
-                '<tr class="folder_row light library-row" data-id="<%- content_item.id %>">',
+                '<tr class="folder_row library-row" data-id="<%- content_item.id %>">',
                 '<td class="mid">',
                 '<span title="Folder" class="fa fa-folder-o"/>',
                 "</td>",
@@ -291,7 +291,7 @@ var FolderRowView = Backbone.View.extend({
     templateRowFile: function() {
         return _.template(
             [
-                '<tr class="dataset_row light library-row" data-id="<%- content_item.id %>">',
+                '<tr class="dataset_row library-row" data-id="<%- content_item.id %>">',
                 '<td class="mid">',
                 '<span title="Dataset" class="fa fa-file-o"/>',
                 "</td>",
@@ -377,7 +377,7 @@ var FolderRowView = Backbone.View.extend({
     templateRowDeletedFolder: function() {
         return _.template(
             [
-                '<tr class="active deleted_folder light library-row" data-id="<%- content_item.id %>">',
+                '<tr class="active deleted_folder library-row" data-id="<%- content_item.id %>">',
                 '<td class="mid">',
                 '<span title="Folder" class="fa fa-folder-o"/>',
                 "</td>",
