@@ -1866,7 +1866,7 @@ class Tool(Dictifiable):
             os.remove(temp_file)
         return tarball_archive
 
-    def to_dict(self, trans, link_details=False, io_details=False):
+    def to_dict(self, trans, link_details=False, io_details=False, tool_help=False):
         """ Returns dict of tool. """
 
         # Basic information
@@ -1912,12 +1912,13 @@ class Tool(Dictifiable):
         tool_class = self.__class__
         regular_form = tool_class == Tool or isinstance(self, DatabaseOperationTool)
         tool_dict["form_style"] = "regular" if regular_form else "special"
-        # create tool help
-        tool_help = ''
-        if self.help:
-            tool_help = self.help.render(static_path=self.app.url_for('/static'), host_url=self.app.url_for('/', qualified=True))
-            tool_help = unicodify(tool_help, 'utf-8')
-        tool_dict["help"] = tool_help
+        if tool_help:
+            # create tool help
+            help_txt = ''
+            if self.help:
+                help_txt = self.help.render(static_path=self.app.url_for('/static'), host_url=self.app.url_for('/', qualified=True))
+                help_txt = unicodify(help_txt, 'utf-8')
+            tool_dict['help'] = help_txt
 
         return tool_dict
 
