@@ -845,7 +845,7 @@ export default Backbone.View.extend({
                     predTemplate += "<div>";            
                     for (const [index, name_obj] of predicted_data_children.entries()) {
                         predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#'" +
-                            "class='pred-tool panel-header-button' id="+ name_obj["tool_id"] +">" + name_obj["name"];
+                            "class='pred-tool panel-header-button' id=" + "'" + name_obj["tool_id"] + "'" + ">" + name_obj["name"];
                         predTemplate += "</a></br>";
                     }
                     predTemplate += "</div>";
