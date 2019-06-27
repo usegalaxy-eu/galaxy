@@ -56,7 +56,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.history_manager = histories.HistoryManager(app)
         self.workflow_manager = workflows.WorkflowsManager(app)
         self.workflow_contents_manager = workflows.WorkflowContentsManager(app)
-        self.loaded_model = None
+        self.model_path = None
 
     def __get_full_shed_url(self, url):
         for name, shed_url in self.app.tool_shed_registry.tool_sheds.items():
@@ -608,35 +608,38 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         POST /api/workflows/get_tool_predictions
         Fetch predicted tools for a workflow
         """
-        trained_model_path = trans.app.config.model_path
         tool_sequence = payload.get('tool_sequence', "")
-        if 'tool_sequence' not in payload or trained_model_path is None:
+        if 'tool_sequence' not in payload or trans.app.config.model_path is None:
             return
-        model_path = os.path.join(os.getcwd(), trained_model_path)
-        all_tools = dict()
-        # collect ids and names of all the installed tools
-        for tool_id, tool in trans.app.toolbox.tools():
-            all_tools[tool_id] = tool.name
         # retrieve all datasets for re-creating the trained model and making predictions
-        trained_model = h5py.File(model_path, 'r')
-        model_config = json.loads(trained_model.get('model_config').value)
-        if self.loaded_model is None:
-            self.loaded_model = model_from_json(model_config)
-        dictionary = json.loads(trained_model.get('data_dictionary').value)
-        compatibile_tools = json.loads(trained_model.get('compatible_tools').value)
-        tool_weights = json.loads(trained_model.get('class_weights').value)
 
-        tool_weights_sorted = dict()
-        tool_pos_sorted = [int(key) for key in tool_weights.keys()]
-        for k in tool_pos_sorted:
-            tool_weights_sorted[k] = tool_weights[str(k)]
-        reverse_dictionary = dict((v, k) for k, v in dictionary.items())
+        if not self.model_path:
+            self.model_path = os.path.join(os.getcwd(), trans.app.config.model_path)
+            self.all_tools = dict()
+            # collect ids and names of all the installed tools
+            for tool_id, tool in trans.app.toolbox.tools():
+                self.all_tools[tool_id] = tool.name
+            self.trained_model = h5py.File(self.model_path, 'r')
+            self.model_config = json.loads(self.trained_model.get('model_config').value)
+            self.loaded_model = model_from_json(self.model_config)
+ 
+            self.model_data_dictionary = json.loads(self.trained_model.get('data_dictionary').value)
+            self.compatible_tools = json.loads(self.trained_model.get('compatible_tools').value)
+            self.tool_weights = json.loads(self.trained_model.get('class_weights').value)
+ 
+            self.tool_weights_sorted = dict()
+            tool_pos_sorted = [int(key) for key in self.tool_weights.keys()]
+            for k in tool_pos_sorted:
+                self.tool_weights_sorted[k] = self.tool_weights[str(k)]
+            self.reverse_dictionary = dict((v, k) for k, v in self.model_data_dictionary.items())
+
+
         model_weights = list()
         weight_ctr = 0
         while True:
             try:
                 d_key = "weight_" + str(weight_ctr)
-                weights = trained_model.get(d_key).value
+                weights = self.trained_model.get(d_key).value
                 model_weights.append(weights)
                 weight_ctr += 1
             except Exception as exception:
@@ -645,7 +648,8 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.loaded_model.set_weights(model_weights)
         tool_sequence = tool_sequence.split(",")
         tool_sequence = list(reversed(tool_sequence))
-        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, to_show, max_seq_len, dictionary, reverse_dictionary, compatibile_tools, tool_weights_sorted, all_tools)
+
+        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, to_show, max_seq_len, self.model_data_dictionary, self.reverse_dictionary, self.compatible_tools, self.tool_weights_sorted, self.all_tools)
 
         return {
             "current_tool": tool_sequence,
