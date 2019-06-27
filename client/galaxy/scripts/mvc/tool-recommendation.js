@@ -10,7 +10,7 @@ var ToolRecommendationView = Backbone.View.extend({
     initialize: function(options) {
         let toolId = options.toolId || "";
         let self = this;
-        
+
         if (toolId.indexOf("/") > 0) {
             let toolIdSlash = toolId.split("/");
             toolId = toolIdSlash[toolIdSlash.length - 2];
@@ -24,13 +24,13 @@ var ToolRecommendationView = Backbone.View.extend({
                     self.$el.append("<div class='infomessagelarge'>You have used " + data.predicted_data.name + " tool. For further analysis, you could try using the following tools.</div>")
                     self.render_tree(data.predicted_data);
                 }
-            }         
-        });       
+            }
+        });
     },
 
     render_tree: function(predicted_data) {
-        let margin = {top: 20, right: 30, bottom: 20, left: 300},
-            width = 700 - margin.right - margin.left,
+        let margin = {top: 20, right: 30, bottom: 20, left: 200},
+            width = 900 - margin.right - margin.left,
             height = 300 - margin.top - margin.bottom;
         let i = 0,
             duration = 750,
@@ -44,7 +44,7 @@ var ToolRecommendationView = Backbone.View.extend({
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-            
+
         function update(source) {
             // Compute the new tree layout.
             let nodes = tree.nodes(root).reverse(),

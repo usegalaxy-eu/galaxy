@@ -618,15 +618,19 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             self.all_tools = dict()
             # collect ids and names of all the installed tools
             for tool_id, tool in trans.app.toolbox.tools():
-                self.all_tools[tool_id] = tool.name
+                t_id_renamed = tool_id
+                if t_id_renamed.find("/") > -1:
+                    t_id_renamed = t_id_renamed.split("/")[-2]
+                self.all_tools[t_id_renamed] = (tool_id, tool.name)
+            # retrieve all datasets for re-creating the trained model and making predictions
             self.trained_model = h5py.File(self.model_path, 'r')
             self.model_config = json.loads(self.trained_model.get('model_config').value)
             self.loaded_model = model_from_json(self.model_config)
- 
+
             self.model_data_dictionary = json.loads(self.trained_model.get('data_dictionary').value)
             self.compatible_tools = json.loads(self.trained_model.get('compatible_tools').value)
             self.tool_weights = json.loads(self.trained_model.get('class_weights').value)
- 
+
             self.tool_weights_sorted = dict()
             tool_pos_sorted = [int(key) for key in self.tool_weights.keys()]
             for k in tool_pos_sorted:
@@ -642,7 +646,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 weights = self.trained_model.get(d_key).value
                 model_weights.append(weights)
                 weight_ctr += 1
-            except Exception as exception:
+            except Exception:
                 break
         # set the model weights
         self.loaded_model.set_weights(model_weights)
@@ -714,27 +718,21 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             # get the predicted tools
             for child, score in zip(pred_tool_ids_rev, predicted_scores_rev):
                 c_dict = dict()
-                c_dict["name"] = child + " (" + str(score) + "%)"
-                c_dict["tool_id"] = child
                 for t_id in all_tools:
                     # update the name and tool id if it is installed in Galaxy
-                    if t_id.find(child) > -1:
-                        c_dict["name"] = all_tools[t_id] + " (" + str(score) + "%)"
-                        c_dict["tool_id"] = t_id
+                    if t_id == child:
+                        c_dict["name"] = all_tools[t_id][1] + " (" + str(score) + "%)"
+                        c_dict["tool_id"] = all_tools[t_id][0]
+                        prediction_data["children"].append(c_dict)
                         break
-                prediction_data["children"].append(c_dict)
-            r_name = prediction_data["name"].split(",")
-            full_name = list()
-            for seq_id in r_name:
-                # get tool name
-                for t_id in all_tools:
-                    if t_id.find(seq_id) > -1:
-                        full_name.append(all_tools[t_id])
-                        break
-            prediction_data["name"] = ",".join(full_name)
+            # get the root name for displaying after tool run
+            for t_id in all_tools:
+                if t_id == last_tool_name:
+                    prediction_data["name"] = all_tools[t_id][1]
+                    break
             return prediction_data
 
-        except Exception as exp:
+        except Exception:
             return prediction_data
 
     #
