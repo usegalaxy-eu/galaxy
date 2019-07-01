@@ -26,6 +26,7 @@
     "font-awesome": "^4.7.0",
     "handsontable": "^2.0.0",
     "imports-loader": "^0.8.0",
+    "isotope-layout": "^3.0.6",
     "jquery": "2",
     "jquery-migrate": "~1.4",
     "jquery-mousewheel": "^3.1.13",
@@ -43,11 +44,12 @@
     "toastr": "^2.1.4",
     "underscore": "^1.9.1",
     "vue": "^2.6.10",
+    "vue-infinite-scroll": "^2.0.2",
     "vue-router": "^3.0.2",
     "vue-rx": "^6.1.0",
+    "vueisotope": "^3.1.2",
     "vuex": "^3.1.0",
-    "vuex-cache": "^3.1.0",
-    "vue-infinite-scroll": "^2.0.2"
+    "vuex-cache": "^3.1.0"
   },
   "scripts": {
     "watch": "gulp && yarn run save-build-hash && yarn run webpack-watch",
