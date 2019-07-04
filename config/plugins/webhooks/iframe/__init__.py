@@ -13,6 +13,12 @@ pages = [
         'weight': 0.5,
     },
     {
+        'src': 'http://teacheng.illinois.edu/SequenceAlignment/',
+        'height': 1000,
+        'title': 'Sequence Alignment: The Game!',
+        'weight': 0.5,
+    },
+    {
         'src': 'https://stats.galaxyproject.eu/dashboard-solo/db/galaxy?refresh=1m&orgId=1&from=now-3h&to=now&panelId=38',
         'height': 1000,
         'title': 'Galaxy Queue (past 3 hours)',
