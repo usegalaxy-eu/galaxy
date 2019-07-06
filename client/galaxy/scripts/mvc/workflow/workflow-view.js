@@ -843,7 +843,6 @@ export default Backbone.View.extend({
                 let output_datatypes = predicted_data["o_extensions"];
                 let predicted_data_children = predicted_data.children;
                 if (predicted_data_children.length > 0) {
-                    predTemplate += "<div>";
                     let compatibleTools = {};
                     // filter results based on datatype compatibility
                     for (const [index, name_obj] of predicted_data_children.entries()) {
@@ -860,9 +859,15 @@ export default Backbone.View.extend({
                             }
                         }
                     }
-                    for (let id in compatibleTools) {
-                        predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#' class='pred-tool panel-header-button' id=" + "'" + id + "'" + ">" + compatibleTools[id];
-                        predTemplate += "</a></br>";
+                    predTemplate += "<div>";
+                    if (Object.keys(compatibleTools).length > 0) {
+                        for (let id in compatibleTools) {
+                            predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#' class='pred-tool panel-header-button' id=" + "'" + id + "'" + ">" + compatibleTools[id];
+                            predTemplate += "</a></br>";
+                        }
+                    }
+                    else {
+                        predTemplate += "No tool recommendations";
                     }
                     predTemplate += "</div>";
                 }
