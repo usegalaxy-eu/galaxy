@@ -11,7 +11,6 @@ var ToolRecommendationView = Backbone.View.extend({
     initialize: function(options) {
         let toolId = options.toolId || "";
         let self = this;
-        
         if (toolId.indexOf("/") > 0) {
             let toolIdSlash = toolId.split("/");
             toolId = toolIdSlash[toolIdSlash.length - 2];
