@@ -840,12 +840,28 @@ export default Backbone.View.extend({
             success: function(data) {
                 let predTemplate = "<div>";
                 let predicted_data = data.predicted_data;
+                let output_datatypes = predicted_data["o_extensions"];
                 let predicted_data_children = predicted_data.children;
                 if (predicted_data_children.length > 0) {
-                    predTemplate += "<div>";            
+                    predTemplate += "<div>";
+                    let compatibleTools = {};
+                    // filter results based on datatype compatibility
                     for (const [index, name_obj] of predicted_data_children.entries()) {
-                        predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#'" +
-                            "class='pred-tool panel-header-button' id=" + "'" + name_obj["tool_id"] + "'" + ">" + name_obj["name"];
+                        let input_datatypes = name_obj["i_extensions"];
+                        for (const out_t of output_datatypes.entries()) {
+                            for(const in_t of input_datatypes.entries()) {
+                                if ((window.workflow_globals.app.isSubType(out_t[1], in_t[1]) === true) ||
+                                     out_t[1] === "input" ||
+                                     out_t[1] === "_sniff_" ||
+                                     out_t[1] === "input_collection") {
+                                    compatibleTools[name_obj["tool_id"]] = name_obj["name"];
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    for (let id in compatibleTools) {
+                        predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#' class='pred-tool panel-header-button' id=" + "'" + id + "'" + ">" + compatibleTools[id];
                         predTemplate += "</a></br>";
                     }
                     predTemplate += "</div>";

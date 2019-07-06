@@ -57,6 +57,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.workflow_manager = workflows.WorkflowsManager(app)
         self.workflow_contents_manager = workflows.WorkflowContentsManager(app)
         self.model_path = None
+        self.loaded_model = None
 
     def __get_full_shed_url(self, url):
         for name, shed_url in self.app.tool_shed_registry.tool_sheds.items():
@@ -608,52 +609,46 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         POST /api/workflows/get_tool_predictions
         Fetch predicted tools for a workflow
         """
+        trained_model_path = trans.app.config.model_path
         tool_sequence = payload.get('tool_sequence', "")
-        if 'tool_sequence' not in payload or trans.app.config.model_path is None:
+        if 'tool_sequence' not in payload or trained_model_path is None:
             return
+        model_path = os.path.join(os.getcwd(), trained_model_path)
+        all_tools = dict()
+        # collect ids and names of all the installed tools
+        for tool_id, tool in trans.app.toolbox.tools():
+            t_id_renamed = tool_id
+            if t_id_renamed.find("/") > -1:
+                t_id_renamed = t_id_renamed.split("/")[-2]
+            all_tools[t_id_renamed] = (tool_id, tool.name)
         # retrieve all datasets for re-creating the trained model and making predictions
+        trained_model = h5py.File(model_path, 'r')
+        model_config = json.loads(trained_model.get('model_config').value)
+        if self.loaded_model is None:
+            self.loaded_model = model_from_json(model_config)
+        dictionary = json.loads(trained_model.get('data_dictionary').value)
+        tool_weights = json.loads(trained_model.get('class_weights').value)
 
-        if not self.model_path:
-            self.model_path = os.path.join(os.getcwd(), trans.app.config.model_path)
-            self.all_tools = dict()
-            # collect ids and names of all the installed tools
-            for tool_id, tool in trans.app.toolbox.tools():
-                t_id_renamed = tool_id
-                if t_id_renamed.find("/") > -1:
-                    t_id_renamed = t_id_renamed.split("/")[-2]
-                self.all_tools[t_id_renamed] = (tool_id, tool.name)
-            # retrieve all datasets for re-creating the trained model and making predictions
-            self.trained_model = h5py.File(self.model_path, 'r')
-            self.model_config = json.loads(self.trained_model.get('model_config').value)
-            self.loaded_model = model_from_json(self.model_config)
-
-            self.model_data_dictionary = json.loads(self.trained_model.get('data_dictionary').value)
-            self.compatible_tools = json.loads(self.trained_model.get('compatible_tools').value)
-            self.tool_weights = json.loads(self.trained_model.get('class_weights').value)
-
-            self.tool_weights_sorted = dict()
-            tool_pos_sorted = [int(key) for key in self.tool_weights.keys()]
-            for k in tool_pos_sorted:
-                self.tool_weights_sorted[k] = self.tool_weights[str(k)]
-            self.reverse_dictionary = dict((v, k) for k, v in self.model_data_dictionary.items())
-
-
+        tool_weights_sorted = dict()
+        tool_pos_sorted = [int(key) for key in tool_weights.keys()]
+        for k in tool_pos_sorted:
+            tool_weights_sorted[k] = tool_weights[str(k)]
+        reverse_dictionary = dict((v, k) for k, v in dictionary.items())
         model_weights = list()
         weight_ctr = 0
         while True:
             try:
                 d_key = "weight_" + str(weight_ctr)
-                weights = self.trained_model.get(d_key).value
+                weights = trained_model.get(d_key).value
                 model_weights.append(weights)
                 weight_ctr += 1
-            except Exception:
+            except Exception as exception:
                 break
         # set the model weights
         self.loaded_model.set_weights(model_weights)
         tool_sequence = tool_sequence.split(",")
         tool_sequence = list(reversed(tool_sequence))
-
-        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, to_show, max_seq_len, self.model_data_dictionary, self.reverse_dictionary, self.compatible_tools, self.tool_weights_sorted, self.all_tools)
+        recommended_tools = self.__compute_tool_prediction(trans, tool_sequence, topk, to_show, max_seq_len, dictionary, reverse_dictionary, tool_weights_sorted, all_tools)
 
         return {
             "current_tool": tool_sequence,
@@ -664,16 +659,35 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
     # -- Helper methods --
     #
 
-    def __compute_tool_prediction(self, tool_sequence, topk, to_show, max_seq_len, dictionary, reverse_dictionary, compatible_tools, tool_weights, all_tools=None):
+    def __get_tool_extensions(self, trans, tool_id, all_tools):
+        payload = {'type': 'tool', 'tool_id': tool_id, '_': 'true'}
+        inputs = payload.get('inputs', {})
+        trans.workflow_building_mode = workflow_building_modes.ENABLED
+        module = module_factory.from_dict(trans, payload)
+        if 'tool_state' not in payload:
+            module_state = {}
+            populate_state(trans, module.get_inputs(), inputs, module_state, check=False)
+            module.recover_state(module_state)
+        inputs = module.get_all_inputs(connectable_only=True)
+        outputs = module.get_all_outputs()
+        input_extensions = list()
+        output_extensions = list()
+        for i_ext in inputs:
+            input_extensions.extend(i_ext['extensions'])
+        for o_ext in outputs:
+            output_extensions.extend(o_ext['extensions'])
+        return input_extensions, output_extensions
+
+    def __compute_tool_prediction(self, trans, tool_sequence, topk, to_show, max_seq_len, dictionary, reverse_dictionary, tool_weights, all_tools=None):
         prediction_data = dict()
         prediction_data["name"] = ",".join(tool_sequence)
         prediction_data["children"] = list()
+        sample = np.zeros(max_seq_len)
+        last_tool_name = tool_sequence[-1]
+        # get the list of datatype extensions
+        _, last_output_extensions = self.__get_tool_extensions(trans, all_tools[last_tool_name][0], all_tools)
+        prediction_data["o_extensions"] = list(set(last_output_extensions))
         try:
-            sample = np.zeros(max_seq_len)
-
-            last_tool_name = tool_sequence[-1]
-            last_compatible_tools = compatible_tools[last_tool_name]
-
             for idx, tool_name in enumerate(tool_sequence):
                 if tool_name.find("/") > -1:
                     tool_name = tool_name.split("/")[-2]
@@ -701,14 +715,13 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
 
             # read tool names using reverse dictionary
             pred_tool_ids = [reverse_dictionary[int(tool_pos)] for tool_pos in topk_prediction_pos]
-            actual_next_tool_ids = list(set(pred_tool_ids).intersection(set(last_compatible_tools.split(","))))
             predicted_scores = [int(prediction[pos] * 100) for pos in topk_prediction_pos]
 
             pred_tool_ids = list()
             for tool_pos in topk_prediction_pos:
                 tool_name = reverse_dictionary[int(tool_pos)]
-                if tool_name in actual_next_tool_ids and tool_name not in last_tool_name:
-                    pred_tool_ids.append(tool_name)
+                # if tool_name in actual_next_tool_ids:
+                pred_tool_ids.append(tool_name)
             pred_tool_ids_rev = list(reversed(pred_tool_ids))
             pred_tool_ids_rev = pred_tool_ids_rev[:to_show - 1]
 
@@ -719,10 +732,13 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             for child, score in zip(pred_tool_ids_rev, predicted_scores_rev):
                 c_dict = dict()
                 for t_id in all_tools:
-                    # update the name and tool id if it is installed in Galaxy
-                    if t_id == child:
+                    # select the name and tool id if it is installed in Galaxy
+                    if t_id == child and score > 0.0:
+                        full_tool_id = all_tools[t_id][0]
+                        pred_input_extensions, _ = self.__get_tool_extensions(trans, full_tool_id, all_tools)
                         c_dict["name"] = all_tools[t_id][1] + " (" + str(score) + "%)"
-                        c_dict["tool_id"] = all_tools[t_id][0]
+                        c_dict["tool_id"] = full_tool_id
+                        c_dict["i_extensions"] = list(set(pred_input_extensions))
                         prediction_data["children"].append(c_dict)
                         break
             # get the root name for displaying after tool run
@@ -731,8 +747,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                     prediction_data["name"] = all_tools[t_id][1]
                     break
             return prediction_data
-
-        except Exception:
+        except Exception as exp:
             return prediction_data
 
     #
