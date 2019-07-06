@@ -69,8 +69,8 @@ var ToolRecommendationView = Backbone.View.extend({
                         self.render_tree(filtered_data);
                     }
                 }
-            }         
-        });       
+            }
+        });
     },
 
     render_tree: function(predicted_data) {
@@ -89,7 +89,7 @@ var ToolRecommendationView = Backbone.View.extend({
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-            
+
         function update(source) {
             // Compute the new tree layout.
             let nodes = tree.nodes(root).reverse(),
