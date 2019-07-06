@@ -609,8 +609,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         tool_sequence = payload.get('tool_sequence', "")
         if 'tool_sequence' not in payload or trans.app.config.model_path is None:
             return
-        # retrieve all datasets for re-creating the trained model and making predictions
-
         if not self.model_path:
             self.model_path = os.path.join(os.getcwd(), trans.app.config.model_path)
             self.all_tools = dict()
@@ -620,7 +618,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 if t_id_renamed.find("/") > -1:
                     t_id_renamed = t_id_renamed.split("/")[-2]
                 self.all_tools[t_id_renamed] = (tool_id, tool.name)
-            # retrieve all datasets for re-creating the trained model and making predictions
             self.trained_model = h5py.File(self.model_path, 'r')
             self.model_config = json.loads(self.trained_model.get('model_config').value)
             self.loaded_model = model_from_json(self.model_config)
@@ -635,7 +632,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 self.tool_weights_sorted[k] = self.tool_weights[str(k)]
             self.reverse_dictionary = dict((v, k) for k, v in self.model_data_dictionary.items())
 
-
         model_weights = list()
         weight_ctr = 0
         while True:
@@ -644,14 +640,13 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 weights = self.trained_model.get(d_key).value
                 model_weights.append(weights)
                 weight_ctr += 1
-            except Exception:
+            except Exception as exception:
                 break
         # set the model weights
         self.loaded_model.set_weights(model_weights)
         tool_sequence = tool_sequence.split(",")
         tool_sequence = list(reversed(tool_sequence))
-
-        recommended_tools = self.__compute_tool_prediction(tool_sequence, topk, to_show, max_seq_len, self.model_data_dictionary, self.reverse_dictionary, self.compatible_tools, self.tool_weights_sorted, self.all_tools)
+        recommended_tools = self.__compute_tool_prediction(trans, tool_sequence, topk, to_show, max_seq_len)
 
         return {
             "current_tool": tool_sequence,
@@ -662,20 +657,39 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
     # -- Helper methods --
     #
 
-    def __compute_tool_prediction(self, tool_sequence, topk, to_show, max_seq_len, dictionary, reverse_dictionary, compatible_tools, tool_weights, all_tools=None):
+    def __get_tool_extensions(self, trans, tool_id):
+        payload = {'type': 'tool', 'tool_id': tool_id, '_': 'true'}
+        inputs = payload.get('inputs', {})
+        trans.workflow_building_mode = workflow_building_modes.ENABLED
+        module = module_factory.from_dict(trans, payload)
+        if 'tool_state' not in payload:
+            module_state = {}
+            populate_state(trans, module.get_inputs(), inputs, module_state, check=False)
+            module.recover_state(module_state)
+        inputs = module.get_all_inputs(connectable_only=True)
+        outputs = module.get_all_outputs()
+        input_extensions = list()
+        output_extensions = list()
+        for i_ext in inputs:
+            input_extensions.extend(i_ext['extensions'])
+        for o_ext in outputs:
+            output_extensions.extend(o_ext['extensions'])
+        return input_extensions, output_extensions
+
+    def __compute_tool_prediction(self, trans, tool_sequence, topk, to_show, max_seq_len):
         prediction_data = dict()
         prediction_data["name"] = ",".join(tool_sequence)
         prediction_data["children"] = list()
         try:
             sample = np.zeros(max_seq_len)
-
             last_tool_name = tool_sequence[-1]
-            last_compatible_tools = compatible_tools[last_tool_name]
-
+            # get the list of datatype extensions
+            _, last_output_extensions = self.__get_tool_extensions(trans, self.all_tools[last_tool_name][0])
+            prediction_data["o_extensions"] = list(set(last_output_extensions))
             for idx, tool_name in enumerate(tool_sequence):
                 if tool_name.find("/") > -1:
                     tool_name = tool_name.split("/")[-2]
-                sample[idx] = int(dictionary[tool_name])
+                sample[idx] = int(self.model_data_dictionary[tool_name])
             sample = np.reshape(sample, (1, max_seq_len))
 
             # predict next tools for a test path
@@ -683,7 +697,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             prediction = np.reshape(prediction, (prediction.shape[1],))
 
             # get the predicted weights of tools
-            weight_values = list(tool_weights.values())
+            weight_values = list(self.tool_weights_sorted.values())
             weight_values = np.reshape(weight_values, (len(weight_values),))
 
             # normalize the predicted scores with max and sort the predictions
@@ -698,15 +712,13 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             topk_prediction_pos = prediction_pos[-topk:]
 
             # read tool names using reverse dictionary
-            pred_tool_ids = [reverse_dictionary[int(tool_pos)] for tool_pos in topk_prediction_pos]
-            actual_next_tool_ids = list(set(pred_tool_ids).intersection(set(last_compatible_tools.split(","))))
+            pred_tool_ids = [self.reverse_dictionary[int(tool_pos)] for tool_pos in topk_prediction_pos]
             predicted_scores = [int(prediction[pos] * 100) for pos in topk_prediction_pos]
 
             pred_tool_ids = list()
             for tool_pos in topk_prediction_pos:
-                tool_name = reverse_dictionary[int(tool_pos)]
-                if tool_name in actual_next_tool_ids and tool_name not in last_tool_name:
-                    pred_tool_ids.append(tool_name)
+                tool_name = self.reverse_dictionary[int(tool_pos)]
+                pred_tool_ids.append(tool_name)
             pred_tool_ids_rev = list(reversed(pred_tool_ids))
             pred_tool_ids_rev = pred_tool_ids_rev[:to_show - 1]
 
@@ -716,26 +728,25 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             # get the predicted tools
             for child, score in zip(pred_tool_ids_rev, predicted_scores_rev):
                 c_dict = dict()
-                for t_id in all_tools:
-                    # update the name and tool id if it is installed in Galaxy
-                    if t_id == child:
-                        c_dict["name"] = all_tools[t_id][1] + " (" + str(score) + "%)"
-                        c_dict["tool_id"] = all_tools[t_id][0]
+                for t_id in self.all_tools:
+                    # select the name and tool id if it is installed in Galaxy
+                    if t_id == child and score > 0.0:
+                        full_tool_id = self.all_tools[t_id][0]
+                        pred_input_extensions, _ = self.__get_tool_extensions(trans, full_tool_id)
+                        c_dict["name"] = self.all_tools[t_id][1] + " (" + str(score) + "%)"
+                        c_dict["tool_id"] = full_tool_id
+                        c_dict["i_extensions"] = list(set(pred_input_extensions))
                         prediction_data["children"].append(c_dict)
                         break
             # get the root name for displaying after tool run
-            for t_id in all_tools:
+            for t_id in self.all_tools:
                 if t_id == last_tool_name:
-                    prediction_data["name"] = all_tools[t_id][1]
+                    prediction_data["name"] = self.all_tools[t_id][1]
                     break
             return prediction_data
-
-        except Exception:
+        except Exception as exp:
             return prediction_data
 
-    #
-    # -- Helper methods --
-    #
     def __api_import_from_archive(self, trans, archive_data, source=None):
         try:
             data = json.loads(archive_data)

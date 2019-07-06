@@ -2,6 +2,7 @@ import Backbone from "backbone";
 import Utils from "utils/utils";
 import * as d3 from "d3";
 import { getAppRoot } from "onload/loadConfig";
+import $ from "jquery";
 
 
 var ToolRecommendationView = Backbone.View.extend({
@@ -10,7 +11,6 @@ var ToolRecommendationView = Backbone.View.extend({
     initialize: function(options) {
         let toolId = options.toolId || "";
         let self = this;
-
         if (toolId.indexOf("/") > 0) {
             let toolIdSlash = toolId.split("/");
             toolId = toolIdSlash[toolIdSlash.length - 2];
@@ -20,16 +20,60 @@ var ToolRecommendationView = Backbone.View.extend({
             url: `${getAppRoot()}api/workflows/get_tool_predictions`,
             data: {"tool_sequence": toolId},
             success: data => {
-                if (data !== null && data.predicted_data.children.length > 0) {
-                    self.$el.append("<div class='infomessagelarge'>You have used " + data.predicted_data.name + " tool. For further analysis, you could try using the following tools.</div>")
-                    self.render_tree(data.predicted_data);
+                // get datatypes mapping
+                let datatypes_mapping = JSON.parse(
+                    $.ajax({
+                        url: `${getAppRoot()}api/datatypes/mapping`,
+                        async: false
+                    }).responseText
+                );
+                let ext_to_type = datatypes_mapping.ext_to_class_name;
+                let type_to_type = datatypes_mapping.class_to_classes;
+                let pred_data = data.predicted_data;
+                
+                if (data !== null && pred_data.children.length > 0) {
+                    let filtered_data = {};
+                    let compatibleTools = {};
+                    let filtered_children = [];
+                    let output_datatypes = pred_data["o_extensions"];
+                    for (const [index, name_obj] of pred_data.children.entries()) {
+                        let input_datatypes = name_obj["i_extensions"];
+                        for (const out_t of output_datatypes.entries()) {
+                            for(const in_t of input_datatypes.entries()) {
+                                let child = ext_to_type[out_t[1]];
+                                let parent = ext_to_type[in_t[1]];
+                                if (((type_to_type[child] && parent in type_to_type[child]) === true) ||
+                                     out_t[1] === "input" ||
+                                     out_t[1] === "_sniff_" ||
+                                     out_t[1] === "input_collection") {
+                                    compatibleTools[name_obj["tool_id"]] = name_obj["name"];
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    for (let id in compatibleTools) {
+                        for (const [index, name_obj] of pred_data.children.entries()) {
+                            if (name_obj["tool_id"] === id) {
+                                filtered_children.push(name_obj);
+                                break
+                            }
+                        }
+                    }
+                    filtered_data["o_extensions"] = pred_data["o_extensions"];
+                    filtered_data["name"] = pred_data["name"];
+                    filtered_data["children"] = filtered_children;
+                    if (filtered_children.length > 0) {
+                        self.$el.append("<div class='infomessagelarge'>You have used " + filtered_data.name + " tool. For further analysis, you could try using the following/recommended tools. The recommended tools are shown in the decreasing order of their scores predicted using machine learning analysis on workflows. A tool with a higher score (closer to 100%) may fit better as the following tool than a tool with a lower score. Please click on one of the following/recommended tools to open its definition. </div>");
+                        self.render_tree(filtered_data);
+                    }
                 }
             }
         });
     },
 
     render_tree: function(predicted_data) {
-        let margin = {top: 20, right: 30, bottom: 20, left: 200},
+        let margin = {top: 20, right: 30, bottom: 20, left: 250},
             width = 900 - margin.right - margin.left,
             height = 300 - margin.top - margin.bottom;
         let i = 0,
@@ -68,6 +112,8 @@ var ToolRecommendationView = Backbone.View.extend({
                 .attr("text-anchor", d => { return d.children || d._children ? "end" : "start"; })
                 .text(d => { return d.name; })
                 .style("fill-opacity", 1e-6);
+            nodeEnter.append("title")
+                .text(d => { return d.children || d._children ? "Click to collapse" : "Click to open tool definition"; })
             // Transition nodes to their new position.
             let nodeUpdate = node.transition()
                 .duration(duration)
@@ -124,6 +170,9 @@ var ToolRecommendationView = Backbone.View.extend({
                 d._children = null;
             }
             update(d);
+            if (d.tool_id !== undefined && d.tool_id !== "undefined" && d.tool_id !== null && d.tool_id !== "") {
+                document.location.href = `${getAppRoot()}` + 'tool_runner?tool_id=' + d.tool_id;
+            }
         }
         function collapse(d) {
             if (d.children) {
