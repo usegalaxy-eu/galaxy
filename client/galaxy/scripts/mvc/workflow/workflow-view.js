@@ -828,9 +828,11 @@ export default Backbone.View.extend({
             height: "230",
             width: "250",
             closing_events: true,
-            title_separator: true          
+            title_separator: true        
         });
         modal.$el.addClass("modal-tool-recommendation");
+        modal.$el.find(".modal-header").attr("title", "The recommended tools are shown in the decreasing order of their scores predicted using machine learning analysis on workflows. A tool with a higher score (closer to 100%) may fit better as the following tool than a tool with a lower score.");
+        
         modal.show();
         // fetch recommended tools
         Utils.request({

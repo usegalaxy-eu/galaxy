@@ -64,7 +64,7 @@ var ToolRecommendationView = Backbone.View.extend({
                     filtered_data["name"] = pred_data["name"];
                     filtered_data["children"] = filtered_children;
                     if (filtered_children.length > 0) {
-                        self.$el.append("<div class='infomessagelarge'>You have used " + filtered_data.name + " tool. For further analysis, you could try using the following tools.</div>");
+                        self.$el.append("<div class='infomessagelarge'>You have used " + filtered_data.name + " tool. For further analysis, you could try using the following/recommended tools. The recommended tools are shown in the decreasing order of their scores predicted using machine learning analysis on workflows. A tool with a higher score (closer to 100%) may fit better as the following tool than a tool with a lower score. </div>");
                         self.render_tree(filtered_data);
                     }
                 }
