@@ -682,12 +682,12 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         prediction_data = dict()
         prediction_data["name"] = ",".join(tool_sequence)
         prediction_data["children"] = list()
-        sample = np.zeros(max_seq_len)
-        last_tool_name = tool_sequence[-1]
-        # get the list of datatype extensions
-        _, last_output_extensions = self.__get_tool_extensions(trans, self.all_tools[last_tool_name][0])
-        prediction_data["o_extensions"] = list(set(last_output_extensions))
         try:
+            sample = np.zeros(max_seq_len)
+            last_tool_name = tool_sequence[-1]
+            # get the list of datatype extensions
+            _, last_output_extensions = self.__get_tool_extensions(trans, self.all_tools[last_tool_name][0])
+            prediction_data["o_extensions"] = list(set(last_output_extensions))
             for idx, tool_name in enumerate(tool_sequence):
                 if tool_name.find("/") > -1:
                     tool_name = tool_name.split("/")[-2]
@@ -720,7 +720,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             pred_tool_ids = list()
             for tool_pos in topk_prediction_pos:
                 tool_name = self.reverse_dictionary[int(tool_pos)]
-                # if tool_name in actual_next_tool_ids:
                 pred_tool_ids.append(tool_name)
             pred_tool_ids_rev = list(reversed(pred_tool_ids))
             pred_tool_ids_rev = pred_tool_ids_rev[:to_show - 1]
