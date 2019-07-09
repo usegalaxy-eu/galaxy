@@ -112,6 +112,8 @@ var ToolRecommendationView = Backbone.View.extend({
                 .attr("text-anchor", d => { return d.children || d._children ? "end" : "start"; })
                 .text(d => { return d.name; })
                 .style("fill-opacity", 1e-6);
+            nodeEnter.append("title")
+                .text(d => { return d.children || d._children ? "Click to collapse" : "Click to open tool definition"; })
             // Transition nodes to their new position.
             let nodeUpdate = node.transition()
                 .duration(duration)

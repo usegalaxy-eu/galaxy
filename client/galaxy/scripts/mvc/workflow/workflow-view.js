@@ -864,7 +864,7 @@ export default Backbone.View.extend({
                     predTemplate += "<div>";
                     if (Object.keys(compatibleTools).length > 0) {
                         for (let id in compatibleTools) {
-                            predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#' class='pred-tool panel-header-button' id=" + "'" + id + "'" + ">" + compatibleTools[id];
+                            predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#' title='Click to open the tool' class='pred-tool panel-header-button' id=" + "'" + id + "'" + ">" + compatibleTools[id];
                             predTemplate += "</a></br>";
                         }
                     }
