@@ -29,26 +29,6 @@ pages = [
         'height': 1000,
         'title': 'Upcoming Events',
         'weight': 0.5,
-    },
-    {
-        'src': 'https://galaxyproject.org/events/gcc2019/',
-        'height': 1000,
-        'title': 'Galaxy Community Conference 2019 - Freiburg, Germany',
-        # 'announcement': gcc_announcement,
-        'weight': 1,
-    },
-    {
-        'src': 'https://galaxyproject.eu/livestream-plain.html',
-        'height': 1000,
-        'title': 'Galaxy Community Conference 2019 - Livestream!',
-        'weight': 2,
-    },
-    {
-        'src': 'https://gcc2019.sched.com/',
-        'height': 1000,
-        'title': 'Galaxy Community Conference 2019 - Schedule',
-        # 'announcement': gcc_announcement,
-        'weight': 2,
     }
 ]
 
