@@ -28,6 +28,7 @@ import WorkflowImport from "components/WorkflowImport.vue";
 import HistoryImport from "components/HistoryImport.vue";
 import HistoryView from "components/HistoryView.vue";
 import ToolsView from "components/ToolsView.vue";
+import ToolsJson from "components/ToolsJson.vue";
 import HistoryList from "mvc/history/history-list";
 import PluginList from "components/PluginList.vue";
 import ToolFormComposite from "mvc/tool/tool-form-composite";
@@ -47,6 +48,7 @@ export const getAnalysisRouter = Galaxy =>
             "(/)(#)(_=_)": "home",
             "(/)root*": "home",
             "(/)tools/view": "show_tools_view",
+            "(/)tools/json": "show_tools_json",
             "(/)tours(/)(:tour_id)": "show_tours",
             "(/)user(/)": "show_user",
             "(/)user(/)(:form_id)": "show_user_form",
@@ -215,6 +217,10 @@ export const getAnalysisRouter = Galaxy =>
             this.page.panels.left.hide();
             this.page.panels.right.hide();
             this._display_vue_helper(ToolsView);
+        },
+
+        show_tools_json: function() {
+            this._display_vue_helper(ToolsJson);
         },
 
         show_histories_permissions: function() {
