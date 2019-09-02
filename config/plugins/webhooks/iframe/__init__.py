@@ -8,10 +8,11 @@ pages = [
         'weight': 0.5,
     },
     {
+        # TODO: need to self-host
         'src': 'http://teacheng.illinois.edu/SequenceAlignment/',
         'height': 1000,
         'title': 'Sequence Alignment: The Game!',
-        'weight': 0.5,
+        'weight': 0.0,
     },
     {
         'src': 'https://stats.galaxyproject.eu/dashboard-solo/db/galaxy?refresh=1m&orgId=1&from=now-3h&to=now&panelId=38',
@@ -23,6 +24,12 @@ pages = [
         'src': 'https://usegalaxy-eu.github.io/galaxy/events.html',
         'height': 1000,
         'title': 'Upcoming Events',
+        'weight': 0.5,
+    },
+    {
+        'src': 'https://usegalaxy.eu/gapars-experiment/',
+        'height': 1000,
+        'title': 'Citizen Science Experiment!',
         'weight': 0.5,
     }
 ]
