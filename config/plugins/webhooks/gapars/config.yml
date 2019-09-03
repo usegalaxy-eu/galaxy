@@ -1,0 +1,5 @@
+id: gapars
+type:
+  - tool
+  - workflow
+activate: true
