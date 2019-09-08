@@ -179,6 +179,7 @@ subprocess32==3.5.4 ; python_version < '3.0'
 svgwrite==1.3.1
 tempita==0.5.2
 tenacity==4.12.0
+tensorflow==1.12.2
 typing-extensions==3.7.4
 typing==3.7.4 ; python_version < '3.5'
 tzlocal==2.0.0
