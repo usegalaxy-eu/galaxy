@@ -62,6 +62,8 @@ class ConfigSerializer(base.ModelSerializer):
             'communication_server_port'         : _required_attribute,
             'communication_server_host'         : _required_attribute,
             'persistent_communication_rooms'    : _required_attribute,
+            'enable_tool_recommendation'        : _defaults_to(False),
+            'model_path'                        : _defaults_to(None),
             'allow_user_impersonation'          : _required_attribute,
             'allow_user_creation'               : _defaults_to(False),  # schema default is True
             'use_remote_user'                   : _defaults_to(None),  # schema default is False; or config.single_user

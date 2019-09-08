@@ -459,9 +459,28 @@ class GalaxyAppConfiguration(BaseAppConfiguration):
                 with open(self.blacklist_file) as f:
                     self.blacklist_content = [line.rstrip() for line in f]
             except IOError:
-                log.error("CONFIGURATION ERROR: Can't open supplied blacklist file from path: %s", self.blacklist_file)
-
-        self.persistent_communication_rooms = listify(self.persistent_communication_rooms, do_strip=True)
+                log.error("CONFIGURATION ERROR: Can't open supplied blacklist file from path: " + str(self.blacklist_file))
+        self.smtp_server = kwargs.get('smtp_server', None)
+        self.smtp_username = kwargs.get('smtp_username', None)
+        self.smtp_password = kwargs.get('smtp_password', None)
+        self.smtp_ssl = kwargs.get('smtp_ssl', None)
+        self.track_jobs_in_database = string_as_bool(kwargs.get('track_jobs_in_database', 'True'))
+        self.expose_dataset_path = string_as_bool(kwargs.get('expose_dataset_path', 'False'))
+        self.expose_potentially_sensitive_job_metrics = string_as_bool(kwargs.get('expose_potentially_sensitive_job_metrics', 'False'))
+        self.enable_communication_server = string_as_bool(kwargs.get('enable_communication_server', 'False'))
+        self.enable_tool_recommendations = string_as_bool(kwargs.get('enable_tool_recommendations', False))
+        self.tool_recommendation_model_path = kwargs.get('tool_recommendation_model_path', None)
+        self.admin_tool_recommendations_path = kwargs.get('admin_tool_recommendations_path', None)
+        self.overwrite_model_recommendations = string_as_bool(kwargs.get('overwrite_model_recommendations', False))
+        self.topk_recommendations = int(kwargs.get('topk_recommendations', 20))
+        self.communication_server_host = kwargs.get('communication_server_host', 'http://localhost')
+        self.communication_server_port = int(kwargs.get('communication_server_port', '7070'))
+        self.persistent_communication_rooms = listify(kwargs.get("persistent_communication_rooms", []), do_strip=True)
+        self.enable_openid = string_as_bool(kwargs.get('enable_openid', 'False'))
+        self.enable_quotas = string_as_bool(kwargs.get('enable_quotas', 'False'))
+        # Tasked job runner.
+        self.use_tasked_jobs = string_as_bool(kwargs.get('use_tasked_jobs', False))
+        self.local_task_queue_workers = int(kwargs.get("local_task_queue_workers", 2))
         # The transfer manager and deferred job queue
         self.enable_beta_job_managers = string_as_bool(kwargs.get('enable_beta_job_managers', 'False'))
         # These are not even beta - just experiments - don't use them unless

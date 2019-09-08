@@ -2714,7 +2714,7 @@ mapping:
         default: markdown_export_pages.css
         required: false
         desc: |
-          CSS file to apply to "Galaxy Page" exports to PDF. Generally prefer 
+          CSS file to apply to "Galaxy Page" exports to PDF. Generally prefer
           markdown_export_css, but this is here for deployments that
           would like to tailor different kinds of exports.
 
@@ -2723,7 +2723,7 @@ mapping:
         default: markdown_export_invocation_reports.css
         required: false
         desc: |
-          CSS file to apply to invocation report exports to PDF. Generally prefer 
+          CSS file to apply to invocation report exports to PDF. Generally prefer
           markdown_export_css, but this is here for deployments that
           would like to tailor different kinds of exports.
 
@@ -2923,6 +2923,10 @@ mapping:
         required: false
         desc: |
           persistent_communication_rooms is a comma-separated list of rooms that should be always available.
+<<<<<<< HEAD
+
+      enable_tool_recommendation:
+=======
 
       use_pbkdf2:
         type: bool
@@ -2932,6 +2936,44 @@ mapping:
           Allow disabling pbkdf2 hashing of passwords for legacy situations.
           This should normally be left enabled unless there is a specific
           reason to disable it.
+
+      enable_tool_recommendations:
+        type: bool
+        default: false
+        required: false
+        desc: |
+          Allow the display of tool recommendations in workflow editor and after tool execution.
+          If it is enabled and set to true, please enable 'tool_recommendation_model_path' as well
+
+      tool_recommendation_model_path:
+        type: str
+        default: 'https://github.com/anuprulez/download_store/raw/tool_recommendation_model/tool_recommendation_model/tool_recommendation_model.hdf5'
+        required: false
+        desc: |
+          Set remote path of the trained model (HDF5 file) for tool recommendation.
+          It is required to be set if 'enable_tool_recommendations' property is enabled and set to true.
+
+      topk_recommendations:
+        type: int
+        default: 20
+        required: false
+        desc: |
+          Set the number of predictions/recommendations to be made by the model
+
+      admin_tool_recommendations_path:
+        type: str
+        default: 'config/tool_recommendations_overwrite.yml'
+        required: false
+        desc: |
+          Set path to the additional tool preferences from Galaxy admins.
+          It has two blocks. One for listing deprecated tools which will be removed from the recommendations and
+          another is for adding additional tools to be recommended along side those from the deep learning model.
+
+      overwrite_model_recommendations:
+        type: bool
+        default: false
+        required: false
+        desc: |
 
       cookie_domain:
         type: str

@@ -388,6 +388,7 @@ def populate_api_routes(webapp, app):
     webapp.mapper.connect('/api/dependency_resolvers/{index}/dependency', action="resolver_dependency", controller="tool_dependencies", conditions=dict(method=["GET"]))
     webapp.mapper.connect('/api/dependency_resolvers/{index}/dependency', action="install_dependency", controller="tool_dependencies", conditions=dict(method=["POST"]))
     webapp.mapper.connect('/api/dependency_resolvers/{index}/requirements', action="resolver_requirements", controller="tool_dependencies")
+    webapp.mapper.connect('/api/workflows/get_tool_predictions', action='get_tool_predictions', controller="workflows", conditions=dict(method=["POST"]))
     webapp.mapper.resource('dependency_resolver', 'dependency_resolvers', controller="tool_dependencies", path_prefix='api')
     webapp.mapper.connect('/api/container_resolvers', action="index", controller="container_resolution", conditions=dict(method=["GET"]))
     webapp.mapper.connect('/api/container_resolvers/resolve', action="resolve", controller="container_resolution", conditions=dict(method=["GET"]))
