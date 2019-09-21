@@ -34,7 +34,7 @@ from galaxy.web import (
     expose_api,
     expose_api_anonymous_and_sessionless,
 )
-from galaxy.web.base.controller import (
+from galaxy.webapps.base.controller import (
     BaseAPIController,
     SharableMixin,
     url_for,
@@ -42,6 +42,7 @@ from galaxy.web.base.controller import (
 )
 from galaxy.workflow.extract import extract_workflow
 from galaxy.workflow.modules import module_factory
+from galaxy.workflow.reports import generate_report_json
 from galaxy.workflow.run import invoke, queue_invoke
 from galaxy.workflow.run_request import build_workflow_run_configs
 from tool_shed.galaxy_install.install_manager import InstallRepositoryManager
@@ -241,6 +242,9 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         POST /api/workflows
 
         Run or create workflows from the api.
+
+        .. tip:: When executing a workflow externally (e.g. from a script) it is
+            recommended to use the :func:`galaxy.webapps.galaxy.api.workflows.WorkflowsAPIController.invoke` method below instead.
 
         If installed_repository_file or from_history_id is specified a new
         workflow will be created for this user. Otherwise, workflow_id must be
@@ -471,7 +475,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             stored_workflow = trans.sa_session.query(self.app.model.StoredWorkflow).get(self.decode_id(workflow_id))
         except Exception as e:
             trans.response.status = 400
-            return ("Workflow with ID='%s' can not be found\n Exception: %s") % (workflow_id, str(e))
+            return ("Workflow with ID='%s' can not be found\n Exception: %s") % (workflow_id, util.unicodify(e))
 
         # check to see if user has permissions to selected workflow
         if stored_workflow.user != trans.user and not trans.user_is_admin:
@@ -557,7 +561,8 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                     if (trans.security.decode_id(id) in entries):
                         trans.get_user().stored_workflow_menu_entries.remove(entries[trans.security.decode_id(id)])
             # set tags
-            trans.app.tag_handler.set_tags_from_list(user=trans.user, item=stored_workflow, new_tags_list=workflow_dict.get('tags', []))
+            if 'tags' in workflow_dict:
+                trans.app.tag_handler.set_tags_from_list(user=trans.user, item=stored_workflow, new_tags_list=workflow_dict['tags'])
 
             if 'steps' in workflow_dict:
                 try:
@@ -570,9 +575,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                     )
                 except workflows.MissingToolsException:
                     raise exceptions.MessageException("This workflow contains missing tools. It cannot be saved until they have been removed from the workflow or installed.")
-            else:
-                # We only adjusted tags and menu entry
-                return payload
         else:
             message = "Updating workflow requires dictionary containing 'workflow' attribute with new JSON description."
             raise exceptions.RequestParameterInvalidException(message)
@@ -882,6 +884,9 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         POST /api/workflows/{encoded_workflow_id}/invocations
 
         Schedule the workflow specified by `workflow_id` to run.
+
+        .. note:: This method takes the same arguments as
+            :func:`galaxy.webapps.galaxy.api.workflows.WorkflowsAPIController.create` above.
         """
         # Get workflow + accessibility check.
         stored_workflow = self.__get_stored_accessible_workflow(trans, workflow_id)
@@ -1016,6 +1021,21 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         decoded_workflow_invocation_id = self.decode_id(invocation_id)
         workflow_invocation = self.workflow_manager.cancel_invocation(trans, decoded_workflow_invocation_id)
         return self.__encode_invocation(workflow_invocation, **kwd)
+
+    @expose_api
+    def show_invocation_report(self, trans, workflow_id, invocation_id, **kwd):
+        """
+        GET /api/workflows/{workflow_id}/invocations/{invocation_id}/report
+
+        Get JSON summarizing invocation for reporting.
+        """
+        decoded_workflow_invocation_id = self.decode_id(invocation_id)
+        workflow_invocation = self.workflow_manager.get_invocation(trans, decoded_workflow_invocation_id)
+        generator_plugin_type = kwd.get("generator_plugin_type")
+        runtime_report_config_json = kwd.get("runtime_report_config_json")
+        return generate_report_json(
+            trans, workflow_invocation, runtime_report_config_json=runtime_report_config_json, plugin_type=generator_plugin_type
+        )
 
     @expose_api
     def invocation_step(self, trans, workflow_id, invocation_id, step_id, **kwd):

@@ -1,44 +1,31 @@
-# This is a sample file distributed with Galaxy that is used to define a
-# list of nucleotide BLAST databases, using three columns tab separated:
+#This is a sample file distributed with Galaxy that is used to define a
+#list of nucleotide BLAST databases, using three columns tab separated
+#(longer whitespace are TAB characters):
 #
-# <unique_id>{tab}<database_caption>{tab}<base_name_path>
+#<unique_id>      <database_caption>     <base_name_path>
 #
-# The captions typically contain spaces and might end with the build date.
-# It is important that the actual database name does not have a space in
-# it, and that there are only two tabs on each line.
+#The captions typically contain spaces and might end with the release date.
+#It is important that the actual database name does not have a space in it.
 #
-# You can download the NCBI provided protein databases like NR from here:
-# ftp://ftp.ncbi.nlm.nih.gov/blast/db/
+#So, for example, if your database is nt and the path to your base name 
+#is /galaxy/data/blastdb/nt/DDmmmYYYY/nt, then the blastdb.loc entry 
+#could look like this:
 #
-# For simplicity, many Galaxy servers are configured to offer just a live
-# version of each NCBI BLAST database (updated with the NCBI provided
-# Perl scripts or similar). In this case, we recommend using the case
-# sensistive base-name of the NCBI BLAST databases as the unique id.
-# Consistent naming is important for sharing workflows between Galaxy
-# servers.
+#02dec2009     nt 02-Dec-2009    /galaxy/data/blastdb/nt/02dec2009/nt
 #
-# For example, consider the NCBI partially non-redundant nucleotide 
-# nt BLAST database, where you have downloaded and decompressed the
-# files under /data/blastdb/ meaning at the command line BLAST+ would
-# would look at the files /data/blastdb/nt.n* when run with:
+#A /galaxy/data/blastdb/nt/02dec2009 directory would contain all of 
+#the "nt" blast indexes from ftp://ftp.ncbi.nlm.nih.gov/blast/db/nt* (e.g.):
 #
-# $ blastn -db /data/blastdb/nt -query ...
+#-rw-r--r--  1 wychung galaxy  23437408 2008-04-09 11:26 nt.chunk.00.nhr
+#-rw-r--r--  1 wychung galaxy   3689920 2008-04-09 11:26 nt.chunk.00.nin
+#-rw-r--r--  1 wychung galaxy 251215198 2008-04-09 11:26 nt.chunk.00.nsq
+#...etc...
 #
-# In this case use nr (lower case to match the NCBI file naming) as the
-# unique id in the first column of blastdb_p.loc, giving an entry like
-# this:
+#The blastdb.loc file should include one entry per line for each database. 
 #
-# nt{tab}NCBI partially non-redundant (nt){tab}/data/blastdb/nt
+#See also blastdb_p.loc, used for protein BLAST database.
 #
-# Alternatively, rather than a "live" mirror of the NCBI databases which
-# are updated automatically, for full reproducibility the Galaxy Team
-# recommend saving date-stamped copies of the databases. In this case
-# your blastdb.loc file should include an entry per line for each
-# version you have stored. For example:
+#Note that for backwards compatibility with workflows, the <unique_id> of
+#an entry must be the path that was in the original loc file.
+#The metadata <unique_id> is the value stored in workflows for "database".
 #
-# nt_05Jun2010{tab}NCBI nt (partially non-redundant) 05 Jun 2010{tab}/data/blastdb/05Jun2010/nt
-# nt_15Aug2010{tab}NCBI nt (partially non-redundant) 15 Aug 2010{tab}/data/blastdb/15Aug2010/nt
-# ...etc...
-#
-# See also blastdb_p.loc which is for any protein BLAST database, and
-# blastdb_d.loc which is for any protein domains databases (like CDD).
