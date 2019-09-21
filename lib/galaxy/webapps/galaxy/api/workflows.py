@@ -708,7 +708,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             weight_values = np.reshape(weight_values, (len(weight_values),))
 
             # normalize the predicted scores with max and sort the predictions
-            prediction = prediction * weight_values
+            # prediction = prediction * weight_values
             max_prediction = float(np.max(prediction))
             if max_prediction == 0.0:
                 max_prediction = 1.0
@@ -717,6 +717,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
 
             # get topk prediction
             topk_prediction_pos = prediction_pos[-topk:]
+            last_compatible_tools = self.compatible_tools[last_tool_name].split(",")
 
             # read tool names using reverse dictionary
             pred_tool_ids = [self.reverse_dictionary[int(tool_pos)] for tool_pos in topk_prediction_pos]
@@ -737,7 +738,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 c_dict = dict()
                 for t_id in self.all_tools:
                     # select the name and tool id if it is installed in Galaxy
-                    if t_id == child and score > 0.0:
+                    if t_id == child and score > 0.0 and child in last_compatible_tools:
                         full_tool_id = self.all_tools[t_id][0]
                         pred_input_extensions, _ = self.__get_tool_extensions(trans, full_tool_id)
                         c_dict["name"] = self.all_tools[t_id][1] + " (" + str(score) + "%)"
