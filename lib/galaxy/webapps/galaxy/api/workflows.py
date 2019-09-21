@@ -687,6 +687,9 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         try:
             sample = np.zeros(max_seq_len)
             last_tool_name = tool_sequence[-1]
+            # if the last tool of a sequence is not present in the model, raise exception
+            if last_tool_name not in self.model_data_dictionary:
+                raise Exception
             # get the list of datatype extensions
             _, last_output_extensions = self.__get_tool_extensions(trans, self.all_tools[last_tool_name][0])
             prediction_data["o_extensions"] = list(set(last_output_extensions))
