@@ -848,6 +848,7 @@ export default Backbone.View.extend({
         });
         modal.$el.addClass("modal-tool-recommendation");
         modal.$el.find(".modal-header").attr("title", "The recommended tools are shown in the decreasing order of their scores predicted using machine learning analysis on workflows. A tool with a higher score (closer to 100%) may fit better as the following tool than a tool with a lower score. Please click on one of the following/recommended tools to have it on the workflow editor.");
+        modal.$el.find(".modal-body").css("overflow", "auto");
         
         modal.show();
         // fetch recommended tools

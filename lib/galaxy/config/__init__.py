@@ -421,6 +421,7 @@ class GalaxyAppConfiguration(BaseAppConfiguration):
         self.persistent_communication_rooms = listify(kwargs.get("persistent_communication_rooms", []), do_strip=True)
         self.enable_tool_recommendation = string_as_bool(kwargs.get('enable_tool_recommendation', 'False'))
         self.model_path = kwargs.get('model_path', None)
+        self.admin_tool_recommendations_path = kwargs.get('admin_tool_recommendations_path', None)
         self.enable_openid = string_as_bool(kwargs.get('enable_openid', 'False'))
         self.enable_quotas = string_as_bool(kwargs.get('enable_quotas', 'False'))
         # Tasked job runner.
