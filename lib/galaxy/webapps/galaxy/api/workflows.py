@@ -620,7 +620,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
             with open(self.admin_tool_recommendations_path) as admin_recommendations:
                 self.admin_recommendations_list = json.loads(admin_recommendations.read())
-
         if not self.model_path:
             self.model_path = os.path.join(os.getcwd(), trans.app.config.model_path)
             self.all_tools = dict()
@@ -633,17 +632,14 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             self.trained_model = h5py.File(self.model_path, 'r')
             self.model_config = json.loads(self.trained_model.get('model_config').value)
             self.loaded_model = model_from_json(self.model_config)
-
             self.model_data_dictionary = json.loads(self.trained_model.get('data_dictionary').value)
             self.compatible_tools = json.loads(self.trained_model.get('compatible_tools').value)
             self.tool_weights = json.loads(self.trained_model.get('class_weights').value)
-
             self.tool_weights_sorted = dict()
             tool_pos_sorted = [int(key) for key in self.tool_weights.keys()]
             for k in tool_pos_sorted:
                 self.tool_weights_sorted[k] = self.tool_weights[str(k)]
             self.reverse_dictionary = dict((v, k) for k, v in self.model_data_dictionary.items())
-
         model_weights = list()
         weight_ctr = 0
         while True:
