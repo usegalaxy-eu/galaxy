@@ -703,12 +703,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             prediction = self.loaded_model.predict(sample, verbose=0)
             prediction = np.reshape(prediction, (prediction.shape[1],))
 
-            # get the predicted weights of tools
-            weight_values = list(self.tool_weights_sorted.values())
-            weight_values = np.reshape(weight_values, (len(weight_values),))
-
             # normalize the predicted scores with max and sort the predictions
-            # prediction = prediction * weight_values
             max_prediction = float(np.max(prediction))
             if max_prediction == 0.0:
                 max_prediction = 1.0
@@ -727,11 +722,9 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             for tool_pos in topk_prediction_pos:
                 tool_name = self.reverse_dictionary[int(tool_pos)]
                 pred_tool_ids.append(tool_name)
-            pred_tool_ids_rev = list(reversed(pred_tool_ids))
-            pred_tool_ids_rev = pred_tool_ids_rev[:to_show - 1]
 
+            pred_tool_ids_rev = list(reversed(pred_tool_ids))
             predicted_scores_rev = list(reversed(predicted_scores))
-            predicted_scores_rev = predicted_scores_rev[:to_show - 1]
 
             # get the predicted tools
             for child, score in zip(pred_tool_ids_rev, predicted_scores_rev):
@@ -746,6 +739,8 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                         c_dict["i_extensions"] = list(set(pred_input_extensions))
                         prediction_data["children"].append(c_dict)
                         break
+            # show only a few
+            prediction_data["children"] = prediction_data["children"][:to_show - 1]
             # get the root name for displaying after tool run
             for t_id in self.all_tools:
                 if t_id == last_tool_name:
