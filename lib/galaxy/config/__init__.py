@@ -419,9 +419,12 @@ class GalaxyAppConfiguration(BaseAppConfiguration):
         self.communication_server_host = kwargs.get('communication_server_host', 'http://localhost')
         self.communication_server_port = int(kwargs.get('communication_server_port', '7070'))
         self.persistent_communication_rooms = listify(kwargs.get("persistent_communication_rooms", []), do_strip=True)
-        self.enable_tool_recommendation = string_as_bool(kwargs.get('enable_tool_recommendation', 'False'))
-        self.model_path = kwargs.get('model_path', None)
+
+        self.enable_tool_recommendations = string_as_bool(kwargs.get('enable_tool_recommendations', 'False'))
+        self.tool_recommendation_model_path = kwargs.get('tool_recommendation_model_path', None)
+        self.enable_admin_tool_recommendations = string_as_bool(kwargs.get('enable_admin_tool_recommendations', 'False'))
         self.admin_tool_recommendations_path = kwargs.get('admin_tool_recommendations_path', None)
+
         self.enable_openid = string_as_bool(kwargs.get('enable_openid', 'False'))
         self.enable_quotas = string_as_bool(kwargs.get('enable_quotas', 'False'))
         # Tasked job runner.

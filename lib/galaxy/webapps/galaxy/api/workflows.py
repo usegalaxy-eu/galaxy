@@ -57,7 +57,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.history_manager = histories.HistoryManager(app)
         self.workflow_manager = workflows.WorkflowsManager(app)
         self.workflow_contents_manager = workflows.WorkflowContentsManager(app)
-        self.model_path = None
+        self.tool_recommendation_model_path = None
         self.admin_tool_recommendations_path = None
 
     def __get_full_shed_url(self, url):
@@ -612,16 +612,22 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         Fetch predicted tools for a workflow
         """
         tool_sequence = payload.get('tool_sequence', "")
-        if 'tool_sequence' not in payload or trans.app.config.model_path is None:
+        if 'tool_sequence' not in payload or trans.app.config.tool_recommendation_model_path is None:
             return
-
+        self.enable_admin_tool_recommendations = trans.app.config.enable_admin_tool_recommendations
+        print(self.enable_admin_tool_recommendations)
         # collect tool recommendations if set by admin
         if not self.admin_tool_recommendations_path:
-            self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
-            with open(self.admin_tool_recommendations_path) as admin_recommendations:
-                self.admin_recommendations_list = json.loads(admin_recommendations.read())
-        if not self.model_path:
-            self.model_path = os.path.join(os.getcwd(), trans.app.config.model_path)
+            print(self.enable_admin_tool_recommendations)
+            print("==========")
+            if self.enable_admin_tool_recommendations == True or self.enable_admin_tool_recommendations == "true":
+                self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
+                with open(self.admin_tool_recommendations_path) as admin_recommendations:
+                    self.admin_recommendations_list = json.loads(admin_recommendations.read())
+                    print(self.admin_recommendations_list)
+        # get model
+        if not self.tool_recommendation_model_path:
+            self.tool_recommendation_model_path = os.path.join(os.getcwd(), trans.app.config.tool_recommendation_model_path)
             self.all_tools = dict()
             # collect ids and names of all the installed tools
             for tool_id, tool in trans.app.toolbox.tools():
@@ -629,7 +635,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 if t_id_renamed.find("/") > -1:
                     t_id_renamed = t_id_renamed.split("/")[-2]
                 self.all_tools[t_id_renamed] = (tool_id, tool.name)
-            self.trained_model = h5py.File(self.model_path, 'r')
+            self.trained_model = h5py.File(self.tool_recommendation_model_path, 'r')
             self.model_config = json.loads(self.trained_model.get('model_config').value)
             self.loaded_model = model_from_json(self.model_config)
             self.model_data_dictionary = json.loads(self.trained_model.get('data_dictionary').value)
@@ -654,7 +660,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.loaded_model.set_weights(model_weights)
         tool_sequence = tool_sequence.split(",")
         tool_sequence = list(reversed(tool_sequence))
-        recommended_tools = self.__compute_tool_prediction(trans, tool_sequence, topk, to_show, max_seq_len, set_admin_recommendations)
+        recommended_tools = self.__compute_tool_prediction(trans, tool_sequence, topk, to_show, max_seq_len)
 
         return {
             "current_tool": tool_sequence,
@@ -684,7 +690,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             output_extensions.extend(o_ext['extensions'])
         return input_extensions, output_extensions
 
-    def __compute_tool_prediction(self, trans, tool_sequence, topk, to_show, max_seq_len, set_admin_recommendations):
+    def __compute_tool_prediction(self, trans, tool_sequence, topk, to_show, max_seq_len):
         prediction_data = dict()
         prediction_data["name"] = ",".join(tool_sequence)
         prediction_data["children"] = list()
@@ -747,7 +753,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             # show only a few
             prediction_data["children"] = prediction_data["children"][:to_show - 1]
             # get a list of recommended tools set by the admin
-            if set_admin_recommendations == True:
+            if self.enable_admin_tool_recommendations == True or self.enable_admin_tool_recommendations == "true":
                 for item in self.admin_recommendations_list["tools"]:
                     if last_tool_name == item["tool_id"]:
                         prediction_data["children"].extend(item["recommendations"])

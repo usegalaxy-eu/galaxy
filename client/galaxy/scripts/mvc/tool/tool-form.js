@@ -247,8 +247,8 @@ const View = Backbone.View.extend({
                     }
                 }
                 this.$el.append(this._templateSuccess(response, job_def));
-                let enable_tool_recommendation = window.Galaxy.config.enable_tool_recommendation;
-                if (enable_tool_recommendation === true || enable_tool_recommendation === 'true') {
+                let enable_tool_recommendations = window.Galaxy.config.enable_tool_recommendations;
+                if (enable_tool_recommendations === true || enable_tool_recommendations === 'true') {
                     // show tool recommendations
                     this.$el.append($("<div/>", { id: "tool-recommendation-view" }));
                     var toolRecommendation = new ToolRecommendation.ToolRecommendationView({

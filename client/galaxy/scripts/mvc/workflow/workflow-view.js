@@ -934,8 +934,8 @@ export default Backbone.View.extend({
                     })
             );
         }
-        let enable_tool_recommendation = window.Galaxy.config.enable_tool_recommendation;
-        if (node.content_id !== undefined && (enable_tool_recommendation === true || enable_tool_recommendation === 'true')) {
+        let enable_tool_recommendations = window.Galaxy.config.enable_tool_recommendations;
+        if (node.content_id !== undefined && (enable_tool_recommendations === true || enable_tool_recommendations === 'true')) {
             let toolId = self.getToolId(node.content_id);
             buttons.append(
                 $("<a/>")
