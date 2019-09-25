@@ -617,7 +617,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.enable_admin_tool_recommendations = trans.app.config.enable_admin_tool_recommendations
         # collect tool recommendations if set by admin
         if not self.admin_tool_recommendations_path:
-            if self.enable_admin_tool_recommendations == True or self.enable_admin_tool_recommendations == "true":
+            if self.enable_admin_tool_recommendations is True or self.enable_admin_tool_recommendations == "true":
                 self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
                 with open(self.admin_tool_recommendations_path) as admin_recommendations:
                     self.admin_recommendations_list = json.loads(admin_recommendations.read())
@@ -749,7 +749,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             # show only a few
             prediction_data["children"] = prediction_data["children"][:to_show - 1]
             # get a list of recommended tools set by the admin
-            if self.enable_admin_tool_recommendations == True or self.enable_admin_tool_recommendations == "true":
+            if self.enable_admin_tool_recommendations is True or self.enable_admin_tool_recommendations == "true":
                 for item in self.admin_recommendations_list["tools"]:
                     if last_tool_name == item["tool_id"]:
                         prediction_data["children"].extend(item["recommendations"])
