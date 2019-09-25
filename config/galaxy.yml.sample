@@ -1762,11 +1762,7 @@ galaxy:
   # Enable tool recommendations to be set by Galaxy admins
   # If set to true, 'admin_tool_recommendations_path' must be set as well
   # which takes the path of the additional list of tools to be recommended
-  # enable_admin_tool_recommendations: false
-
-  # Additional tool recommendations from Galaxy admin
-  # They are shown along with the recommendations using deep learning trained model
-  #admin_tool_recommendations_path: 'database/admin_tool_recommendation.json'
+  #enable_admin_tool_recommendations: false
 
   # Additional tool recommendations from Galaxy admin
   # They are shown along with the recommendations using deep learning trained model
