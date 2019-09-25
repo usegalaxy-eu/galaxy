@@ -1,7 +1,7 @@
 {
     "tools": [
         {
-             "tool_id": "<<tool1>",
+             "tool_id": "<<tool1>>",
              "recommendations": [
                 {
                     "tool_id": "<<recommended tool id  for tool1>>",

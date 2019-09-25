@@ -615,16 +615,12 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         if 'tool_sequence' not in payload or trans.app.config.tool_recommendation_model_path is None:
             return
         self.enable_admin_tool_recommendations = trans.app.config.enable_admin_tool_recommendations
-        print(self.enable_admin_tool_recommendations)
         # collect tool recommendations if set by admin
         if not self.admin_tool_recommendations_path:
-            print(self.enable_admin_tool_recommendations)
-            print("==========")
             if self.enable_admin_tool_recommendations == True or self.enable_admin_tool_recommendations == "true":
                 self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
                 with open(self.admin_tool_recommendations_path) as admin_recommendations:
                     self.admin_recommendations_list = json.loads(admin_recommendations.read())
-                    print(self.admin_recommendations_list)
         # get model
         if not self.tool_recommendation_model_path:
             self.tool_recommendation_model_path = os.path.join(os.getcwd(), trans.app.config.tool_recommendation_model_path)
