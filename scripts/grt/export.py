@@ -21,6 +21,7 @@ import galaxy.config
 from galaxy.objectstore import build_object_store_from_config
 from galaxy.util import hash_util
 from galaxy.util.script import app_properties_from_args, populate_config_args
+from galaxy.util import unicodify
 
 sample_config = os.path.abspath(os.path.join(os.path.dirname(__file__), 'grt.yml.sample'))
 default_config = os.path.abspath(os.path.join(os.path.dirname(__file__), 'grt.yml'))
@@ -249,7 +250,7 @@ def main(argv):
                 handle_datasets.write('\t')
                 handle_datasets.write(round_to_2sd(datasets[dataset_id][0]))
                 handle_datasets.write('\t')
-                handle_datasets.write(str(job[2]))
+                handle_datasets.write(unicodify(job[2]).encode('utf-8'))
                 handle_datasets.write('\t')
                 handle_datasets.write(str(filetype))
                 handle_datasets.write('\n')
@@ -303,7 +304,7 @@ def main(argv):
             os.unlink(REPORT_BASE + '.' + name + '.tsv')
 
     _times.append(('job_finish', time.time() - _start_time))
-    sha = hash_util.memory_bound_hexdigest(hash_util.sha256, REPORT_BASE + ".tar.gz")
+    sha = hash_util.memory_bound_hexdigest(hash_func=hash_util.sha256, path=REPORT_BASE + ".tar.gz")
     _times.append(('hash_finish', time.time() - _start_time))
 
     # Now serialize the individual report data.
