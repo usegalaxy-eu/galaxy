@@ -12,10 +12,7 @@ it at this time.
 """
 import logging
 import os
-<<<<<<< HEAD
-=======
 import subprocess
->>>>>>> 895895fd7e7d731bd96a225280b4719f3ce708f9
 import time
 
 from galaxy import model

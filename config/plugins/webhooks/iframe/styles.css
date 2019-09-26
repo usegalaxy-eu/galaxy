@@ -13,26 +13,6 @@
 
 #iframe-name {
     color: #fff;
-<<<<<<< HEAD
-    padding-left: 30px;
-    font-size: 28px;
-    float: left;
-}
-
-#announcement {
-    padding-right: 30px;
-    float: right;
-}
-
-#announcement a {
-    font-size: 18px;
-    color: #b1e7b1;
-    text-decoration: none;
-}
-
-.clearfix{
-    clear: both;
-=======
     padding-bottom: 10px;
 }
 
@@ -68,5 +48,4 @@
     padding: 10px;
     max-width: 100%;
     margin-bottom: -4px;
->>>>>>> 895895fd7e7d731bd96a225280b4719f3ce708f9
 }
