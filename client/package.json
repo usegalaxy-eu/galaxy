@@ -29,6 +29,7 @@
     "handsontable": "^2.0.0",
     "imask": "^4.1.5",
     "imports-loader": "^0.8.0",
+    "isotope-layout": "^3.0.6",
     "jquery": "2",
     "jquery-migrate": "~1.4",
     "jquery-mousewheel": "^3.1.13",
@@ -45,12 +46,15 @@
     "rxjs": "^6.4.0",
     "slugify": "^1.3.4",
     "toastr": "^2.1.4",
-    "underscore": "^1.9.1",
-    "vue": "^2.6.10",
+    "underscore": "^1.9.2",
+    "vue": "2.6.10",
     "vue-router": "^3.0.2",
     "vue-rx": "^6.1.0",
     "vuex": "^3.1.0",
-    "vuex-cache": "^3.1.0"
+    "vuex-cache": "^3.1.0",
+    "vue-infinite-scroll": "^2.0.2",
+    "vue-multiselect": "^2.1.0",
+    "vueisotope": "^3.1.2"
   },
   "scripts": {
     "watch": "gulp && yarn run save-build-hash && yarn run webpack-watch",
