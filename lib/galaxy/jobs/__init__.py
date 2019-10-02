@@ -2021,7 +2021,7 @@ class JobWrapper(HasResourceParameters):
                 "connection_configuration": container.connection_configuration,
             }, f)
 
-        return "(python '%s'/lib/galaxy_ext/container_monitor/monitor.py &) " % exec_dir
+        return "(python '/data/gxtst/server/lib/galaxy_ext/container_monitor/monitor.py' &) "
 
     @property
     def user(self):
