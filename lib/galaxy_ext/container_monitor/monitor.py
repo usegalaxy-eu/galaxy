@@ -1,7 +1,9 @@
 import json
+import time
 import os
 import socket
 import subprocess
+import socket
 import sys
 import tempfile
 import time
@@ -11,6 +13,18 @@ sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pa
 
 from galaxy.tool_util.deps import docker_util
 
+def parse_ports(container_name, connection_configuration):
+    while True:
+        ports_command = docker_util.build_docker_simple_command("port", container_name=container_name, **connection_configuration)
+        with tempfile.TemporaryFile() as stdout_file:
+            exit_code = subprocess.call(ports_command,
+                                        shell=True,
+                                        stdout=stdout_file,
+                                        preexec_fn=os.setpgrp)
+            if exit_code == 0:
+                stdout_file.seek(0)
+                ports_raw = stdout_file.read()
+                return ports_raw
 
 def parse_ports(container_name, connection_configuration):
     while True:
@@ -27,6 +41,8 @@ def parse_ports(container_name, connection_configuration):
 
 
 def main():
+    open("monitor.log", 'w+').write('HXR monitor script running')
+
     with open("container_config.json", "r") as f:
         container_config = json.load(f)
 

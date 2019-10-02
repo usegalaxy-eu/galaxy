@@ -184,6 +184,8 @@ class CondorJobRunner(AsynchronousJobRunner):
             try:
                 if cjs.job_wrapper.tool.tool_type != 'interactive' and os.stat(cjs.user_log).st_size == cjs.user_log_size:
                     new_watched.append(cjs)
+                    # this seems to be needed, otherwise jobs are missed
+                    cjs.job_wrapper.check_for_entry_points()
                     continue
                 s1, s4, s7, s5, s9, log_size = summarize_condor_log(cjs.user_log, job_id)
                 job_running = s1 and not (s4 or s7)

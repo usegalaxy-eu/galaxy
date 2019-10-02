@@ -87,6 +87,8 @@ class InteractiveToolSqlite(object):
                            info,
                            ))
                 conn.commit()
+            except:
+                log.error('HXR Could not write to interactive-table %s %s %s' % (key, key_type, token))
             finally:
                 conn.close()
 
@@ -170,7 +172,13 @@ class InteractiveToolManager(object):
                 self.save_entry_point(ep)
                 configured.append(ep)
         if configured:
-            self.sa_session.flush()
+            try:
+                self.sa_session.flush()
+            except:
+                log.debug('HXR Could not sa_session flush in manager, no sqlite write')
+                import time
+                time.sleep(0.5)
+                self.sa_session.flush()
         return dict(not_configured=not_configured, configured=configured)
 
     def save_entry_point(self, entry_point):

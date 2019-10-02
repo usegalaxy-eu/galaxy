@@ -2086,8 +2086,9 @@ class JobWrapper(HasResourceParameters):
                     container_runtime = json.load(f)
                 except ValueError:
                     # File exists, but is not fully populated yet
+                    log.debug('HXR Could not load json file')
                     return False
-            log.debug("found container runtime %s" % container_runtime)
+            log.debug("HXR found container runtime %s" % container_runtime)
             self.app.interactivetool_manager.configure_entry_points(job, container_runtime)
             return True
 
