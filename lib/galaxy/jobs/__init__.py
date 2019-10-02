@@ -2162,7 +2162,7 @@ class JobWrapper(HasResourceParameters):
         with open(container_config, "w") as f:
             json.dump(container_config_dict, f)
 
-        return "(python '%s'/lib/galaxy_ext/container_monitor/monitor.py &); sleep 1 " % exec_dir
+        return "(python '/data/gxtst/server/lib/galaxy_ext/container_monitor/monitor.py' &) "
 
     @property
     def user(self):
