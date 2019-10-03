@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import socket
 import sys
 import tempfile
 
@@ -35,8 +36,14 @@ def main():
                     break
 
         if ports_raw is not None:
+            host_ip = socket.gethostbyname(socket.gethostname())
             with open("container_runtime.json", "w") as f:
                 json.dump(docker_util.parse_port_text(ports_raw), f)
+                # Override the IPs
+                ports = docker_util.parse_port_text(ports_raw)
+                for key in ports:
+                    ports[key]['host'] = host_ip
+                json.dump(ports, f)
         else:
             raise Exception("Failed to recover ports...")
     except Exception as e:
