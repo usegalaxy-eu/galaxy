@@ -950,7 +950,7 @@ export default Backbone.View.extend({
         });
         modal.$el.addClass("modal-tool-recommendation");
         modal.$el.find(".modal-header").attr("title", "The recommended tools are shown in the decreasing order of their scores predicted using machine learning analysis on workflows. A tool with a higher score (closer to 100%) may fit better as the following tool than a tool with a lower score. Please click on one of the following/recommended tools to have it on the workflow editor.");
-        
+        modal.$el.find(".modal-body").css("overflow", "auto");
         modal.show();
         // fetch recommended tools
         Utils.request({
@@ -1035,8 +1035,8 @@ export default Backbone.View.extend({
                     })
             );
         }
-        let enable_tool_recommendation = window.Galaxy.config.enable_tool_recommendation;
-        if (node.content_id !== undefined && (enable_tool_recommendation === true || enable_tool_recommendation === 'true')) {
+        let enable_tool_recommendations = window.Galaxy.config.enable_tool_recommendations;
+        if (node.content_id !== undefined && (enable_tool_recommendations === true || enable_tool_recommendations === 'true')) {
             let toolId = self.getToolId(node.content_id);
             buttons.append(
                 $("<a/>")
