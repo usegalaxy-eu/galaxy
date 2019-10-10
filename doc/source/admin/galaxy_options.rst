@@ -3299,9 +3299,13 @@
 :Description:
     File where Tool Shed based Data Managers are configured. This file
     will be created automatically upon data manager installation.
+<<<<<<< HEAD
     The value of this option will be resolved with respect to
     <mutable_config_dir>.
 :Default: ``shed_data_manager_conf.xml``
+=======
+:Default: ``config/shed_data_manager_conf.xml``
+>>>>>>> d13602c0bf... clarify that shed_data_manager is auto created
 :Type: str
 
 

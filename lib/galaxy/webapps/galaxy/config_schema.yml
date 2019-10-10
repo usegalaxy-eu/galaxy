@@ -2923,10 +2923,6 @@ mapping:
         required: false
         desc: |
           persistent_communication_rooms is a comma-separated list of rooms that should be always available.
-<<<<<<< HEAD
-
-      enable_tool_recommendation:
-=======
 
       use_pbkdf2:
         type: bool

@@ -1,21 +1,21 @@
 # Galaxy is configured by default to be usable in a single-user development
 # environment.  To tune the application for a multi-user production
 # environment, see the documentation at:
-# 
+#
 #  https://docs.galaxyproject.org/en/master/admin/production.html
-# 
+#
 # Throughout this sample configuration file, except where stated otherwise,
 # uncommented values override the default if left unset, whereas commented
 # values are set to the default value.  Relative paths are relative to the root
 # Galaxy directory.
-# 
+#
 # Examples of many of these options are explained in more detail in the Galaxy
 # Community Hub.
-# 
+#
 #   https://galaxyproject.org/admin/config
-# 
+#
 # Config hackers are encouraged to check there before asking for help.
-# 
+#
 uwsgi:
 
   # The address and port on which to listen.  By default, only listen to
@@ -1617,9 +1617,13 @@ galaxy:
 
   # File where Tool Shed based Data Managers are configured. This file
   # will be created automatically upon data manager installation.
+<<<<<<< HEAD
   # The value of this option will be resolved with respect to
   # <mutable_config_dir>.
   #shed_data_manager_config_file: shed_data_manager_conf.xml
+=======
+  #shed_data_manager_config_file: config/shed_data_manager_conf.xml
+>>>>>>> d13602c0bf... clarify that shed_data_manager is auto created
 
   # Directory to store Data Manager based tool-data. Defaults to the
   # value of the <tool_data_path> option.
