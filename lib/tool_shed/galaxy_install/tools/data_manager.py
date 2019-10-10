@@ -59,7 +59,7 @@ class DataManagerHandler(object):
                 repository_tools_by_guid[tool_tup[1]] = dict(tool_config_filename=tool_tup[0], tool=tool_tup[2])
             # Load existing data managers.
             try:
-                tree, error_message = xml_util.parse_xml(shed_data_manager_conf_filename)
+                tree, error_message = xml_util.parse_xml(shed_data_manager_conf_filename, check_exists=False)
             except (OSError, IOError) as exc:
                 if exc.errno == errno.ENOENT:
                     with open(shed_data_manager_conf_filename, 'w') as fh:
@@ -131,6 +131,8 @@ class DataManagerHandler(object):
                                                                       tool_path=shed_config_dict.get('tool_path', ''))
                     if data_manager:
                         rval.append(data_manager)
+                elif elem.tag is ElementTree.Comment:
+                    pass
                 else:
                     log.warning("Encountered unexpected element '%s':\n%s" % (elem.tag, xml_to_string(elem)))
                 config_elems.append(elem)

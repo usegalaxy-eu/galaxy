@@ -168,6 +168,10 @@ def job_config_xml_to_dict(config, root):
         environment["metrics"] = metrics_to_dict
 
         params = JobConfiguration.get_params(config, destination)
+        # Handle legacy XML enabling sudo when using docker by default.
+        if "docker_sudo" not in params:
+            params["docker_sudo"] = "true"
+
         # TODO: handle enabled/disabled in configure_from
         environment['params'] = params
         environment['env'] = JobConfiguration.get_envs(destination)
@@ -375,18 +379,23 @@ class JobConfiguration(ConfiguresHandlers):
         environments = execution_dict.get("environments", [])
         enviroment_iter = map(lambda e: (e["id"], e), environments) if isinstance(environments, list) else environments.items()
         for environment_id, environment_dict in enviroment_iter:
-            metrics = environment_dict.get("metrics") or {"src": "default"}
-            metrics_src = metrics.get("src") or "default"
-            if metrics_src != "default":
-                # customized metrics for this environment.
-                if metrics_src == "disabled":
-                    job_metrics.set_destination_instrumenter(environment_id, None)
-                elif metrics_src == "xml_element":
-                    metrics_element = metrics.get("xml_element")
-                    job_metrics.set_destination_conf_element(environment_id, metrics_element)
-                elif metrics_src == "path":
-                    metrics_conf_path = self.app.config.resolve_path(metrics.get("path"))
-                    job_metrics.set_destination_conf_file(environment_id, metrics_conf_path)
+            metrics = environment_dict.get("metrics")
+            if metrics is None:
+                metrics = {"src": "default"}
+            if isinstance(metrics, list):
+                job_metrics.set_destination_conf_dicts(environment_id, metrics)
+            else:
+                metrics_src = metrics.get("src") or "default"
+                if metrics_src != "default":
+                    # customized metrics for this environment.
+                    if metrics_src == "disabled":
+                        job_metrics.set_destination_instrumenter(environment_id, None)
+                    elif metrics_src == "xml_element":
+                        metrics_element = metrics.get("xml_element")
+                        job_metrics.set_destination_conf_element(environment_id, metrics_element)
+                    elif metrics_src == "path":
+                        metrics_conf_path = self.app.config.resolve_path(metrics.get("path"))
+                        job_metrics.set_destination_conf_file(environment_id, metrics_conf_path)
 
             destination_kwds = {}
 
@@ -1991,8 +2000,9 @@ class JobWrapper(HasResourceParameters):
                     container_runtime = json.load(f)
                 except ValueError:
                     # File exists, but is not fully populated yet
+                    log.debug('HXR Could not load json file')
                     return False
-            log.debug("found container runtime %s" % container_runtime)
+            log.debug("HXR found container runtime %s" % container_runtime)
             self.app.interactivetool_manager.configure_entry_points(job, container_runtime)
             return True
 
@@ -2021,7 +2031,7 @@ class JobWrapper(HasResourceParameters):
                 "connection_configuration": container.connection_configuration,
             }, f)
 
-        return "(python '%s'/lib/galaxy_ext/container_monitor/monitor.py &) " % exec_dir
+        return "(python '/data/gxnew/server/lib/galaxy_ext/container_monitor/monitor.py' &) "
 
     @property
     def user(self):

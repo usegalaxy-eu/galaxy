@@ -6,7 +6,7 @@ from time import time
 import uwsgi
 
 
-realtime_db_file = uwsgi.opt["interactivetools_map"]
+realtime_db_file = "/opt/galaxy/mutable-config/interactivetools_map.sqlite"
 db_conn = sqlite3.connect(realtime_db_file)
 
 DATABASE_TABLE_NAME = 'gxitproxy'
