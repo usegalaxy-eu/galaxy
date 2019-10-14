@@ -622,7 +622,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                 self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
                 with open(self.admin_tool_recommendations_path) as admin_recommendations:
                     self.admin_recommendations_list = json.loads(admin_recommendations.read())
-
         # recreate the neural network model to be used for prediction
         if not self.tool_recommendation_model_path:
             self.tool_recommendation_model_path = os.path.join(os.getcwd(), trans.app.config.tool_recommendation_model_path)
@@ -644,6 +643,12 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             self.reverse_dictionary = dict((v, k) for k, v in self.model_data_dictionary.items())
             # set the list of compatible tools
             self.compatible_tools = json.loads(trained_model.get('compatible_tools').value)
+            self.tool_weights = json.loads(trained_model.get('class_weights').value)
+            self.tool_weights_sorted = dict()
+            # sort the tools' usage dictionary
+            tool_pos_sorted = [int(key) for key in self.tool_weights.keys()]
+            for k in tool_pos_sorted:
+                self.tool_weights_sorted[k] = self.tool_weights[str(k)]
             # iterate through all the attributes of the model to find weights of neural network layers
             for item in trained_model.keys():
                 if "weight_" in item:
@@ -750,6 +755,9 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             # predict next tools for a test path
             prediction = self.loaded_model.predict(sample, verbose=0)
             prediction = np.reshape(prediction, (prediction.shape[1],))
+            # boost the predicted scores using tools' usage
+            weight_values = list(self.tool_weights_sorted.values())
+            prediction = prediction * weight_values
             # normalize the predicted scores with max and sort the predictions
             max_prediction = float(np.max(prediction))
             if max_prediction == 0.0:
