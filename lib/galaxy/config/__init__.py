@@ -409,6 +409,7 @@ class GalaxyAppConfiguration(BaseAppConfiguration):
         self.tool_recommendation_model_path = kwargs.get('tool_recommendation_model_path', None)
         self.enable_admin_tool_recommendations = string_as_bool(kwargs.get('enable_admin_tool_recommendations', 'False'))
         self.admin_tool_recommendations_path = kwargs.get('admin_tool_recommendations_path', None)
+        self.overwrite_model_recommendations = string_as_bool(kwargs.get('overwrite_model_recommendations', 'False'))
         self.enable_openid = string_as_bool(kwargs.get('enable_openid', 'False'))
         self.enable_quotas = string_as_bool(kwargs.get('enable_quotas', 'False'))
         # Tasked job runner.

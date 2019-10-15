@@ -1751,13 +1751,6 @@ galaxy:
 
   # Galaxy real time communication server settings
   #communication_server_port: 7070
-  
-  # Galaxy tool recommendation settings
-  #enable_tool_recommendation: false
-  
-  # Trained model (HDF5 file) path for tool recommendation.
-  # It is required to be set if 'enable_tool_recommendation' property is enabled and set to true.
-  #model_path: 'database/trained_model.hdf5'
 
   # persistent_communication_rooms is a comma-separated list of rooms
   # that should be always available.
@@ -1782,5 +1775,9 @@ galaxy:
 
   # Additional tool recommendations from Galaxy admin
   # They are shown along with the recommendations using deep learning trained model
-  #admin_tool_recommendations_path: 'database/admin_tool_recommendation.json'
-
+  #admin_tool_recommendations_path: 'config/admin_tool_recommendation.yml'
+  
+  # Overwrite or append to the tool recommendations by the deep learning model
+  # When set to true, all the recommendations by the deep learning model are overwritten by the recommendations set by an admin
+  # When set to false, they are appended
+  #overwrite_model_recommendations: false

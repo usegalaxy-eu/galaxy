@@ -60,6 +60,7 @@ class ConfigSerializer(base.ModelSerializer):
             'tool_recommendation_model_path'    : _defaults_to(None),
             'enable_admin_tool_recommendations' : _defaults_to(False),
             'admin_tool_recommendations_path'   : _defaults_to(None),
+            'overwrite_model_recommendations'   : _defaults_to(False),
             'allow_user_impersonation'          : _defaults_to(False),
             'allow_user_creation'               : _defaults_to(False),
             'use_remote_user'                   : _defaults_to(None),

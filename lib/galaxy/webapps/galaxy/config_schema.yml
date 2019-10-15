@@ -2834,8 +2834,17 @@ mapping:
 
       admin_tool_recommendations_path:
         type: str
-        default: 'database/admin_tool_recommendation.json'
+        default: 'config/tool_recommendations_overwrite.yml'
         required: false
         desc: |
           Set path to the additional tool recommendations from Galaxy admin.
           They are shown along with the recommendations using deep learning trained model
+          
+      overwrite_model_recommendations:
+        type: bool
+        default: false
+        required: false
+        desc: |
+          Overwrite or append to the tool recommendations by the deep learning model
+          When set to true, all the recommendations by the deep learning model are overwritten by the recommendations set by an admin.
+          When set to false, they are appended

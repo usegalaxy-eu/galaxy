@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 import io
 import json
+import yaml
 import logging
 import os
 
@@ -616,12 +617,13 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             return
         tool_sequence = payload.get('tool_sequence', "")
         self.enable_admin_tool_recommendations = trans.app.config.enable_admin_tool_recommendations
+        self.overwrite_model_recommendations = trans.app.config.overwrite_model_recommendations
         # collect tool recommendations if set by admin
         if not self.admin_tool_recommendations_path:
             if self.enable_admin_tool_recommendations is True or self.enable_admin_tool_recommendations == "true":
                 self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
                 with open(self.admin_tool_recommendations_path) as admin_recommendations:
-                    self.admin_recommendations_list = json.loads(admin_recommendations.read())
+                    self.admin_recommendations = yaml.safe_load(admin_recommendations)
         # recreate the neural network model to be used for prediction
         if not self.tool_recommendation_model_path:
             self.tool_recommendation_model_path = os.path.join(os.getcwd(), trans.app.config.tool_recommendation_model_path)
@@ -712,11 +714,16 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                     break
         # show only a few
         prediction_data["children"] = prediction_data["children"][:to_show - 1]
-        # extend recommendations by adding a list of recommended tools set by the admin
+        assert isinstance(self.admin_recommendations, dict), True
+        # apply the recommendations setup by admins
         if self.enable_admin_tool_recommendations is True or self.enable_admin_tool_recommendations == "true":
-            for item in self.admin_recommendations_list["tools"]:
-                if last_tool_name == item["tool_id"]:
-                    prediction_data["children"].extend(item["recommendations"])
+            for tool_id in self.admin_recommendations:
+                if last_tool_name == tool_id:
+                    admin_recommendations = self.admin_recommendations[tool_id]
+                    if self.overwrite_model_recommendations is True or self.overwrite_model_recommendations == "true":
+                        prediction_data["children"] = admin_recommendations
+                    else:
+                        prediction_data["children"].extend(admin_recommendations)
                     break
         # get the root name for displaying after tool run
         for t_id in self.all_tools:
