@@ -1770,7 +1770,8 @@ galaxy:
   
   # Enable tool recommendations to be set by Galaxy admins
   # If set to true, 'admin_tool_recommendations_path' must be set as well
-  # which takes the path of the additional list of tools to be recommended
+  # which takes the path of the additional list of tools to be recommended.
+  # This is useful to promote new tools.
   #enable_admin_tool_recommendations: false
 
   # Additional tool recommendations from Galaxy admin
