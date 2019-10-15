@@ -2849,7 +2849,3 @@ mapping:
           Overwrite or append to the tool recommendations by the deep learning model. When set to true, all the recommendations by the deep learning model 
           are overwritten by the recommendations set by an admin in a config file 'admin_tool_recommendation.yml'. When set to false, the recommended tools 
           by an admin and predicted by the deep learning model are shown.
-          
-          
-          
-          
