@@ -1,0 +1,22 @@
+# Provide list of tools to be recommended as YAML collections. These tools will either be appended to the tools recommended by deep learning model or 
+# completely overwrite them for the specified tools.
+# Please add the source tool id and its recommended tools in the following format.
+#
+# '<<source tool id>>': [{tool_id: <<recommended tool id>>, name: '<<tool description>>', i_extensions: [<<list of input datatype extensions for tool1>>]}]
+#
+# For example - To recommend tools for 'Cut1' tool
+# 'Cut1': [
+#     {
+#          tool_id: cat1,
+#          name: 'Concatenate datasets tail-to-head',
+#          i_extensions: ['tabular', 'txt']
+#     },
+#     {
+#          tool_id: Filter1,
+#          name: 'Filter1',
+#          i_extensions: ['tabular', 'txt']
+#     },
+# ]
+#
+#
+
