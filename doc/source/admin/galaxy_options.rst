@@ -3808,9 +3808,11 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :Description:
-    Set path to the additional tool recommendations from Galaxy admin.
-    They are shown along with the recommendations using deep learning
-    trained model
+    Set path to the additional tool preferences from Galaxy admins. It
+    has two blocks. One for listing deprecated tools which will be
+    removed from the recommendations and  another is for adding
+    additional tools to be recommended along side those from the deep
+    learning model.
 :Default: ``config/tool_recommendations_overwrite.yml``
 :Type: str
 
@@ -3824,7 +3826,7 @@
     learning model. When set to true, all the recommendations by the
     deep learning model  are overwritten by the recommendations set by
     an admin in a config file 'admin_tool_recommendation.yml'. When
-    set to false, the recommended tools  by an admin and predicted by
+    set to false, the recommended tools  by admins and predicted by
     the deep learning model are shown.
 :Default: ``false``
 :Type: bool

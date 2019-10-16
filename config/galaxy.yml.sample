@@ -1831,16 +1831,18 @@ galaxy:
   # This is useful to promote new tools.
   #enable_admin_tool_recommendations: false
 
-  # Set path to the additional tool recommendations from Galaxy admin.
-  # They are shown along with the recommendations using deep learning
-  # trained model
+  # Set path to the additional tool preferences from Galaxy admins. It
+  # has two blocks. One for listing deprecated tools which will be
+  # removed from the recommendations and  another is for adding
+  # additional tools to be recommended along side those from the deep
+  # learning model.
   #admin_tool_recommendations_path: config/tool_recommendations_overwrite.yml
 
   # Overwrite or append to the tool recommendations by the deep learning
   # model. When set to true, all the recommendations by the deep
   # learning model  are overwritten by the recommendations set by an
   # admin in a config file 'admin_tool_recommendation.yml'. When set to
-  # false, the recommended tools  by an admin and predicted by the deep
+  # false, the recommended tools  by admins and predicted by the deep
   # learning model are shown.
   #overwrite_model_recommendations: false
 
