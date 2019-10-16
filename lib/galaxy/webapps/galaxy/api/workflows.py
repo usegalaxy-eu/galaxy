@@ -626,7 +626,7 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                     self.admin_recommendations = yaml.safe_load(admin_recommendations)
         # recreate the neural network model to be used for prediction
         if not self.tool_recommendation_model_path:
-            self.tool_recommendation_model_path = os.path.join(os.getcwd(), trans.app.config.tool_recommendation_model_path)
+            self.tool_recommendation_model_path = self.__download_model(trans)
             self.all_tools = dict()
             model_weights = list()
             counter_layer_weights = 0
@@ -670,6 +670,19 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
     #
     # -- Helper methods --
     #
+
+    def __download_model(self, trans, download_local='database/'):
+        """
+        Download the model from remote server
+        """
+        url = trans.app.config.tool_recommendation_model_path
+        local_dir = os.path.join(os.getcwd(), download_local, 'tool_recommendation_model.hdf5')
+        # read model from remote
+        model_binary = requests.get(url)
+        # save model to a local directory
+        with open(local_dir, 'wb') as model_file:
+            model_file.write(model_binary.content)
+            return local_dir
 
     def __get_tool_extensions(self, trans, tool_id):
         """

@@ -235,7 +235,7 @@
     of files, or (for backwards compatibility) a comma-separated list
     of files.
 :Default: ``config/tool_conf.xml``
-:Type: list or str
+:Type: any
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -320,7 +320,7 @@
     defaults set relative to this path, such as the default conda
     prefix, default Galaxy packages path, legacy tool shed
     dependencies path, and the dependency cache directory.  Set the
-    string to None to explicitly disable tool dependency handling. If
+    string to null to explicitly disable tool dependency handling. If
     this option is set to none or an invalid path, installing tools
     with dependencies from the Tool Shed or in Conda will fail.
 :Default: ``database/dependencies``
@@ -3764,6 +3764,69 @@
     This should normally be left enabled unless there is a specific
     reason to disable it.
 :Default: ``true``
+:Type: bool
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``enable_tool_recommendations``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Description:
+    Allow the display of tool recommendations in workflow editor and
+    after tool execution
+:Default: ``false``
+:Type: bool
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``tool_recommendation_model_path``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Description:
+    Set remote path of the trained model (HDF5 file) for tool
+    recommendation. It is required to be set if
+    'enable_tool_recommendations' property is enabled and set to true.
+:Default: ``https://github.com/anuprulez/download_store/raw/tool_recommendation_model/tool_recommendation_model/tool_recommendation_model.hdf5``
+:Type: str
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``enable_admin_tool_recommendations``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Description:
+    Enable tool recommendations to be set by Galaxy admins. If set to
+    true, 'admin_tool_recommendations_path' must be set as well which
+    takes the path of the additional list of tools to be recommended.
+    This is useful to promote new tools.
+:Default: ``false``
+:Type: bool
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``admin_tool_recommendations_path``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Description:
+    Set path to the additional tool recommendations from Galaxy admin.
+    They are shown along with the recommendations using deep learning
+    trained model
+:Default: ``config/tool_recommendations_overwrite.yml``
+:Type: str
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``overwrite_model_recommendations``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Description:
+    Overwrite or append to the tool recommendations by the deep
+    learning model. When set to true, all the recommendations by the
+    deep learning model  are overwritten by the recommendations set by
+    an admin in a config file 'admin_tool_recommendation.yml'. When
+    set to false, the recommended tools  by an admin and predicted by
+    the deep learning model are shown.
+:Default: ``false``
 :Type: bool
 
 
