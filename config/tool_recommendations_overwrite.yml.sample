@@ -9,6 +9,7 @@
 #  - is_deprecated: True
 #    text_message: It is deprecated
 #
+
 #
 # Provide list of tools to be recommended. These tools will either be appended to the tools recommended by deep learning model or 
 # completely overwrite them for the specified tools.

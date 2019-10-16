@@ -725,12 +725,14 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         """
         to_show = 20
         last_compatible_tools = self.compatible_tools[last_tool_name].split(",")
-        # get the predicted tools
-        for child, score in zip(tool_ids, tool_scores):
+        prediction_data["is_deprecated"] = False
+        t_ids_scores = zip(tool_ids, tool_scores)
+        # form the payload of the predicted tools to be shown
+        for child, score in t_ids_scores:
             c_dict = dict()
             for t_id in self.all_tools:
                 # select the name and tool id if it is installed in Galaxy
-                if t_id == child and score > 0.0 and child in last_compatible_tools and t_id not in self.deprecated_tools:
+                if t_id == child and score > 0.0 and child in last_compatible_tools:
                     full_tool_id = self.all_tools[t_id][0]
                     pred_input_extensions, _ = self.__get_tool_extensions(trans, full_tool_id)
                     c_dict["name"] = self.all_tools[t_id][1] + " (" + str(score) + "%)"
@@ -738,10 +740,17 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
                     c_dict["i_extensions"] = list(set(pred_input_extensions))
                     prediction_data["children"].append(c_dict)
                     break
-        # show only a few
+        # show only a few by the deep learning model
         prediction_data["children"] = prediction_data["children"][:to_show - 1]
-        # apply the recommendations setup by admins
+        # incorporate preferences set by admins
         if self.enable_admin_tool_recommendations is True:
+            # filter out deprecated tools
+            t_ids_scores = [(tid, score) for tid, score in zip(tool_ids, tool_scores) if tid not in self.deprecated_tools]
+            # set the property if the last tool of the sequence is deprecated
+            if last_tool_name in self.deprecated_tools:
+                prediction_data["is_deprecated"] = True
+                prediction_data["message"] = self.deprecated_tools[last_tool_name]
+            # add the recommendations given by admins
             for tool_id in self.admin_recommendations:
                 if last_tool_name == tool_id:
                     admin_recommendations = self.admin_recommendations[tool_id]
@@ -755,12 +764,6 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
             if t_id == last_tool_name:
                 prediction_data["name"] = self.all_tools[t_id][1]
                 break
-        # set the property if the last tool of the sequence is deprecated
-        if last_tool_name in self.deprecated_tools:
-            prediction_data["is_deprecated"] = True
-            prediction_data["message"] = self.deprecated_tools[last_tool_name]
-        else:
-            prediction_data["is_deprecated"] = False
         return prediction_data
 
     def __compute_tool_prediction(self, trans, tool_sequence):

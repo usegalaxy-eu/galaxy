@@ -3773,7 +3773,8 @@
 
 :Description:
     Allow the display of tool recommendations in workflow editor and
-    after tool execution
+    after tool execution. If it is enabled and set to true, please
+    enable 'tool_recommendation_model_path' as well
 :Default: ``false``
 :Type: bool
 
@@ -3825,9 +3826,9 @@
     Overwrite or append to the tool recommendations by the deep
     learning model. When set to true, all the recommendations by the
     deep learning model  are overwritten by the recommendations set by
-    an admin in a config file 'admin_tool_recommendation.yml'. When
-    set to false, the recommended tools  by admins and predicted by
-    the deep learning model are shown.
+    an admin in a config file 'tool_recommendations_overwrite.yml'.
+    When set to false, the recommended tools  by admins and predicted
+    by the deep learning model are shown.
 :Default: ``false``
 :Type: bool
 
