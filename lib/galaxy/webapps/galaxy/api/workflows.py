@@ -620,19 +620,23 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         self.overwrite_model_recommendations = trans.app.config.overwrite_model_recommendations
         # collect tool recommendation preferences if set by admin
         if not self.admin_tool_recommendations_path:
-            if self.enable_admin_tool_recommendations is True or self.enable_admin_tool_recommendations == "true":
+            if self.enable_admin_tool_recommendations is True:
                 self.admin_tool_recommendations_path = os.path.join(os.getcwd(), trans.app.config.admin_tool_recommendations_path)
-                with open(self.admin_tool_recommendations_path) as admin_recommendations:
-                    self.admin_recommendation_preferences = yaml.safe_load(admin_recommendations)
-                    self.deprecated_tools = dict()
-                    self.admin_recommendations = dict()
-                    for tool_id in self.admin_recommendation_preferences:
-                        tool_info = self.admin_recommendation_preferences[tool_id]
-                        if 'is_deprecated' in tool_info[0]:
-                            self.deprecated_tools[tool_id] = tool_info[0]["text_message"]
-                        else:
-                            if tool_id not in self.admin_recommendations:
-                                self.admin_recommendations[tool_id] = tool_info
+                self.deprecated_tools = dict()
+                self.admin_recommendations = dict()
+                try:
+                    with open(self.admin_tool_recommendations_path) as admin_recommendations:
+                        admin_recommendation_preferences = yaml.safe_load(admin_recommendations)
+                        if admin_recommendation_preferences:
+                            for tool_id in admin_recommendation_preferences:
+                                tool_info = admin_recommendation_preferences[tool_id]
+                                if 'is_deprecated' in tool_info[0]:
+                                    self.deprecated_tools[tool_id] = tool_info[0]["text_message"]
+                                else:
+                                    if tool_id not in self.admin_recommendations:
+                                        self.admin_recommendations[tool_id] = tool_info
+                except Exception as exp:
+                    pass
         # recreate the neural network model to be used for prediction
         if not self.tool_recommendation_model_path:
             self.tool_recommendation_model_path = self.__download_model(trans)
@@ -737,11 +741,11 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         # show only a few
         prediction_data["children"] = prediction_data["children"][:to_show - 1]
         # apply the recommendations setup by admins
-        if self.enable_admin_tool_recommendations is True or self.enable_admin_tool_recommendations == "true":
+        if self.enable_admin_tool_recommendations is True:
             for tool_id in self.admin_recommendations:
                 if last_tool_name == tool_id:
                     admin_recommendations = self.admin_recommendations[tool_id]
-                    if self.overwrite_model_recommendations is True or self.overwrite_model_recommendations == "true":
+                    if self.overwrite_model_recommendations is True:
                         prediction_data["children"] = admin_recommendations
                     else:
                         prediction_data["children"].extend(admin_recommendations)
