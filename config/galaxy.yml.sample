@@ -1826,12 +1826,6 @@ galaxy:
   # 'enable_tool_recommendations' property is enabled and set to true.
   #tool_recommendation_model_path: https://github.com/anuprulez/download_store/raw/tool_recommendation_model/tool_recommendation_model/tool_recommendation_model.hdf5
 
-  # Enable tool recommendations to be set by Galaxy admins. If set to
-  # true, 'admin_tool_recommendations_path' must be set as well which
-  # takes the path of the additional list of tools to be recommended.
-  # This is useful to promote new tools.
-  #enable_admin_tool_recommendations: false
-
   # Set path to the additional tool preferences from Galaxy admins. It
   # has two blocks. One for listing deprecated tools which will be
   # removed from the recommendations and  another is for adding

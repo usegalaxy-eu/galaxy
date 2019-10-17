@@ -3791,19 +3791,6 @@
 :Type: str
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``enable_admin_tool_recommendations``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:Description:
-    Enable tool recommendations to be set by Galaxy admins. If set to
-    true, 'admin_tool_recommendations_path' must be set as well which
-    takes the path of the additional list of tools to be recommended.
-    This is useful to promote new tools.
-:Default: ``false``
-:Type: bool
-
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``admin_tool_recommendations_path``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
