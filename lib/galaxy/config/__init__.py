@@ -406,6 +406,7 @@ class GalaxyAppConfiguration(BaseAppConfiguration):
         self.tool_recommendation_model_path = kwargs.get('tool_recommendation_model_path', None)
         self.admin_tool_recommendations_path = kwargs.get('admin_tool_recommendations_path', None)
         self.overwrite_model_recommendations = string_as_bool(kwargs.get('overwrite_model_recommendations', False))
+        self.topk_recommendations = int(kwargs.get('topk_recommendations', 20))
         self.communication_server_host = kwargs.get('communication_server_host', 'http://localhost')
         self.communication_server_port = int(kwargs.get('communication_server_port', '7070'))
         self.persistent_communication_rooms = listify(kwargs.get("persistent_communication_rooms", []), do_strip=True)

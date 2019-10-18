@@ -1543,7 +1543,8 @@ galaxy:
   # does not exist).
   #data_manager_config_file: config/data_manager_conf.xml
 
-  # File where Tool Shed based Data Managers are configured.
+  # File where Tool Shed based Data Managers are configured. This file
+  # will be created automatically upon data manager installation.
   #shed_data_manager_config_file: config/shed_data_manager_conf.xml
 
   # Directory to store Data Manager based tool-data; defaults to
@@ -1825,6 +1826,10 @@ galaxy:
   # recommendation. It is required to be set if
   # 'enable_tool_recommendations' property is enabled and set to true.
   #tool_recommendation_model_path: https://github.com/anuprulez/download_store/raw/tool_recommendation_model/tool_recommendation_model/tool_recommendation_model.hdf5
+
+  # Set the number of predictions/recommendations to be made by the
+  # model
+  #topk_recommendations: 20
 
   # Set path to the additional tool preferences from Galaxy admins. It
   # has two blocks. One for listing deprecated tools which will be
