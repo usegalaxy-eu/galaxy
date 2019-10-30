@@ -1,20 +1,21 @@
 import json
-import time
 import os
-import subprocess
 import socket
+import subprocess
 import sys
 import tempfile
+import time
 
 # insert *this* galaxy before all others on sys.path
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
 
 from galaxy.tool_util.deps import docker_util
 
+
 def parse_ports(container_name, connection_configuration):
     while True:
         ports_command = docker_util.build_docker_simple_command("port", container_name=container_name, **connection_configuration)
-        with tempfile.TemporaryFile() as stdout_file:
+        with tempfile.TemporaryFile(prefix="docker_port_") as stdout_file:
             exit_code = subprocess.call(ports_command,
                                         shell=True,
                                         stdout=stdout_file,
@@ -24,9 +25,8 @@ def parse_ports(container_name, connection_configuration):
                 ports_raw = stdout_file.read()
                 return ports_raw
 
-def main():
-    open("monitor.log", 'w+').write('HXR monitor script running')
 
+def main():
     with open("container_config.json", "r") as f:
         container_config = json.load(f)
 
@@ -52,7 +52,7 @@ def main():
             else:
                 raise Exception("Failed to recover ports...")
         except Exception as e:
-            with open("exception.txt", "w") as f:
+            with open("container_monitor_exception.txt", "a") as f:
                 f.write(str(e))
         time.sleep(i * 2)
 
