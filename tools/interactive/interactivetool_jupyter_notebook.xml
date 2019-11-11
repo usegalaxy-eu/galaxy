@@ -1,4 +1,12 @@
-<tool id="interactive_tool_jupyter_notebook" tool_type="interactive" name="Interactive Jupyter Notebook" version="0.1">
+<tool id="interactive_tool_jupyter_notebook" tool_type="interactive" name="Interactive Jupyter Notebook" version="0.2">
+    <macros>
+        <token name="@COPEN@"><![CDATA[<code>]]></token>
+        <token name="@CCLOSE@"><![CDATA[</code>]]></token>
+        <macro name="validator_text_required" >
+            <validator type="regex" message="No special characters allowed">^[A-Za-z0-9_]+$</validator>
+            <validator type="empty_field" />
+        </macro>
+    </macros>
     <requirements>
         <container type="docker">quay.io/bgruening/docker-jupyter-notebook:ie2</container>
     </requirements>
@@ -21,8 +29,13 @@
         mkdir -p ./jupyter/outputs/ &&
         mkdir -p ./jupyter/data &&
 
-        #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($input.element_identifier))
-        ln -sf '$input' './jupyter/data/${cleaned_name}' &&
+        ## Previous method of cleaning filenames is not needed if the wrapper now
+        ## takes a clean user string
+        ## #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($input.element_identifier))
+
+        #for $x in $input_repeats:
+            ln -sf '$x.dataset' './jupyter/data/$x.handle' &&
+        #end for
 
         ## change into the directory where the notebooks are located
         cd ./jupyter/ &&
@@ -63,8 +76,13 @@
                     help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
             </when>
         </conditional>
-        <param name="input" type="data" optional="true" label="Include data into the environment"/>
-
+        <repeat name="input_repeats" title="Input Dataset(s)" >
+            <param name="dataset" type="data" optional="true" label="Dataset : choose data to place into the environment"/>
+            <param name="handle" type="text" label="Handle: set the desired name of the dataset in the environment"
+                   help="The dataset will be available in the root directory of the environment with this handle. e.g. setting the handle to @COPEN@mydataset1.csv@CCLOSE@ will enable the file to be imported into RStudio via @COPEN@file = read.csv('./mydataset1.csv')@CCLOSE@. Please do not use the same handle for different datasets." >
+                <expand macro="validator_text_required" />
+            </param>
+        </repeat>
     </inputs>
     <outputs>
         <data name="jupyter_notebook" format="ipynb" label="Executed Notebook"></data>
