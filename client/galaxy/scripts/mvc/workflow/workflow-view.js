@@ -931,8 +931,6 @@ export default Backbone.View.extend({
         }
         return toolId;
     },
-    
-    
 
     getToolRecommendations: function(node, toolId) {
         let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId),
@@ -952,7 +950,7 @@ export default Backbone.View.extend({
             body: "<div> Loading tools ... </div>",
             buttons: buttons,
             height: "280",
-            width: "250",
+            width: "260",
             closing_events: true,
             title_separator: true        
         });
