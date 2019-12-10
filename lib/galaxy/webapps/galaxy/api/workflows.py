@@ -738,7 +738,9 @@ class WorkflowsAPIController(BaseAPIController, UsesStoredWorkflowMixin, UsesAnn
         Filter tool predictions based on datatype compatibility and tool connections.
         Add admin preferences to recommendations.
         """
-        last_compatible_tools = self.compatible_tools[last_tool_name].split(",")
+        last_compatible_tools = list()
+        if last_tool_name in self.compatible_tools:
+            last_compatible_tools = self.compatible_tools[last_tool_name].split(",")
         prediction_data["is_deprecated"] = False
         t_ids_scores = zip(tool_ids, tool_scores)
         # form the payload of the predicted tools to be shown

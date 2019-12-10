@@ -931,19 +931,27 @@ export default Backbone.View.extend({
         }
         return toolId;
     },
+    
+    
 
     getToolRecommendations: function(node, toolId) {
-        let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId);
+        let tool_sequence = this.get_workflow_path(this.workflow.to_simple(), node.id, toolId),
+        noRecommendationsMessage = "No tool recommendations",
+        predTemplate = "<div>",
+        modal = null,
+        buttons = {},
         // remove ui-modal if present
-        let $modal = $(".modal-tool-recommendation");
+        $modal = $(".modal-tool-recommendation");
         if ($modal.length > 0) {
             $modal.remove();
         }
+        buttons[_l("Close")] = function() {modal.el.remove()};
         // create new modal
-        let modal = new Modal.View({
+        modal = new Modal.View({
             title: "Recommended tools",
             body: "<div> Loading tools ... </div>",
-            height: "230",
+            buttons: buttons,
+            height: "280",
             width: "250",
             closing_events: true,
             title_separator: true        
@@ -958,11 +966,9 @@ export default Backbone.View.extend({
             url: `${getAppRoot()}api/workflows/get_tool_predictions`,
             data: {"tool_sequence": tool_sequence},
             success: function(data) {
-                let predTemplate = "<div>";
-                let predictedData = data.predicted_data;
-                let outputDatatypes = predictedData["o_extensions"];
-                let predictedDataChildren = predictedData.children;
-                let noRecommendationsMessage = "No tool recommendations";
+                let predictedData = data.predicted_data,
+                outputDatatypes = predictedData["o_extensions"],
+                predictedDataChildren = predictedData.children;
                 if (predictedDataChildren.length > 0) {
                     let compatibleTools = {};
                     // filter results based on datatype compatibility
@@ -980,7 +986,6 @@ export default Backbone.View.extend({
                             }
                         }
                     }
-                    predTemplate += "<div>";
                     if (Object.keys(compatibleTools).length > 0 && predictedData["is_deprecated"] === false) {
                         for (let id in compatibleTools) {
                             predTemplate += "<i class='fa mr-1 fa-wrench'></i><a href='#' title='Click to open the tool' class='pred-tool panel-header-button' id=" + "'" + id + "'" + ">" + compatibleTools[id];
@@ -1004,6 +1009,11 @@ export default Backbone.View.extend({
                     workflow_globals.app.add_node_for_tool(e.target.id, e.target.id);
                     modal.hide();
                 });
+            },
+            error: function(response, status) {
+                predTemplate += noRecommendationsMessage;
+                predTemplate += "</div>";
+                modal.$body.html(predTemplate);
             }
         });
     },
