@@ -1,0 +1,28 @@
+<tool id="interactive_tool_higlass" tool_type="interactive" name="HiGlass" version="1.8.0">
+    <requirements>
+        <container type="docker">higlass/higlass-docker</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="HiGlass Visualisation on $infile.display_name" requires_domain="True">
+            <port>80</port>
+        </entry_point>
+    </entry_points>
+    <command><![CDATA[
+        mkdir higlass-local-data
+        && mkdir higlass-local-tmp
+        
+        && ln -s '$matrix' higlass-local-tmp/'matrix_name.$matrix.ext'
+         
+        && python higlass-server/manage.py ingest_tileset --filename /tmp/'matrix_name.$matrix.ext' --filetype cooler --datatype matrix
+        
+    ]]>
+    </command>
+    <inputs>
+        <param name="matrix" type="data" format="cool" label="Cool file with multiple resolutions"/>
+    </inputs>
+    <tests>
+    </tests>
+    <help>
+    Interactive tool for visualising Hi-C data
+    </help>
+</tool>
