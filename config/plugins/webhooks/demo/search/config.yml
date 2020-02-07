@@ -1,7 +1,7 @@
 id: searchover
 type:
   - masthead
-activate: false
+activate: true
 
 icon: fa-search
 tooltip: Toggle search overlay

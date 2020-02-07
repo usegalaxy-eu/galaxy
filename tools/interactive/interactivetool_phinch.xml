@@ -18,7 +18,6 @@
         cd /home/Phinch/data &&
         sed -i  "s/'REPLACE_ME'/'${name}.biom'/g" /home/Phinch/scripts/readFile.js &&
         sed -i  "s/http/https/g" /home/Phinch/scripts/readFile.js &&
-
         ## keep it running
         cd /home/Phinch &&
         php -S 0.0.0.0:80 2>&1 > /var/log/phinch.log
