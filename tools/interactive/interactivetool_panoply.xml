@@ -10,14 +10,14 @@
     </entry_points>
     <command><![CDATA[
         current_pwd=`pwd` &&
-        ln -s $current_pwd /config && 
+        ln -s $current_pwd /config &&
 	mkdir /config/home  &&
 	mkdir /config/home/output &&
 	export HOME=/config/home &&
 	ln -s '$infile' '/config/home/$infile.display_name' &&
 	mkdir /config/home/.gissjava &&
 	cd /config/home/.gissjava    &&
-	tar xvf '$__tool_directory__/colorbars.tar' &&
+	tar xvf /opt/PanoplyJ/colorbars.tar &&
 	cd /config/home &&
 	/init
     ]]>
@@ -27,7 +27,7 @@
     </inputs>
     <outputs>
         <data name="outfile" format="png">
-	   <discover_datasets pattern="__designation_and_ext__" directory="output" visible="true" />
+	   <discover_datasets pattern="__designation_and_ext__" directory="output" visible="true"/>
 	</data>
     </outputs>
     <tests>
