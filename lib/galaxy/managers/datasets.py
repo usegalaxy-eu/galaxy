@@ -659,6 +659,7 @@ class DatasetAssociationDeserializer(base.ModelDeserializer, deletable.PurgableD
         self.deserializers.update({
             'name' : self.deserialize_basestring,
             'info' : self.deserialize_basestring,
+            'extension' : self.deserialize_basestring,
         })
         self.deserializable_keyset.update(self.deserializers.keys())
 
