@@ -19,7 +19,7 @@
 	tar xvf /opt/PanoplyJ/colorbars.tar &&
 	cd - &&
 	/init &&
-	cp /config/home/output/*.png output/.
+	cp /config/home/output/*.png output/. | true
     ]]>
     </command>
     <inputs>
