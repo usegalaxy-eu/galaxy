@@ -1,7 +1,7 @@
 <tool id="interactive_tool_panoply" tool_type="interactive" name="Panoply" version="0.1">
     <description>interative plotting tool for geo-referenced data</description>
     <requirements>
-        <container type="docker">quay.io/nordicesmhub/docker-panoply</container>
+        <container type="docker">quay.io/nordicesmhub/docker-panoply:4.5.1</container>
     </requirements>
     <entry_points>
         <entry_point name="Panoply on $infile.display_name" requires_domain="True">
