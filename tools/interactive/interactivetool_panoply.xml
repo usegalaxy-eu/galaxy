@@ -23,12 +23,12 @@
         tar xvf /opt/PanoplyJ/colorbars.tar &&
         cd - &&
         /init ;
-        echo "Panoply version @VERSION@" > output/version.txt &&
+        echo "Galaxy Panoply version @VERSION@" > output/version.txt &&
         cp /config/home/output/* output/ | true &&
         cd output &&
-        for file in *; do mv \$file \$file.\${file\#\#*.}; done
-        &&
-    ls -l
+        sleep 2 &&
+        for file in *; do mv "\$file" "\${file// /_}"; done &&
+        for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
     ]]>
     </command>
     <inputs>
