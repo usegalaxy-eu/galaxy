@@ -23,7 +23,7 @@
 
         #if $input:
             #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($input.element_identifier))
-	    get -t name -i '${input.hid}' &&
+	    get -t hid -i '${input.hid}' &&
 	    ln -sf '/import/${input.hid}' './jupyter/data/${cleaned_name}' &&
         #end if
 
@@ -40,7 +40,7 @@
 
         #else:
             #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($mode.ipynb.element_identifier))
-	    get -t name -i '${mode.ipynb.hid}' &&
+	    get -t hid -i '${mode.ipynb.hid}' &&
 	    ln -sf '/import/${mode.ipynb.hid}' './jupyter/data/${cleaned_name}' &&
             jupyter trust ./${cleaned_name} &&
 
