@@ -32,16 +32,12 @@
     ]]>
     </command>
     <inputs>
-    <param name="infile" type="data" format="netcdf,h5" label="netcdf"/>
+        <param name="infile" type="data" format="netcdf,h5" label="netcdf"/>
     </inputs>
     <outputs>
-    <!--data name="outfile" format="png">
-           <discover_datasets pattern="__designation_and_ext__" directory="output" visible="true"/>
-        </data-->
         <collection name="outputs" type="list" label="Panoply outputs">
             <discover_datasets pattern="__name_and_ext__" directory="output" />
         </collection>
-
     </outputs>
     <tests>
     </tests>
