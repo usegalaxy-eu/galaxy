@@ -62,12 +62,14 @@ html, body {
 .top-row {
     height: 6%;
     width: 100%;
+    margin-top: 0.5%;
 }
 
 .filter-row {
     display: none;
     height: 4%;
     width: 100%;
+    margin-top: 0.1%;
 }
 
 .heading {
@@ -75,7 +77,6 @@ html, body {
 }
 
 .elem-rna {
-    margin-top: 0.5%;
     font-size: 9pt;
 }
 

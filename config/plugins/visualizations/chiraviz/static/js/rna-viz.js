@@ -1716,14 +1716,14 @@ var RNAInteractionViewer = (function(riv) {
       "</div>" +
       '<div class="col-sm-2 elem-rna">' +
       '<select name="sort" class="rna-sort form-control elem-rna" title="Sort">' +
-      '<option value="-1">Sort by...</option>' +
+      '<option value="-1">--sort--</option>' +
       '<option value="score_asc">Score asc</option>' +
       '<option value="score_desc">Score desc</option>' +
       "</select>" +
       "</div>" +
       '<div class="col-sm-2 elem-rna">' +
       '<select name="filter" class="rna-filter form-control elem-rna" title="Filter">' +
-      '<option value="-1">Filter by...</option>' +
+      '<option value="-1">--filter--</option>' +
       '<option value="score">Score</option>' +
       '<option value="hybrid">Hybrid</option>' +
       '<option value="mfe">Free energy</option>' +
@@ -1731,7 +1731,7 @@ var RNAInteractionViewer = (function(riv) {
       "</div>" +
       '<div class="col-sm-2 elem-rna">' +
       '<select name="filter-operator" class="filter-operator form-control elem-rna" title="Filter operator">' +
-      '<option value="-1">Choose operator...</option>' +
+      '<option value="-1">--operator--</option>' +
       '<option value="=">=</option>' +
       '<option value=">">></option>' +
       '<option value="<"><</option>' +
