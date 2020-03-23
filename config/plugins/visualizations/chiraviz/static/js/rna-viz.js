@@ -9,8 +9,7 @@ in multiple plots, comic alignments
 var RNAInteractionViewer = (function(riv) {
   riv.configObject = null;
   riv.model = null;
-  riv.showRecords = 50;
-  riv.nIncrement = 50;
+  riv.nIncrement = 25;
   riv.counterRecords = 0;
   riv.minQueryLength = 3;
   riv.type1 = null;
