@@ -4,7 +4,7 @@ import 'script-loader!./js/rna-viz'
 import 'script-loader!underscore/underscore-min'
 import 'script-loader!plotly.js-dist'
 
-import './js/visualize-alignment'
+import 'script-loader!./js/visualize-alignment'
 
 require('bootstrap');
 
