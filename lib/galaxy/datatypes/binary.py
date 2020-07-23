@@ -1543,6 +1543,62 @@ class MCool(H5):
         except Exception:
             return f"MCool (HDF5) file ({nice_size(dataset.get_size())})."
 
+        
+class SCool(H5):
+    """
+    Class describing the single-cell cool format (https://github.com/mirnylab/cooler)
+    """
+
+    file_ext = "scool"
+
+    def sniff(self, filename):
+        """
+        >>> from galaxy.datatypes.sniff import get_test_fname
+        >>> fname = get_test_fname('matrix.scool')
+        >>> SCool().sniff(fname)
+        True
+        >>> fname = get_test_fname('matrix.cool')
+        >>> SCool().sniff(fname)
+        False
+        >>> fname = get_test_fname('test.mz5')
+        >>> SCool().sniff(fname)
+        False
+        >>> fname = get_test_fname('wiggle.wig')
+        >>> SCool().sniff(fname)
+        False
+        >>> fname = get_test_fname('biom2_sparse_otu_table_hdf5.biom2')
+        >>> SCool().sniff(fname)
+        False
+        """
+
+        MAGIC = "HDF5::Cooler"
+        URL = "https://github.com/mirnylab/cooler"
+
+        if super(SCool, self).sniff(filename):
+            with h5py.File(filename, 'r') as handle:
+                keys = ['chroms', 'bins', 'pixels', 'indexes']
+                for matrix in handle.keys():
+                    fmt = util.unicodify(handle[matrix].attrs.get('format'))
+                    url = util.unicodify(handle[matrix].attrs.get('format-url'))
+                    if fmt == MAGIC or url == URL:
+                        if not all(name in handle[matrix].keys() for name in keys):
+                            return False
+                return True
+        return False
+
+    def set_peek(self, dataset, is_multi_byte=False):
+        if not dataset.dataset.purged:
+            dataset.peek = "Single-cell Cool (HDF5) file for storing genomic interaction data."
+            dataset.blurb = nice_size(dataset.get_size())
+        else:
+            dataset.peek = 'file does not exist'
+            dataset.blurb = 'file purged from disk'
+
+    def display_peek(self, dataset):
+        try:
+            return dataset.peek
+        except Exception:
+            return "SCool (HDF5) file (%s)." % (nice_size(dataset.get_size()))
 
 class H5MLM(H5):
     """
