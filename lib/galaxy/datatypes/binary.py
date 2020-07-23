@@ -861,6 +861,47 @@ class BcfUncompressed(BaseBcf):
             return False
 
 
+class HIC(Binary):
+    """
+    Class describing an Juicer hic file
+
+    >>> from galaxy.datatypes.sniff import get_test_fname
+    >>> fname = get_test_fname('SRR1791297_30.hic')
+    >>> HIC().sniff(fname)
+    True
+    """
+    file_ext = "hic"
+    # edam_format = "format_3590" # Don't know what to set here or if it is necessary at all. Copied from h5(binary) class.
+
+    def __init__(self, **kwd):
+        Binary.__init__(self, **kwd)
+        self._magic = b'HIC'
+
+    def sniff(self, filename):
+        try:
+            header = open(filename, 'rb')
+            header_magic = struct.unpack('<3s', header.read(3))[0]
+            if header_magic == self._magic:
+                return True
+            return False
+        except Exception:
+            return False
+
+    def set_peek(self, dataset, is_multi_byte=False):
+        if not dataset.dataset.purged:
+            dataset.peek = "HIC file for storing genomic interaction data."
+            dataset.blurb = nice_size(dataset.get_size())
+        else:
+            dataset.peek = 'file does not exist'
+            dataset.blurb = 'file purged from disk'
+
+    def display_peek(self, dataset):
+        try:
+            return dataset.peek
+        except Exception:
+            return "HIC file (%s)" % (nice_size(dataset.get_size()))
+
+
 class H5(Binary):
     """
     Class describing an HDF5 file
