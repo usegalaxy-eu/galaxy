@@ -25,6 +25,7 @@
 import { getToolPredictions } from "./services";
 import LoadingSpan from "components/LoadingSpan";
 import _l from "utils/localization";
+import _ from "underscore";
 
 export default {
     components: {
@@ -135,7 +136,7 @@ export default {
                             }
                         }
                     }
-                    this.compatibleTools = cTools;
+                    this.compatibleTools = _.uniq(cTools, "id");
                 }
                 this.showLoading = false;
             });
