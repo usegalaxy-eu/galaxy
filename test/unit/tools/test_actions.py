@@ -134,13 +134,12 @@ class DefaultToolActionTestCase(unittest.TestCase, tools_support.UsesApp, tools_
         if incoming is None:
             incoming = dict(param1="moo")
         self._init_tool(contents)
-        job, out_data, _, _ = self.action.execute(
+        return self.action.execute(
             tool=self.tool,
             trans=self.trans,
             history=self.history,
             incoming=incoming,
         )
-        return job, out_data
 
 
 def test_determine_output_format():

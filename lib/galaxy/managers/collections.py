@@ -89,8 +89,7 @@ class DatasetCollectionManager(object):
 
     def create(self, trans, parent, name, collection_type, element_identifiers=None,
                elements=None, implicit_collection_info=None, trusted_identifiers=None,
-               hide_source_items=False, tags=None, copy_elements=False, history=None,
-               set_hid=True, flush=True):
+               hide_source_items=False, tags=None, copy_elements=False, history=None):
         """
         PRECONDITION: security checks on ability to add to parent
         occurred during load.
@@ -121,10 +120,10 @@ class DatasetCollectionManager(object):
             implicit_output_name = implicit_collection_info["implicit_output_name"]
 
         return self._create_instance_for_collection(
-            trans, parent, name, dataset_collection, implicit_inputs=implicit_inputs, implicit_output_name=implicit_output_name, tags=tags, set_hid=set_hid, flush=flush,
+            trans, parent, name, dataset_collection, implicit_inputs=implicit_inputs, implicit_output_name=implicit_output_name, tags=tags
         )
 
-    def _create_instance_for_collection(self, trans, parent, name, dataset_collection, implicit_output_name=None, implicit_inputs=None, tags=None, set_hid=True, flush=True):
+    def _create_instance_for_collection(self, trans, parent, name, dataset_collection, implicit_output_name=None, implicit_inputs=None, tags=None, flush=True):
         if isinstance(parent, model.History):
             dataset_collection_instance = self.model.HistoryDatasetCollectionAssociation(
                 collection=dataset_collection,
@@ -138,9 +137,8 @@ class DatasetCollectionManager(object):
                 dataset_collection_instance.implicit_output_name = implicit_output_name
 
             log.debug("Created collection with %d elements" % (len(dataset_collection_instance.collection.elements)))
-
-            if set_hid:
-                parent.add_dataset_collection(dataset_collection_instance)
+            # Handle setting hid
+            parent.add_dataset_collection(dataset_collection_instance)
 
         elif isinstance(parent, model.LibraryFolder):
             dataset_collection_instance = self.model.LibraryDatasetCollectionAssociation(

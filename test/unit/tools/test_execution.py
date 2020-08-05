@@ -211,9 +211,6 @@ class MockTrans(object):
     def get_current_user_roles(self):
         return []
 
-    def log_event(self, *args, **kwds):
-        pass
-
 
 class MockCollectionService(object):
 
