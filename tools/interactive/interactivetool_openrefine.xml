@@ -45,7 +45,7 @@ tail -f /dev/null
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="tabular" label="tabular file"/>
+        <param name="infile" type="data" format="tabular,tsv" optional="true" label="Input file in tabular format"/>
     </inputs>
     <outputs>
         <data name="outfile" format="tabular" />
