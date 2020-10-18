@@ -2,7 +2,6 @@
 Offload jobs to a Kubernetes cluster.
 """
 
-import errno
 import logging
 import math
 import os
@@ -67,8 +66,8 @@ class KubernetesJobRunner(AsynchronousJobRunner):
             k8s_default_limits_cpu=dict(map=str, default=None),
             k8s_default_limits_memory=dict(map=str, default=None),
             k8s_cleanup_job=dict(map=str, valid=lambda s: s in {"onsuccess", "always", "never"}, default="always"),
-            k8s_pod_retries=dict(map=int, valid=lambda x: int >= 0, default=3),
-            k8s_pod_retrials=dict(map=int, valid=lambda x: int >= 0, default=3),
+            k8s_pod_retries=dict(map=int, valid=lambda x: int(x) >= 0, default=3),
+            k8s_pod_retrials=dict(map=int, valid=lambda x: int(x) >= 0, default=3),
             k8s_walltime_limit=dict(map=int, valid=lambda x: int(x) >= 0, default=172800))
 
         if 'runner_param_specs' not in kwargs:
@@ -212,7 +211,7 @@ class KubernetesJobRunner(AsynchronousJobRunner):
     def __produce_unique_k8s_job_name(self, galaxy_internal_job_id):
         # wrapper.get_id_tag() instead of job_id for compatibility with TaskWrappers.
         instance_id = self._galaxy_instance_id or ''
-        return produce_unique_k8s_job_name(app_prefix='galaxy', instance_id=instance_id, job_id=galaxy_internal_job_id)
+        return produce_unique_k8s_job_name(app_prefix='gxy', instance_id=instance_id, job_id=galaxy_internal_job_id)
 
     def __get_k8s_job_spec(self, ajs):
         """Creates the k8s Job spec. For a Job spec, the only requirement is to have a .spec.template.
@@ -227,7 +226,7 @@ class KubernetesJobRunner(AsynchronousJobRunner):
         (see pod selector) and an appropriate restart policy."""
         k8s_spec_template = {
             "metadata": {
-                "labels": {"app": self.__produce_unique_k8s_job_name(ajs.job_wrapper.get_id_tag())}
+                "labels": {"app": self.__produce_unique_k8s_job_name(ajs.job_wrapper.get_id_tag())[:-5]}
             },
             "spec": {
                 "volumes": self.runner_params['k8s_mountable_volumes'],
@@ -465,30 +464,14 @@ class KubernetesJobRunner(AsynchronousJobRunner):
             # there is no job responding to this job_id, it is either lost or something happened.
             log.error("No Jobs are available under expected selector app=%s", job_state.job_id)
             self.mark_as_failed(job_state)
-            try:
-                with open(job_state.error_file, 'w') as error_file:
-                    error_file.write("No Kubernetes Jobs are available under expected selector app=%s\n" % job_state.job_id)
-            except EnvironmentError as e:
-                # Python 2/3 compatible handling of FileNotFoundError
-                if e.errno == errno.ENOENT:
-                    log.error("Job directory already cleaned up. Assuming already handled for selector app=%s", job_state.job_id)
-                else:
-                    raise
-            return job_state
+            # job is no longer viable - remove from watched jobs
+            return None
         else:
             # there is more than one job associated to the expected unique job id used as selector.
             log.error("More than one Kubernetes Job associated to job id '%s'", job_state.job_id)
             self.mark_as_failed(job_state)
-            try:
-                with open(job_state.error_file, 'w') as error_file:
-                    error_file.write("More than one Kubernetes Job associated with job id '%s'\n" % job_state.job_id)
-            except EnvironmentError as e:
-                # Python 2/3 compatible handling of FileNotFoundError
-                if e.errno == errno.ENOENT:
-                    log.error("Job directory already cleaned up. Assuming already handled for selector app=%s", job_state.job_id)
-                else:
-                    raise
-            return job_state
+            # job is no longer viable - remove from watched jobs
+            return None
 
     def _handle_job_failure(self, job, job_state):
         # Figure out why job has failed
@@ -543,7 +526,7 @@ class KubernetesJobRunner(AsynchronousJobRunner):
         """Attempts to delete a dispatched job to the k8s cluster"""
         job = job_wrapper.get_job()
         try:
-            name = self.__produce_unique_k8s_job_name(job.get_id_tag())
+            name = job.job_runner_external_id
             namespace = self.runner_params['k8s_namespace']
             job_to_delete = find_job_object_by_name(self._pykube_api, name, namespace)
             if job_to_delete:
