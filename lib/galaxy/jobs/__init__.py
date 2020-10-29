@@ -467,7 +467,7 @@ class JobConfiguration(ConfiguresHandlers):
             if params is None:
                 params = {}
                 for key, value in tool.items():
-                    if key in ["environment", "handler", "id"]:
+                    if key in ["environment", "handler", "id", "resources"]:
                         continue
                     params[key] = value
                 tool["params"] = params
@@ -1932,10 +1932,13 @@ class JobWrapper(HasResourceParameters):
         return self.output_paths
 
     def get_output_path(self, dataset):
+        if getattr(dataset, "fake_dataset_association", False):
+            return dataset.file_name
+        assert dataset.id is not None, "{} needs to be flushed to find output path".format(dataset)
         if self.output_paths is None:
             self.compute_outputs()
         for (hda, dataset_path) in self.output_hdas_and_paths.values():
-            if hda == dataset:
+            if hda.id == dataset.id:
                 return dataset_path
         raise KeyError("Couldn't find job output for [{}] in [{}]".format(dataset, self.output_hdas_and_paths.values()))
 
