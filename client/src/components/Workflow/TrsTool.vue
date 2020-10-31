@@ -48,7 +48,8 @@ export default {
     },
     methods: {
         importVersion(version) {
-            this.$emit("onImport", version);
+            const id = version.id.includes(`:${version.name}`) ? version.name : version.id;
+            this.$emit("onImport", id);
         },
     },
 };
