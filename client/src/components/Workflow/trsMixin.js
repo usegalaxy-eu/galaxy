@@ -10,7 +10,7 @@ export default {
     methods: {
         importVersion(toolId, version) {
             this.services
-                .importTrsTool(this.trsSelection.id, toolId, version.name)
+                .importTrsTool(this.trsSelection.id, toolId, version.id)
                 .then((response_data) => {
                     // copied from the WorkflowImport, de-duplicate somehow
                     window.location = `${getAppRoot()}workflows/list?message=${response_data.message}&status=success`;
