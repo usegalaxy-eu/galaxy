@@ -9,7 +9,8 @@ export default {
         TrsTool,
     },
     methods: {
-        importVersion(toolId, version_id, isRunFormRedirect = false) {
+        importVersion(toolId, version, isRunFormRedirect = false) {
+            const version_id = version.id.includes(`:${version.name}`) ? version.name : version.id;
             this.services
                 .importTrsTool(this.trsSelection.id, toolId, version_id)
                 .then((response_data) => {
