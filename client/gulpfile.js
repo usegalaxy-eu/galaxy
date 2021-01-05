@@ -21,6 +21,7 @@ const PLUGIN_BUILD_IDS = [
     "ngl",
     "openlayers",
     "pv",
+    "nora",
 ];
 
 const paths = {
