@@ -1798,6 +1798,7 @@ function startAutoloader(loader, psid, onerror, callback)
                         
                         var item = {fileID: fi.ID, URLType: 'serverfile',intent: finalLoader  };
                         item.intendedName = finalLoader.intendedName;
+                        item.filetype = finalLoader.filetype;
 
                         //finalLoader.fileparams = {fileID: fi.ID, URLType: 'serverfile'  }
                         // queue.push( $.extend(true, { viewportID:ids[j], slicing:slicing[j] },   finalLoader   ) ); //make a deep copy and add j
