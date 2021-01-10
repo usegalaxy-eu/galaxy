@@ -33,7 +33,7 @@
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="bam" label="BAM file"/>
+        <param name="infile" type="data" format="bam,cram" label="BAM file"/>
     </inputs>
     <outputs>
         <data name="outfile" format="txt" />
