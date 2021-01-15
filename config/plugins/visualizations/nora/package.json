@@ -1,23 +1,18 @@
 {
   "name": "nora",
+  "license": "MIT",
+  "description": "NORA Medical Image Viewer",
   "version": "1.1.0",
   "keywords": [
     "galaxy",
     "visualization"
   ],
-  "description": "nora",
   "main": "index.js",
-  "scripts": {
-    "build": "webpack"
-  },
-  "license": "MIT",
   "dependencies": {
-    "underscore": "^1.12.0",
-    "gifti-reader-js": "^0.4.4",
-    "daikon": "1.2.42",
-    "babylon": "6.18.0",
+    "@reisertm/nora_galaxy_plugin": "^1.1.7",
+    "cpy-cli": "^3.1.1"
   },
-    "scripts": {
-        "build": "cpy --cwd='node_modules/nora/build/nora' --parents './' '../../../../static/dist'"
-    }
+  "scripts": {
+    "build": "cpy --cwd='node_modules/@galaxyproject/nora/static/dist' --parents './' '../../../../../static/dist'"
+  }
 }
