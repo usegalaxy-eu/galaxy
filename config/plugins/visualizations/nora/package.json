@@ -13,6 +13,6 @@
     "cpy-cli": "^3.1.1"
   },
   "scripts": {
-    "build": "cpy --cwd='node_modules/@galaxyproject/nora/static/dist' --parents './' '../../../../../static/dist'"
+    "build": "cpy --cwd='node_modules/@reisertm/nora_galaxy_plugin/static/dist' --parents './' '../../../../../static/dist'"
   }
 }
