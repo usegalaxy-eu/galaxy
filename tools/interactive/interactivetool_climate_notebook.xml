@@ -1,6 +1,6 @@
-<tool id="interactive_tool_climate_notebook" tool_type="interactive" name="Interactive Climate Notebook" version="0.2">
+<tool id="interactive_tool_climate_notebook" tool_type="interactive" name="Interactive Climate Notebook" version="0.3">
     <requirements>
-        <container type="docker">nordicesmhub/docker-climate-notebook:1.2</container>
+        <container type="docker">quay.io/nordicesmhub/docker-climate-notebook:2021-03-15</container>
     </requirements>
     <entry_points>
         <entry_point name="Climate Interactive Tool" requires_domain="True">
