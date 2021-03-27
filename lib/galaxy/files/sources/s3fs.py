@@ -26,7 +26,8 @@ class S3FsFilesSource(BaseFilesSource):
         self._bucket = props.pop("bucket", '')
         self._endpoint_url = props.pop('endpoint_url', None)
         self._props = props
-
+        if self._endpoint_url:
+            self._props.update({'client_kwargs': {'endpoint_url': self._endpoint_url}})
         assert self._endpoint_url or self._bucket or self._props.get('client_kwargs')
 
     def list(self, path="/", recursive=True, user_context=None):
@@ -58,9 +59,6 @@ class S3FsFilesSource(BaseFilesSource):
         return f"{self._bucket}{path}"
 
     def _open_fs(self, user_context=None):
-        if self._endpoint_url:
-            self._props.update({'client_kwargs': {'endpoint_url': self._endpoint_url}})
-
         fs = s3fs.S3FileSystem(**self._props)
         return fs
 
