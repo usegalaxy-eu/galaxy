@@ -28,7 +28,7 @@
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="txt,netcdf,h5" label="input"/>
+        <param name="infile" type="data" format="txt,netcdf,h5" label="input" optional="true" />
     </inputs>
     <outputs>
         <collection name="outputs" type="list" label="VRM Editor outputs">
