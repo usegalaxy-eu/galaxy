@@ -1492,7 +1492,7 @@ class MCool(H5):
         except Exception:
             return "MCool (HDF5) file (%s)." % (nice_size(dataset.get_size()))
 
-        
+
 class SCool(H5):
     """
     Class describing the single-cell cool format (https://github.com/mirnylab/cooler)
@@ -1548,6 +1548,7 @@ class SCool(H5):
             return dataset.peek
         except Exception:
             return "SCool (HDF5) file (%s)." % (nice_size(dataset.get_size()))
+
 
 class Scf(Binary):
     """Class describing an scf binary sequence file"""
@@ -3027,6 +3028,7 @@ class WiffTar(BafTar):
     def get_type(self):
         return "Sciex WIFF/SCAN archive"
 
+
 @build_sniff_from_prefix
 class Pretext(Binary):
     """
@@ -3056,6 +3058,7 @@ class Pretext(Binary):
             return dataset.peek
         except Exception:
             return "Binary pretext file (%s)" % (nice_size(dataset.get_size()))
+
 
 if __name__ == '__main__':
     import doctest
