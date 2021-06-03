@@ -1492,7 +1492,7 @@ class MCool(H5):
         except Exception:
             return "MCool (HDF5) file (%s)." % (nice_size(dataset.get_size()))
 
-        
+
 class SCool(H5):
     """
     Class describing the single-cell cool format (https://github.com/mirnylab/cooler)
@@ -1548,6 +1548,7 @@ class SCool(H5):
             return dataset.peek
         except Exception:
             return "SCool (HDF5) file (%s)." % (nice_size(dataset.get_size()))
+
 
 class Scf(Binary):
     """Class describing an scf binary sequence file"""
@@ -3026,6 +3027,37 @@ class WiffTar(BafTar):
 
     def get_type(self):
         return "Sciex WIFF/SCAN archive"
+
+
+@build_sniff_from_prefix
+class Pretext(Binary):
+    """
+    PretextMap contact map file
+    Try to guess if the file is a Pretext file.
+    >>> from galaxy.datatypes.sniff import get_test_fname
+    >>> fname = get_test_fname('sample.pretext')
+    >>> Pretext().sniff(fname)
+    True
+    """
+
+    def sniff_prefix(self, sniff_prefix):
+        # The first 4 bytes of any pretext file is 'pstm', and the rest of the
+        # file contains binary data.
+        return sniff_prefix.startswith_bytes(b'pstm')
+
+    def set_peek(self, dataset, is_multi_byte=False):
+        if not dataset.dataset.purged:
+            dataset.peek = "Binary pretext file"
+            dataset.blurb = nice_size(dataset.get_size())
+        else:
+            dataset.peek = 'file does not exist'
+            dataset.blurb = 'file purged from disk'
+
+    def display_peek(self, dataset):
+        try:
+            return dataset.peek
+        except Exception:
+            return "Binary pretext file (%s)" % (nice_size(dataset.get_size()))
 
 
 if __name__ == '__main__':
