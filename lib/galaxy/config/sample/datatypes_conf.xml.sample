@@ -936,6 +936,7 @@
     <sniffer type="galaxy.datatypes.binary:Fast5ArchiveBz2"/>
     <sniffer type="galaxy.datatypes.binary:Fast5Archive"/>
     <sniffer type="galaxy.datatypes.binary:Meryldb" />
+    <sniffer type="galaxy.datatypes.binary:Bref3" />
     <sniffer type="galaxy.datatypes.binary:PostgresqlArchive"/>
     <sniffer type="galaxy.datatypes.binary:ICM"/>
     <sniffer type="galaxy.datatypes.binary:Idat"/>

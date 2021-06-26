@@ -246,7 +246,16 @@ class Bref3(Binary):
         self._magic = binascii.unhexlify("7a8874f400156272")
 
     def sniff(self, filename):
-        # The first 8 bytes of any hdf5 file are 0x7a8874f400156272
+        """
+        Try to guess if the file is a bref3 file.
+        >>> from galaxy.datatypes.sniff import get_test_fname
+        >>> fname = get_test_fname('affy_v_agcc.cel')
+        >>> Bref3().sniff(fname)
+        False
+        >>> fname = get_test_fname('ref.bref3')
+        >>> Bref3().sniff(fname)
+        True
+        """
         try:
             header = open(filename, 'rb').read(8)
             if header == self._magic:
