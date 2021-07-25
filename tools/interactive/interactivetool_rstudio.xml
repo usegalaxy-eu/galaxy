@@ -1,7 +1,7 @@
 <tool id="interactive_tool_rstudio" tool_type="interactive" name="RStudio" version="0.2">
     <requirements>
         <!--container type="docker">quay.io/erasche/docker-rstudio-notebook:19.09</container-->
-        <container type="docker">quay.io/erasche/docker-rstudio-notebook:21.05</container>
+        <container type="docker">quay.io/erasche/docker-rstudio-notebook:ie2</container>
     </requirements>
     <entry_points>
         <entry_point name="RStudio" requires_domain="True">
