@@ -74,7 +74,10 @@ class PosixFilesSource(BaseFilesSource):
 
         target_native_path_parent = os.path.dirname(target_native_path)
         if not os.path.exists(target_native_path_parent):
-            raise Exception("Parent directory does not exist.")
+            if True:
+                os.makedirs(target_native_path_parent)
+            else:
+                raise Exception("Parent directory does not exist.")
 
         shutil.copyfile(native_path, target_native_path)
 
