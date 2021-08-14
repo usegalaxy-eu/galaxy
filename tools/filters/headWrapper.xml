@@ -11,14 +11,12 @@
     <exit_code range="142:"/>
   </stdio>
   <command><![CDATA[
-    set -eo pipefail;
     #if $header
       head -n 1 '$input' > '$out_file1' &&
-      tail -n +2 '$input'
+      tail -n +2 '$input' | head -n $lineNum 
     #else
-      cat '$input'
+      head -n $lineNum '$input'
     #end if
-    | head -n $lineNum 
     >> '$out_file1'
   ]]></command>
   <inputs>
