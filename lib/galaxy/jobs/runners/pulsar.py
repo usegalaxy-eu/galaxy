@@ -6,6 +6,7 @@ More information on Pulsar can be found at https://pulsar.readthedocs.io/ .
 import errno
 import logging
 import os
+import re
 import subprocess
 from time import sleep
 
@@ -187,6 +188,7 @@ PARAMETER_SPECIFICATION_IGNORED = object()
 class PulsarJobRunner(AsynchronousJobRunner):
     """Base class for pulsar job runners."""
 
+    start_methods = ['_init_worker_threads', '_init_client_manager', '_monitor']
     runner_name = "PulsarJobRunner"
     default_build_pulsar_app = False
     use_mq = False
@@ -195,15 +197,12 @@ class PulsarJobRunner(AsynchronousJobRunner):
     def __init__(self, app, nworkers, **kwds):
         """Start the job runner."""
         super().__init__(app, nworkers, runner_param_specs=PULSAR_PARAM_SPECS, **kwds)
-        self._init_worker_threads()
         galaxy_url = self.runner_params.galaxy_url
         if not galaxy_url:
             galaxy_url = app.config.galaxy_infrastructure_url
         if galaxy_url:
             galaxy_url = galaxy_url.rstrip("/")
         self.galaxy_url = galaxy_url
-        self.__init_client_manager()
-        self._monitor()
 
     def _monitor(self):
         if self.use_mq:
@@ -217,7 +216,7 @@ class PulsarJobRunner(AsynchronousJobRunner):
         else:
             self._init_noop_monitor()
 
-    def __init_client_manager(self):
+    def _init_client_manager(self):
         pulsar_conf = self.runner_params.get('pulsar_app_config', None)
         pulsar_conf_file = None
         if pulsar_conf is None:
@@ -758,6 +757,10 @@ class PulsarJobRunner(AsynchronousJobRunner):
         output_files = self.get_output_files(job_wrapper)
         metadata_directory = os.path.join(job_wrapper.working_directory, "metadata")
         metadata_strategy = job_wrapper.get_destination_configuration('metadata_strategy', None)
+        tool = job_wrapper.tool
+        tool_provided_metadata_file_path = tool.provided_metadata_file
+        tool_provided_metadata_style = tool.provided_metadata_style
+
         dynamic_outputs = None  # use default
         if metadata_strategy == "extended" and PulsarJobRunner.__remote_metadata(client):
             # if Pulsar is doing remote metadata and the remote metadata is extended,
@@ -766,10 +769,10 @@ class PulsarJobRunner(AsynchronousJobRunner):
         else:
             # otherwise collect everything we might need
             dynamic_outputs = DEFAULT_DYNAMIC_COLLECTION_PATTERN[:]
+            # grab discovered outputs...
             dynamic_outputs.extend(job_wrapper.tool.output_discover_patterns)
-        tool = job_wrapper.tool
-        tool_provided_metadata_file_path = tool.provided_metadata_file
-        tool_provided_metadata_style = tool.provided_metadata_style
+            # grab tool provided metadata (galaxy.json) also...
+            dynamic_outputs.append(re.escape(tool_provided_metadata_file_path))
         dynamic_file_sources = [
             {"path": tool_provided_metadata_file_path, "type": "galaxy" if tool_provided_metadata_style == "default" else "legacy_galaxy"}
         ]
