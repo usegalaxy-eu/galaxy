@@ -73,6 +73,7 @@
     "splitpanes": "2.3.6",
     "threads": "^1.6.3",
     "toastr": "^2.1.4",
+    "tus-js-client": "^2.3.0",
     "underscore": "^1.10.2",
     "underscore.string": "^3.3.5",
     "vue": "^2.6.11",

@@ -96,7 +96,7 @@ jsonpointer==2.1; python_version >= "3.6" and python_full_version < "3.0.0" or p
 jsonschema==3.2.0
 keystoneauth1==4.3.1; python_version >= "3.6"
 kombu==5.0.2; python_version >= "3.6"
-lagom==1.2.0; python_version >= "3.6" and python_version < "4.0"
+lagom==1.4.1; python_version >= "3.6" and python_version < "4.0"
 lockfile==0.12.2; python_version >= "3.6" and python_version < "4"
 lxml==4.6.3; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 mako==1.1.4; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0")
@@ -238,6 +238,8 @@ tifffile==2020.9.3; python_version >= "3.6"
 toml==0.10.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.6"
 tornado==6.1; python_version >= "3.5"
 tqdm==4.60.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
+tuspy==0.2.5
+tuswsgi==0.5.4
 twill==3.0
 typing-extensions==3.7.4.3; python_version >= "3.6" and python_version < "3.8"
 tzlocal==2.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
