@@ -699,6 +699,7 @@ class JobHandlerQueue(Monitors):
             for row in result:
                 # there should only be one row
                 rval += row[0]
+        log.info(f"get_user_job_count for user {user_id} is [{rval}]")
         return rval
 
     def __cache_user_job_count(self):
@@ -734,6 +735,7 @@ class JobHandlerQueue(Monitors):
             for row in result:
                 # Add the count from the database to the cached count
                 rval[row['destination_id']] = rval.get(row['destination_id'], 0) + row['job_count']
+        log.info(f"get_user_job_count_per_destination for user {user_id} is [{rval}]")
         return rval
 
     def __cache_user_job_count_per_destination(self):
