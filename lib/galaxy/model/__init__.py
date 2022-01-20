@@ -1147,6 +1147,15 @@ class Job(Base, JobLike, UsesCreateAndUpdateTime, Dictifiable, Serializable):
     def set_tool_id(self, tool_id):
         self.tool_id = tool_id
 
+    def get_user_email(self):
+        if self.user is not None:
+            return self.user.email
+        elif self.galaxy_session is not None and self.galaxy_session.user is not None:
+            return self.galaxy_session.user.email
+        elif self.history is not None and self.history.user is not None:
+            return self.history.user.email
+        return None
+
     def set_tool_version(self, tool_version):
         self.tool_version = tool_version
 
@@ -1358,6 +1367,7 @@ class Job(Base, JobLike, UsesCreateAndUpdateTime, Dictifiable, Serializable):
         job_attrs['exit_code'] = self.exit_code
         job_attrs['create_time'] = self.create_time.isoformat()
         job_attrs['update_time'] = self.update_time.isoformat()
+        job_attrs['job_messages'] = self.job_messages
 
         # Get the job's parameters
         param_dict = self.raw_param_dict()
