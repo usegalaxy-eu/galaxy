@@ -36,7 +36,7 @@ from galaxy.datatypes.metadata import (
     MetadataElement,
     MetadataParameter,
 )
-from galaxy.datatypes.sniff import build_sniff_from_prefix
+from galaxy.datatypes.sniff import build_sniff_from_prefix, FilePrefix
 from galaxy.datatypes.text import Html
 from galaxy.util import compression_utils, nice_size, sqlite
 from galaxy.util.checkers import is_bz2, is_gzip
@@ -373,8 +373,8 @@ class BamNative(CompressedArchive, _BamOrSam):
     MetadataElement(name="column_types", default=['str', 'int', 'str', 'int', 'int', 'str', 'str', 'int', 'int', 'str', 'str', 'str'], desc="Column types", param=metadata.ColumnTypesParameter, readonly=True, visible=False, no_value=[])
     MetadataElement(name="column_names", default=['QNAME', 'FLAG', 'RNAME', 'POS', 'MAPQ', 'CIGAR', 'MRNM', 'MPOS', 'ISIZE', 'SEQ', 'QUAL', 'OPT'], desc="Column names", readonly=True, visible=False, optional=True, no_value=[])
 
-    MetadataElement(name="bam_version", default=None, desc="BAM Version", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=None)
-    MetadataElement(name="sort_order", default=None, desc="Sort Order", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=None)
+    MetadataElement(name="bam_version", default=None, desc="BAM Version", param=MetadataParameter, readonly=True, visible=False, optional=True)
+    MetadataElement(name="sort_order", default=None, desc="Sort Order", param=MetadataParameter, readonly=True, visible=False, optional=True)
     MetadataElement(name="read_groups", default=[], desc="Read Groups", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=[])
     MetadataElement(name="reference_names", default=[], desc="Chromosome Names", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=[])
     MetadataElement(name="reference_lengths", default=[], desc="Chromosome Lengths", param=MetadataParameter, readonly=True, visible=False, optional=True, no_value=[])
@@ -467,7 +467,7 @@ class BamNative(CompressedArchive, _BamOrSam):
     def get_chunk(self, trans, dataset, offset=0, ck_size=None):
         if not offset == -1:
             try:
-                with pysam.AlignmentFile(dataset.file_name, "rb") as bamfile:
+                with pysam.AlignmentFile(dataset.file_name, "rb", check_sq=False) as bamfile:
                     ck_size = 300  # 300 lines
                     ck_data = ""
                     header_line_count = 0
@@ -543,8 +543,8 @@ class Bam(BamNative):
     track_type = "ReadTrack"
     data_sources = {"data": "bai", "index": "bigwig"}
 
-    MetadataElement(name="bam_index", desc="BAM Index File", param=metadata.FileParameter, file_ext="bai", readonly=True, no_value=None, visible=False, optional=True)
-    MetadataElement(name="bam_csi_index", desc="BAM CSI Index File", param=metadata.FileParameter, file_ext="bam.csi", readonly=True, no_value=None, visible=False, optional=True)
+    MetadataElement(name="bam_index", desc="BAM Index File", param=metadata.FileParameter, file_ext="bai", readonly=True, visible=False, optional=True)
+    MetadataElement(name="bam_csi_index", desc="BAM CSI Index File", param=metadata.FileParameter, file_ext="bam.csi", readonly=True, visible=False, optional=True)
 
     def get_index_flag(self, file_name):
         """
@@ -749,8 +749,8 @@ class CRAM(Binary):
     edam_format = "format_3462"
     edam_data = "data_0863"
 
-    MetadataElement(name="cram_version", default=None, desc="CRAM Version", param=MetadataParameter, readonly=True, visible=False, optional=False, no_value=None)
-    MetadataElement(name="cram_index", desc="CRAM Index File", param=metadata.FileParameter, file_ext="crai", readonly=True, no_value=None, visible=False, optional=True)
+    MetadataElement(name="cram_version", default=None, desc="CRAM Version", param=MetadataParameter, readonly=True, visible=False, optional=False)
+    MetadataElement(name="cram_index", desc="CRAM Index File", param=metadata.FileParameter, file_ext="crai", readonly=True, visible=False, optional=True)
 
     def set_meta(self, dataset, overwrite=True, **kwd):
         major_version, minor_version = self.get_cram_version(dataset.file_name)
@@ -809,7 +809,7 @@ class Bcf(BaseBcf):
     """
     file_ext = "bcf"
 
-    MetadataElement(name="bcf_index", desc="BCF Index File", param=metadata.FileParameter, file_ext="csi", readonly=True, no_value=None, visible=False, optional=True)
+    MetadataElement(name="bcf_index", desc="BCF Index File", param=metadata.FileParameter, file_ext="csi", readonly=True, visible=False, optional=True)
 
     def sniff(self, filename):
         # BCF is compressed in the BGZF format, and must not be uncompressed in Galaxy.
@@ -974,18 +974,18 @@ class Loom(H5):
     MetadataElement(name="url", default="", desc="url", readonly=True, visible=True, no_value="")
     MetadataElement(name="doi", default="", desc="doi", readonly=True, visible=True, no_value="")
     MetadataElement(name="loom_spec_version", default="", desc="loom_spec_version", readonly=True, visible=True, no_value="")
-    MetadataElement(name="creation_date", default=None, desc="creation_date", readonly=True, visible=True, no_value=None)
+    MetadataElement(name="creation_date", default=None, desc="creation_date", readonly=True, visible=True)
     MetadataElement(name="shape", default=(), desc="shape", param=metadata.ListParameter, readonly=True, visible=True, no_value=())
     MetadataElement(name="layers_count", default=0, desc="layers_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="layers_names", desc="layers_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="layers_names", desc="layers_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="row_attrs_count", default=0, desc="row_attrs_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="row_attrs_names", desc="row_attrs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="row_attrs_names", desc="row_attrs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="col_attrs_count", default=0, desc="col_attrs_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="col_attrs_names", desc="col_attrs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="col_attrs_names", desc="col_attrs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="col_graphs_count", default=0, desc="col_graphs_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="col_graphs_names", desc="col_graphs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="col_graphs_names", desc="col_graphs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="row_graphs_count", default=0, desc="row_graphs_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="row_graphs_names", desc="row_graphs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="row_graphs_names", desc="row_graphs_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
 
     def sniff(self, filename):
         if super().sniff(filename):
@@ -1089,29 +1089,29 @@ class Anndata(H5):
     MetadataElement(name="url", default="", desc="url", readonly=True, visible=True, no_value="")
     MetadataElement(name="doi", default="", desc="doi", readonly=True, visible=True, no_value="")
     MetadataElement(name="anndata_spec_version", default="", desc="anndata_spec_version", readonly=True, visible=True, no_value="")
-    MetadataElement(name="creation_date", default=None, desc="creation_date", readonly=True, visible=True, no_value=None)
+    MetadataElement(name="creation_date", default=None, desc="creation_date", readonly=True, visible=True)
     MetadataElement(name="layers_count", default=0, desc="layers_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="layers_names", desc="layers_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="layers_names", desc="layers_names", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="row_attrs_count", default=0, desc="row_attrs_count", readonly=True, visible=True, no_value=0)
     # obs_names: Cell1, Cell2, Cell3,...
     # obs_layers: louvain, leidein, isBcell
     # obs_count: number of obs_layers
     # obs_size: number of obs_names
-    MetadataElement(name="obs_names", desc="obs_names", default=[], multiple=True, readonly=True, no_value=None)
-    MetadataElement(name="obs_layers", desc="obs_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="obs_names", desc="obs_names", default=[], multiple=True, readonly=True)
+    MetadataElement(name="obs_layers", desc="obs_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="obs_count", default=0, desc="obs_count", readonly=True, visible=True, no_value=0)
     MetadataElement(name="obs_size", default=-1, desc="obs_size", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="obsm_layers", desc="obsm_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="obsm_layers", desc="obsm_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="obsm_count", default=0, desc="obsm_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="raw_var_layers", desc="raw_var_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="raw_var_layers", desc="raw_var_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="raw_var_count", default=0, desc="raw_var_count", readonly=True, visible=True, no_value=0)
     MetadataElement(name="raw_var_size", default=0, desc="raw_var_size", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="var_layers", desc="var_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="var_layers", desc="var_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="var_count", default=0, desc="var_count", readonly=True, visible=True, no_value=0)
     MetadataElement(name="var_size", default=-1, desc="var_size", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="varm_layers", desc="varm_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="varm_layers", desc="varm_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="varm_count", default=0, desc="varm_count", readonly=True, visible=True, no_value=0)
-    MetadataElement(name="uns_layers", desc="uns_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="uns_layers", desc="uns_layers", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="uns_count", default=0, desc="uns_count", readonly=True, visible=True, no_value=0)
     MetadataElement(name="shape", default=(-1, -1), desc="shape", param=metadata.ListParameter, readonly=True, visible=True, no_value=(0, 0))
 
@@ -1266,6 +1266,71 @@ class Anndata(H5):
 
 
 @build_sniff_from_prefix
+class Grib(Binary):
+    """
+    Class describing an GRIB file
+
+    >>> from galaxy.datatypes.sniff import get_test_fname
+    >>> fname = get_test_fname('test.grib')
+    >>> Grib().sniff_prefix(FilePrefix(fname))
+    True
+    >>> fname = FilePrefix(get_test_fname('interval.interval'))
+    >>> Grib().sniff_prefix(fname)
+    False
+    """
+    file_ext = "grib"
+    # GRIB not yet in EDAM (work in progress). For now, so set to binary
+    edam_format = "format_2333"
+    MetadataElement(name="grib_edition", default=1, desc="GRIB edition", readonly=True, visible=True, optional=True, no_value=0)
+
+    def __init__(self, **kwd):
+        super().__init__(**kwd)
+        self._magic = b'GRIB'
+
+    def sniff_prefix(self, file_prefix: FilePrefix):
+        # The first 4 bytes of any GRIB file are GRIB
+        try:
+            if file_prefix.startswith_bytes(self._magic):
+                tmp = file_prefix.contents_header_bytes[4:8]
+                _uint8struct = struct.Struct(b">B")
+                edition = _uint8struct.unpack_from(tmp, 3)[0]
+                if edition == 1 or edition == 2:
+                    return True
+            return False
+        except Exception:
+            return False
+
+    def set_peek(self, dataset):
+        if not dataset.dataset.purged:
+            dataset.peek = "Binary GRIB file"
+            dataset.blurb = nice_size(dataset.get_size())
+        else:
+            dataset.peek = 'file does not exist'
+            dataset.blurb = 'file purged from disk'
+
+    def display_peek(self, dataset):
+        try:
+            return dataset.peek
+        except Exception:
+            return f"Binary GRIB file ({nice_size(dataset.get_size())})"
+
+    def set_meta(self, dataset, **kwd):
+        """
+        Set the GRIB edition.
+        """
+        dataset.metadata.grib_edition = self._get_grib_edition(dataset.file_name)
+
+    def _get_grib_edition(self, filename):
+        _uint8struct = struct.Struct(b">B")
+        edition = 0
+        with open(filename, 'rb') as f:
+            f.seek(4)
+            tmp = f.read(4)
+            edition = _uint8struct.unpack_from(tmp, 3)[0]
+        return edition
+
+
+@build_sniff_from_prefix
 class GmxBinary(Binary):
     """
     Base class for GROMACS binary files - xtc, trr, cpt
@@ -1365,13 +1430,13 @@ class Biom2(H5):
     """
     Class describing a biom2 file (http://biom-format.org/documentation/biom_format.html)
     """
-    MetadataElement(name="id", default=None, desc="table id", readonly=True, visible=True, no_value=None)
-    MetadataElement(name="format_url", default=None, desc="format-url", readonly=True, visible=True, no_value=None)
-    MetadataElement(name="format_version", default=None, desc="format-version", readonly=True, visible=True, no_value=None)
-    MetadataElement(name="format", default=None, desc="format", readonly=True, visible=True, no_value=None)
-    MetadataElement(name="type", default=None, desc="table type", readonly=True, visible=True, no_value=None)
-    MetadataElement(name="generated_by", default=None, desc="generated by", readonly=True, visible=True, no_value=None)
-    MetadataElement(name="creation_date", default=None, desc="creation date", readonly=True, visible=True, no_value=None)
+    MetadataElement(name="id", default=None, desc="table id", readonly=True, visible=True)
+    MetadataElement(name="format_url", default=None, desc="format-url", readonly=True, visible=True)
+    MetadataElement(name="format_version", default=None, desc="format-version (equal to format)", readonly=True, visible=True)
+    MetadataElement(name="format", default=None, desc="format (equal to format=version)", readonly=True, visible=True)
+    MetadataElement(name="type", default=None, desc="table type", readonly=True, visible=True)
+    MetadataElement(name="generated_by", default=None, desc="generated by", readonly=True, visible=True)
+    MetadataElement(name="creation_date", default=None, desc="creation date", readonly=True, visible=True)
     MetadataElement(name="nnz", default=-1, desc="nnz: The number of non-zero elements in the table", readonly=True, visible=True, no_value=-1)
     MetadataElement(name="shape", default=(), desc="shape: The number of rows and columns in the dataset", readonly=True, visible=True, no_value=())
 
@@ -1407,8 +1472,10 @@ class Biom2(H5):
                 dataset.metadata.format_url = util.unicodify(attributes['format-url'])
                 if 'format-version' in attributes:  # biom 2.1
                     dataset.metadata.format_version = '.'.join(str(_) for _ in attributes['format-version'])
+                    dataset.metadata.format = dataset.metadata.format_version
                 elif 'format' in attributes:  # biom 2.0
                     dataset.metadata.format = util.unicodify(attributes['format'])
+                    dataset.metadata.format_version = dataset.metadata.format
                 dataset.metadata.type = util.unicodify(attributes['type'])
                 dataset.metadata.shape = tuple(int(_) for _ in attributes['shape'])
                 dataset.metadata.generated_by = util.unicodify(attributes['generated-by'])
@@ -1618,7 +1685,7 @@ class H5MLM(H5):
     max_peek_size = 1000         # 1 KB
     max_preview_size = 1000000   # 1 MB
 
-    MetadataElement(name="hyper_params", desc="Hyperparameter File", param=FileParameter, file_ext="tabular", readonly=True, no_value=None, visible=False, optional=True)
+    MetadataElement(name="hyper_params", desc="Hyperparameter File", param=FileParameter, file_ext="tabular", readonly=True, visible=False, optional=True)
 
     def set_meta(self, dataset, overwrite=True, **kwd):
         try:
@@ -1751,7 +1818,7 @@ class HexrdMaterials(H5):
     file_ext = "hexrd.materials.h5"
     edam_format = "format_3590"
 
-    MetadataElement(name="materials", desc="materials", default=[], param=metadata.SelectParameter, multiple=True, readonly=True, no_value=None)
+    MetadataElement(name="materials", desc="materials", default=[], param=metadata.SelectParameter, multiple=True, readonly=True)
     MetadataElement(name="SpaceGroupNumber", default={}, param=DictParameter, desc="SpaceGroupNumber", readonly=True, visible=True, no_value={})
     MetadataElement(name="LatticeParameters", default={}, param=DictParameter, desc="LatticeParameters", readonly=True, visible=True, no_value={})
 
@@ -2566,7 +2633,7 @@ class RData(CompressedArchive):
     VERSION_3_PREFIX = b'RDX3\nX\n'
     file_ext = 'rdata'
 
-    MetadataElement(name="version", default=None, desc="serialisation version", param=MetadataParameter, readonly=True, visible=False, optional=False, no_value=None)
+    MetadataElement(name="version", default=None, desc="serialisation version", param=MetadataParameter, readonly=True, visible=False, optional=False)
 
     def set_meta(self, dataset, overwrite=True, **kwd):
         super().set_meta(dataset, overwrite=overwrite, **kwd)
@@ -2622,9 +2689,9 @@ class RDS(CompressedArchive):
     """
     file_ext = 'rds'
 
-    MetadataElement(name="version", default=None, desc="serialisation version", param=MetadataParameter, readonly=True, visible=False, optional=False, no_value=None)
-    MetadataElement(name="rversion", default=None, desc="R version", param=MetadataParameter, readonly=True, visible=False, optional=False, no_value=None)
-    MetadataElement(name="minrversion", default=None, desc="minimum R version", param=MetadataParameter, readonly=False, visible=True, optional=False, no_value=None)
+    MetadataElement(name="version", default=None, desc="serialisation version", param=MetadataParameter, readonly=True, visible=False, optional=False)
+    MetadataElement(name="rversion", default=None, desc="R version", param=MetadataParameter, readonly=True, visible=False, optional=False)
+    MetadataElement(name="minrversion", default=None, desc="minimum R version", param=MetadataParameter, readonly=False, visible=True, optional=False)
 
     def set_meta(self, dataset, overwrite=True, **kwd):
         super().set_meta(dataset, overwrite=overwrite, **kwd)
@@ -2853,7 +2920,7 @@ class PostgresqlArchive(CompressedArchive):
     False
     """
     MetadataElement(name="version", default=None, param=MetadataParameter, desc="PostgreSQL database version",
-                    readonly=True, visible=True, no_value=None)
+                    readonly=True, visible=True)
     file_ext = "postgresql"
 
     def set_meta(self, dataset, overwrite=True, **kwd):
@@ -2897,7 +2964,7 @@ class Fast5Archive(CompressedArchive):
     True
     """
     MetadataElement(name="fast5_count", default='0', param=MetadataParameter, desc="Read Count",
-                    readonly=True, visible=True, no_value=None)
+                    readonly=True, visible=True)
     file_ext = "fast5.tar"
 
     def set_meta(self, dataset, overwrite=True, **kwd):
@@ -2990,9 +3057,9 @@ class Fast5ArchiveBz2(Fast5Archive):
 class SearchGuiArchive(CompressedArchive):
     """Class describing a SearchGUI archive """
     MetadataElement(name="searchgui_version", default='1.28.0', param=MetadataParameter, desc="SearchGui Version",
-                    readonly=True, visible=True, no_value=None)
+                    readonly=True, visible=True)
     MetadataElement(name="searchgui_major_version", default='1', param=MetadataParameter, desc="SearchGui Major Version",
-                    readonly=True, visible=True, no_value=None)
+                    readonly=True, visible=True)
     file_ext = "searchgui_archive"
 
     def set_meta(self, dataset, overwrite=True, **kwd):

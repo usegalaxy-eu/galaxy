@@ -43,6 +43,7 @@ from galaxy.exceptions import ConfigurationError
 from galaxy.model import mapping
 from galaxy.model.database_utils import database_exists
 from galaxy.model.tool_shed_install.migrate.check import create_or_verify_database as tsi_create_or_verify_database
+from galaxy.schema.fields import BaseDatabaseIdField
 from galaxy.structured_app import BasicSharedApp
 from galaxy.util import (
     ExecutionTimer,
@@ -628,7 +629,35 @@ class GalaxyAppConfiguration(BaseAppConfiguration, CommonConfigurationMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._override_tempdir(kwargs)
+        self._configure_sqlalchemy20_warnings(kwargs)
         self._process_config(kwargs)
+
+    def _configure_sqlalchemy20_warnings(self, kwargs):
+        """
+        This method should be deleted after migration to SQLAlchemy 2.0 is complete.
+        To enable warnings, set `GALAXY_CONFIG_SQLALCHEMY_WARN_20=1`,
+        """
+        warn = string_as_bool(kwargs.get('sqlalchemy_warn_20', False))
+        if warn:
+            import sqlalchemy
+            sqlalchemy.util.deprecations.SQLALCHEMY_WARN_20 = True
+            self._setup_sqlalchemy20_warnings_filters()
+
+    def _setup_sqlalchemy20_warnings_filters(self):
+        import warnings
+        from sqlalchemy.exc import RemovedIn20Warning
+        # Always display RemovedIn20Warning warnings.
+        warnings.filterwarnings('always', category=RemovedIn20Warning)
+        # Optionally, enable filters for specific warnings (raise error, or log, etc.)
+        # messages = [
+        #     r"replace with warning text to match",
+        # ]
+        # for msg in messages:
+        #     warnings.filterwarnings('error', message=msg, category=RemovedIn20Warning)
+        #
+        # See documentation:
+        # https://docs.python.org/3.7/library/warnings.html#the-warnings-filter
+        # https://docs.sqlalchemy.org/en/14/changelog/migration_20.html#migration-to-2-0-step-three-resolve-all-removedin20warnings
 
     def _load_schema(self):
         return AppSchema(GALAXY_CONFIG_SCHEMA_PATH, GALAXY_APP_NAME)
@@ -1325,7 +1354,7 @@ class ConfiguresGalaxyMixin:
         from galaxy.datatypes import registry
         # Create an empty datatypes registry.
         self.datatypes_registry = registry.Registry(self.config)
-        if installed_repository_manager:
+        if installed_repository_manager and self.config.load_tool_shed_datatypes:
             # Load proprietary datatypes defined in datatypes_conf.xml files in all installed tool shed repositories.  We
             # load proprietary datatypes before datatypes in the distribution because Galaxy's default sniffers include some
             # generic sniffers (eg text,xml) which catch anything, so it's impossible for proprietary sniffers to be used.
@@ -1348,6 +1377,7 @@ class ConfiguresGalaxyMixin:
     def _configure_security(self):
         from galaxy.security import idencoding
         self.security = idencoding.IdEncodingHelper(id_secret=self.config.id_secret)
+        BaseDatabaseIdField.security = self.security
 
     def _configure_tool_shed_registry(self):
         import galaxy.tool_shed.tool_shed_registry

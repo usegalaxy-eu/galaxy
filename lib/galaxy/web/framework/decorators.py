@@ -75,16 +75,22 @@ def json_pretty(func):
     return json(func, pretty=True)
 
 
-def require_login(verb="perform this action", use_panels=False, webapp='galaxy'):
+def require_login(verb="perform this action", use_panels=False):
     def argcatcher(func):
         @wraps(func)
         def decorator(self, trans, *args, **kwargs):
             if trans.get_user():
                 return func(self, trans, *args, **kwargs)
             else:
+                redirect_url = url_for(controller=trans.controller, action=trans.action)
+                query_string = trans.environ.get('QUERY_STRING', '')
+                if query_string:
+                    redirect_url = f"{redirect_url}?{query_string}"
+                href = url_for(controller='login', redirect=redirect_url)
                 return trans.show_error_message(
-                    'You must be <a target="galaxy_main" href="%s">logged in</a> to %s.'
-                    % (url_for(controller='user', action='login', webapp=webapp), verb), use_panels=use_panels)
+                    f'You must be <a target="galaxy_main" href="{href}">logged in</a> to {verb}.',
+                    use_panels=use_panels
+                )
         return decorator
     return argcatcher
 

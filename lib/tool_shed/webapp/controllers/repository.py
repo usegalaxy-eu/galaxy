@@ -45,6 +45,7 @@ from tool_shed.util import (
 )
 from tool_shed.util.web_util import escape
 from tool_shed.utility_containers import ToolShedUtilityContainerManager
+from tool_shed.webapp.framework.decorators import require_login
 from tool_shed.webapp.util import ratings_util
 
 log = logging.getLogger(__name__)
@@ -812,7 +813,7 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                                    status=status)
 
     @web.expose
-    @web.require_login("deprecate repository")
+    @require_login("deprecate repository")
     def deprecate(self, trans, **kwd):
         """Mark a repository in the tool shed as deprecated or not deprecated."""
         # Marking a repository in the tool shed as deprecated has no effect on any downloadable changeset
@@ -1607,7 +1608,7 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                                                         status='error'))
 
     @web.expose
-    @web.require_login("manage email alerts")
+    @require_login("manage email alerts")
     def manage_email_alerts(self, trans, **kwd):
         message = escape(kwd.get('message', ''))
         status = kwd.get('status', 'done')
@@ -1638,7 +1639,7 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                                    status=status)
 
     @web.expose
-    @web.require_login("manage repository")
+    @require_login("manage repository")
     def manage_repository(self, trans, id, **kwd):
         message = escape(kwd.get('message', ''))
         status = kwd.get('status', 'done')
@@ -1850,7 +1851,7 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                                    status=status)
 
     @web.expose
-    @web.require_login("manage repository administrators")
+    @require_login("manage repository administrators")
     def manage_repository_admins(self, trans, id, **kwd):
         message = escape(kwd.get('message', ''))
         status = kwd.get('status', 'done')
@@ -1897,14 +1898,14 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                                    status=status)
 
     @web.expose
-    @web.require_login("review repository revision")
+    @require_login("review repository revision")
     def manage_repository_reviews_of_revision(self, trans, **kwd):
         return trans.response.send_redirect(web.url_for(controller='repository_review',
                                                         action='manage_repository_reviews_of_revision',
                                                         **kwd))
 
     @web.expose
-    @web.require_login("multi select email alerts")
+    @require_login("multi select email alerts")
     def multi_select_email_alerts(self, trans, **kwd):
         if 'operation' in kwd:
             operation = kwd['operation'].lower()
@@ -2053,7 +2054,7 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
         return ''
 
     @web.expose
-    @web.require_login("rate repositories")
+    @require_login("rate repositories")
     def rate_repository(self, trans, **kwd):
         """ Rate a repository and return updated rating data. """
         message = escape(kwd.get('message', ''))
@@ -2156,29 +2157,11 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                 tip = repository.tip()
                 for selected_file in selected_files_to_delete:
                     try:
-                        hg_util.remove_file(repo_dir, selected_file, force=True)
+                        hg_util.remove_path(repo_dir, selected_file)
                     except Exception as e:
-                        log.debug("Error removing the following file using the mercurial API:\n %s", selected_file)
-                        log.debug("The error was: %s", util.unicodify(e))
-                        log.debug("Attempting to remove the file using a different approach.")
-                        relative_selected_file = selected_file.split('repo_%d' % repository.id)[1].lstrip('/')
-                        repo.dirstate.remove(relative_selected_file)
-                        repo.dirstate.write()
-                        absolute_selected_file = os.path.abspath(selected_file)
-                        if os.path.isdir(absolute_selected_file):
-                            try:
-                                os.rmdir(absolute_selected_file)
-                            except OSError:
-                                # The directory is not empty
-                                pass
-                        elif os.path.isfile(absolute_selected_file):
-                            os.remove(absolute_selected_file)
-                            dir = os.path.split(absolute_selected_file)[0]
-                            try:
-                                os.rmdir(dir)
-                            except OSError:
-                                # The directory is not empty
-                                pass
+                        status = 'error'
+                        message = f"Error removing file {selected_file} in mercurial repo:\n{e}"
+                        log.debug(message)
                 # Commit the change set.
                 if not commit_message:
                     commit_message = 'Deleted selected files'
@@ -2260,7 +2243,7 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                                                         status=status))
 
     @web.expose
-    @web.require_login("set email alerts")
+    @require_login("set email alerts")
     def set_email_alerts(self, trans, **kwd):
         """Set email alerts for selected repositories."""
         # This method is called from multiple grids, so the caller must be passed.
@@ -2300,7 +2283,7 @@ class RepositoryController(BaseUIController, ratings_util.ItemRatings):
                                                         **kwd))
 
     @web.expose
-    @web.require_login("set repository as malicious")
+    @require_login("set repository as malicious")
     def set_malicious(self, trans, id, ctx_str, **kwd):
         malicious = kwd.get('malicious', '')
         if kwd.get('malicious_button', False):
