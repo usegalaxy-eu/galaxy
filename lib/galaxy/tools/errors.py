@@ -242,6 +242,7 @@ class EmailErrorReporter(ErrorReporter):
         assert to, ValueError("Error reporting has been disabled for this Galaxy instance")
 
         frm = self.app.config.email_from
+        reply_to = to
         error_msg = validate_email_str(email)
         if not error_msg and self._can_access_dataset(user):
             to += f", {email.strip()}"
@@ -252,4 +253,4 @@ class EmailErrorReporter(ErrorReporter):
         except Exception:
             pass
 
-        return util.send_mail(frm, to, subject, self.report, self.app.config, html=self.html_report)
+        return util.send_mail(frm, to, subject, self.report, self.app.config, html=self.html_report, reply_to=reply_to)
