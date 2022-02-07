@@ -1449,7 +1449,7 @@ def send_mail(frm, to, subject, body, config, html=None, reply_to=None):
     msg['Subject'] = subject
     if reply_to:
         reply_to = listify(reply_to)
-        msg['Reply-To'] = reply_to
+        msg['Reply-To'] = ', '.join(reply_to)
 
     if config.smtp_server is None:
         log.error("Mail is not configured for this Galaxy instance.")
