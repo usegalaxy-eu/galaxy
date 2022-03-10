@@ -169,8 +169,9 @@ export default {
             } else if (tool.form_style === "regular") {
                 evt.preventDefault();
                 const Galaxy = getGalaxyInstance();
+                // encode spaces in tool.id
                 Galaxy.router.push("/", {
-                    tool_id: tool.id,
+                    tool_id: tool.id.replace(/ /g, "%20"),
                     version: tool.version,
                 });
             }
