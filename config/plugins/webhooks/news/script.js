@@ -53,14 +53,6 @@
 
         let currentGalaxyVersion = Galaxy.config.version_major;
 
-        // TODO/@hexylena: By 21.01 we will have a proper solution for this. For
-        // now we'll hardcode the version users 'see'. @hexylena will remove this
-        // code when she writes the user-facing release notes, and then will file
-        // an issue for how we'll fix this properly.
-        if (currentGalaxyVersion == "22.01") {
-            currentGalaxyVersion = "21.09";
-        }
-
         const releaseNotes = `https://docs.galaxyproject.org/en/latest/releases/${currentGalaxyVersion}_announce_user.html`;
         const lastSeenVersion = window.localStorage.getItem("galaxy-news-seen-release");
         // Check that they've seen the current version's release notes.
