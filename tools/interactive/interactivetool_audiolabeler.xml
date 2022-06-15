@@ -6,7 +6,7 @@
     <entry_points>
         <entry_point name="Audio Labeler" requires_domain="True">
             <port>3838</port>
-            <url>/</url>
+            <url>/sample-apps/audio/</url>
         </entry_point>
     </entry_points>
     <command><![CDATA[
