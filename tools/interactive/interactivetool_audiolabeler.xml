@@ -11,7 +11,6 @@
     </entry_points>
     <command><![CDATA[
 
-        rm /opt/shiny-server/samples/sample-apps/audio/www/tmp/* &&
         #import re
         #for $count, $file in enumerate($input):
             #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\w\-\.\s]', '_', str($file.element_identifier))
