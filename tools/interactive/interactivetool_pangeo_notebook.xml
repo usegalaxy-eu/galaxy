@@ -1,9 +1,9 @@
-<tool id="interactive_tool_climate_notebook" tool_type="interactive" name="Interactive Climate Notebook" version="0.4">
+<tool id="interactive_tool_pangeo_notebook" tool_type="interactive" name="Interactive Pangeo Notebook" version="1c0f66b">
     <requirements>
-        <container type="docker">quay.io/nordicesmhub/docker-climate-notebook:2021-03-18</container>
+        <container type="docker">quay.io/nordicesmhub/docker-pangeo-notebook:1c0f66b</container>
     </requirements>
     <entry_points>
-        <entry_point name="Climate Interactive Tool" requires_domain="True">
+        <entry_point name="Pangeo Interactive Tool" requires_domain="True">
             <port>8888</port>
             <url>ipython/lab</url>
         </entry_point>
@@ -73,7 +73,7 @@
 
     </inputs>
     <outputs>
-        <data name="jupyter_notebook" format="ipynb" label="Executed Climate Notebook"></data>
+        <data name="jupyter_notebook" format="ipynb" label="Executed Pangeo Notebook"></data>
     </outputs>
     <tests>
         <test expect_num_outputs="1">
@@ -84,11 +84,9 @@
         </test>
     </tests>
     <help>
-    The Climate Notebook is based on Jupyter an open-source web application that allows you to create and share documents that contain live code, equations,
-    visualizations and narrative text. Uses include: data cleaning and transformation, numerical simulation, statistical modeling, data visualization,
-    machine learning, and much more.
+    The Pangeo Notebook is based on Pangeo, an open and inclusive community platform for Big Data geoscience. 
 
-    Galaxy offers you to use Jupyter Notebooks directly in Galaxy accessing and interacting with Galaxy datasets as you like. A very common use-case is to
+    Galaxy offers you to use Pangeo Notebooks directly in Galaxy accessing and interacting with Galaxy datasets as you like. A very common use-case is to
     do the heavy lifting and data reduction steps in Galaxy and the plotting and more `interactive` part on smaller datasets in Jupyter.
 
     You can start with a new Jupyter notebook from scratch or load an already existing one, e.g. from your collegue and execute it on your dataset.
@@ -96,22 +94,9 @@
 
     You can import data into the notebook via a predefined `get()` function and write results back to Galaxy with a `put()` function.
 
-    The Climate version of the Jupyter Notebook offers a lot of preinstalled tools for climate science. The list of packages is based on what is available
-	on the [Pangeo](http://pangeo.io/) platform and [Pangeo stacks](https://pangeo-data.github.io/pangeo-stacks/).
-
-    - **Core scipy packages**: numpy, scipy, matplotlib, pandas, xarray, sparse and sympy
-    - **Data science**: scikit-image, scikit-learn, dask-ml, tensorflow, keras, pytorch-cpu, dask_labextension
-    - **Visualization**: holoviews, panel, geoviews, hvplot, geoviews, datashader, seaborn, altair, descartes, folium, vega,
-	                     vega_datasets, palettable, cmocean,plotly, psy-maps, psy-reg, psyplot, psyplot-gui, psy-maps, psy-reg,
-						 geopy, branca
-	- **Geospatial**: iris, cartopy, basemap, basemap-data-hires, geopandas, rasterio, netcdf4, erddapy, pydap, h5py, h5netcdf, regionmask and rio-cogeo
-    - **Geoscience related**: climlab, metpy, satpy, gsw, eofs, esmpy, xesmf, windspharm, rasterstats, geojsoncontour
-	- **Climate related**: pyaerocom, cdo, cdsapi, cfgrib, cis. esmvaltool, nc-time-axis, nco
-	- **Intake related**: intake, intake-xarray, intake-esm, fsspec and intake-stac
-    - **zarr related**: zarr, numcodecs, python-blosc, lz4, gcsfs, s3fs, tiledb-py
-    - **jupyter related**: ipyleaflet, papermill, jupytext, ipydatawidgets, sidecar
-    - **xarray related**: xgcm, xrft, xhistogram, xlrd, xrviz, climpred, pytide, pyinterp
-    - **misc**: python-wget, prefect, requests, pillow, pip, nbgitpuller, pysplit, biopython, bioblend and galaxy-ie-helpers
+    The Pangeo notebook is developed and maintained by the [Pangeo](https://pangeo.io/) community. 
+    A new version of Galaxy Pangeo JupyterLab is deployed whenever a new Pangeo notebook docker image is made available by the Pangeo community.
+    The list of packages is available at [Pangeo docker images](https://github.com/pangeo-data/pangeo-docker-images/tree/master/pangeo-notebook).
 
     </help>
 </tool>
