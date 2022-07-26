@@ -1460,7 +1460,7 @@ def size_to_bytes(size):
         raise ValueError(f"Unknown multiplier '{multiple}' in '{size}'")
 
 
-def send_mail(frm, to, subject, body, config, html=None):
+def send_mail(frm, to, subject, body, config, html=None, reply_to=None):
     """
     Sends an email.
 
@@ -1482,6 +1482,9 @@ def send_mail(frm, to, subject, body, config, html=None):
     :type  html: str
     :param html: Alternative HTML representation of the body content. If
                  provided will convert the message to a MIMEMultipart. (Default 'None')
+
+    :type  reply_to: str
+    :param reply_to: reply_to address
     """
 
     to = listify(to)
@@ -1493,6 +1496,9 @@ def send_mail(frm, to, subject, body, config, html=None):
     msg["To"] = ", ".join(to)
     msg["From"] = frm
     msg["Subject"] = subject
+    if reply_to:
+        reply_to = listify(reply_to)
+        msg['Reply-To'] = ', '.join(reply_to)
 
     if config.smtp_server is None:
         log.error("Mail is not configured for this Galaxy instance.")
