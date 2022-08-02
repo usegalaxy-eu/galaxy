@@ -20,6 +20,8 @@
 
         mkdir -p /srv/shiny-server/data/ &&
         cp '$infile' /srv/shiny-server/data/inputdata.txt &&
+        chmod 777 /srv/shiny-server/data/inputdata.txt &&
+
         mkdir -p /var/log/shiny-server &&
         chown shiny.shiny /var/log/shiny-server &&
 
