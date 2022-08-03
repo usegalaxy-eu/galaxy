@@ -10,7 +10,6 @@ from typing import (
     Iterable,
     List,
     Optional,
-    Set,
     Union,
 )
 
@@ -125,7 +124,7 @@ from galaxy.webapps.galaxy.services.base import (
 
 log = logging.getLogger(__name__)
 
-DatasetDetailsType = Union[Set[EncodedDatabaseIdField], Literal["all"]]
+DatasetDetailsType = Union[List[EncodedDatabaseIdField], Literal["all"]]
 
 HistoryItemModel = Union[HistoryDatasetAssociation, HistoryDatasetCollectionAssociation]
 
@@ -1196,7 +1195,7 @@ class HistoriesContentsService(ServiceBase, ServesExportStores, ConsumesModelSto
         dataset_details: Optional[DatasetDetailsType] = None,
     ):
         encoded_content_id = self.encode_id(content.id)
-        detailed = dataset_details and (dataset_details == "all" or (encoded_content_id in dataset_details))
+        detailed = dataset_details and (dataset_details == "all" or (encoded_content_id in set(dataset_details)))
         if isinstance(content, HistoryDatasetAssociation):
             view = "detailed" if detailed else "summary"
             return self.hda_serializer.serialize_to_view(content, view=view, user=trans.user, trans=trans)

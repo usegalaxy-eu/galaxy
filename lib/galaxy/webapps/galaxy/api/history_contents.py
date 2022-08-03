@@ -251,7 +251,7 @@ def parse_dataset_details(details: Optional[str]):
     can have from a string."""
     dataset_details: Optional[DatasetDetailsType] = None
     if details and details != "all":
-        dataset_details = set(util.listify(details))
+        dataset_details = util.listify(details)
     else:  # either None or 'all'
         dataset_details = details  # type: ignore
     return dataset_details
