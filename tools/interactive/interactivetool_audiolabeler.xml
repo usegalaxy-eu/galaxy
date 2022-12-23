@@ -19,7 +19,7 @@
 
 
         #if $mode.mode_select == 'curation':
-            cp '$mode.inputlabel' '/opt/shiny-server/samples/sample-apps/audio/labels/labels_tmp.csv
+            cp '$mode.inputlabel' /opt/shiny-server/samples/sample-apps/audio/labels/labels_tmp.csv
         #end if
 
         chown shiny.shiny /var/log/shiny-server &&
@@ -38,7 +38,7 @@
             </param>
             <when value="labeling"/>
             <when value="curation">
-                <param name="inputlabel" type="data" format="csv"  label="Input sound data labels file in csv format"/>
+                <param name="inputlabel" type="data" format="csv" label="Input sound data labels file in csv format"/>
             </when>
         </conditional>
     </inputs>
