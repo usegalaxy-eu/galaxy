@@ -1,7 +1,7 @@
 <tool id="interactive_tool_audiolabeler" tool_type="interactive" name="NEAL" version="0.1">
     <description>Nature+Energy Audio Labeller audio data annotation tool</description>
     <requirements>
-        <container type="docker">ylebras/neal-docker:latest</container>
+        <container type="docker">ylebras/neal-docker:dev</container>
     </requirements>
     <entry_points>
         <entry_point name="Audio Labeler" requires_domain="True">
