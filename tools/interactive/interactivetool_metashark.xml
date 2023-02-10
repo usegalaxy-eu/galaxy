@@ -15,9 +15,9 @@
 
     ]]>
     </command>
-    <!--inputs>
-        <param name="infile" type="data" multiple="true" format="tabular,csv" optional="true" label="Input biodiversity data file(s)"/>
-    </inputs-->
+    <inputs>
+        <!--param name="infile" type="data" multiple="true" format="tabular,csv" optional="true" label="Input biodiversity data file(s)"/-->
+    </inputs>
     <outputs>
         <data name="outfile" format="txt" />
     </outputs>
