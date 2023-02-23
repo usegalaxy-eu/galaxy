@@ -224,6 +224,7 @@ class ToolRecommendations:
                     t_id == child
                     and score >= 0.0
                     and child not in self.deprecated_tools
+                    and child != last_tool_name
                 ):
                     full_tool_id = self.all_tools[t_id][0]
                     pred_input_extensions, _ = self.__get_tool_extensions(trans, full_tool_id)
@@ -279,14 +280,14 @@ class ToolRecommendations:
         )
         t_intersect.extend(t_diff)
         u_intersect.extend(u_diff)
-        t_intersect = t_intersect[:topk]
-        u_intersect = u_intersect[:topk]
         t_intersect_compat = list(set(last_compatible_tools).intersection(set(t_intersect)))
         # filter against rare bad predictions for any tool
-        if len(t_intersect_compat) == 0 and len(last_compatible_tools) > 0:
+        if len(t_intersect_compat) == 0:
             t_intersect, u_intersect = self.__sort_by_usage(
                 last_compatible_tools, self.tool_weights_sorted, self.model_data_dictionary
             )
+        t_intersect = t_intersect[:topk]
+        u_intersect = u_intersect[:topk]
         return t_intersect, u_intersect
 
     def __sort_by_usage(self, t_list, class_weights, d_dict):
