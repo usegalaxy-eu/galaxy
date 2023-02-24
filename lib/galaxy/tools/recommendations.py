@@ -230,6 +230,7 @@ class ToolRecommendations:
                     pred_input_extensions, _ = self.__get_tool_extensions(trans, full_tool_id)
                     c_dict["name"] = self.all_tools[t_id][1]
                     c_dict["tool_id"] = full_tool_id
+                    c_dict["tool_score"] = score
                     c_dict["i_extensions"] = list(set(pred_input_extensions))
                     prediction_data["children"].append(c_dict)
                     break
@@ -278,14 +279,18 @@ class ToolRecommendations:
         t_diff, u_diff = self.__sort_by_usage(
             t_diff, self.tool_weights_sorted, self.model_data_dictionary
         )
-        t_intersect.extend(t_diff)
-        u_intersect.extend(u_diff)
-        t_intersect_compat = list(set(last_compatible_tools).intersection(set(t_intersect)))
+        t_intersect_compat = list(set(last_compatible_tools).intersection(set(t_diff)))
         # filter against rare bad predictions for any tool
-        if len(t_intersect_compat) == 0:
-            t_intersect, u_intersect = self.__sort_by_usage(
+        if len(t_intersect_compat) > 0:
+            t_compat, u_compat = self.__sort_by_usage(
+                t_intersect_compat, self.tool_weights_sorted, self.model_data_dictionary
+            )
+        else:
+            t_compat, u_compat = self.__sort_by_usage(
                 last_compatible_tools, self.tool_weights_sorted, self.model_data_dictionary
             )
+        t_intersect.extend(t_compat)
+        u_intersect.extend(u_compat)
         t_intersect = t_intersect[:topk]
         u_intersect = u_intersect[:topk]
         return t_intersect, u_intersect
