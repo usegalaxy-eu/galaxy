@@ -60,7 +60,7 @@ class ToolRecommendations:
 
         class TransformerBlock(Layer):
             def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):
-                super().__init__()
+                super(TransformerBlock, self).__init__()
                 self.att = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim, dropout=rate)
                 self.ffn = Sequential([Dense(ff_dim, activation="relu"), Dense(embed_dim)])
                 self.layernorm1 = LayerNormalization(epsilon=1e-6)
@@ -80,7 +80,7 @@ class ToolRecommendations:
 
         class TokenAndPositionEmbedding(Layer):
             def __init__(self, maxlen, vocab_size, embed_dim):
-                super().__init__()
+                super(TokenAndPositionEmbedding, self).__init__()
                 self.token_emb = Embedding(input_dim=vocab_size, output_dim=embed_dim, mask_zero=True)
                 self.pos_emb = Embedding(input_dim=maxlen, output_dim=embed_dim, mask_zero=True)
 
@@ -134,7 +134,7 @@ class ToolRecommendations:
         self.loaded_model = self.create_transformer_model(len(self.reverse_dictionary) + 1)
         self.loaded_model.load_weights(self.tool_recommendation_model_path)
 
-        self.model_data_dictionary = {v: k for k, v in self.reverse_dictionary.items()}
+        self.model_data_dictionary = dict((v, k) for k, v in self.reverse_dictionary.items())
         # set the list of compatible tools
         self.compatible_tools = json.loads(model_file["compatible_tools"][()].decode("utf-8"))
         tool_weights = json.loads(model_file["class_weights"][()].decode("utf-8"))
@@ -210,14 +210,6 @@ class ToolRecommendations:
         Filter tool predictions based on datatype compatibility and tool connections.
         Add admin preferences to recommendations.
         """
-        last_compatible_tools = list()
-        if last_tool_name in self.model_data_dictionary:
-            last_tool_name_id = self.model_data_dictionary[last_tool_name]
-            if last_tool_name_id in self.compatible_tools:
-                last_compatible_tools = [
-                    self.reverse_dictionary[t_id] for t_id in self.compatible_tools[last_tool_name_id]
-                ]
-
         prediction_data["is_deprecated"] = False
         # get the list of datatype extensions of the last tool of the tool sequence
         _, last_output_extensions = self.__get_tool_extensions(trans, self.all_tools[last_tool_name][0])
@@ -231,13 +223,14 @@ class ToolRecommendations:
                 if (
                     t_id == child
                     and score >= 0.0
-                    and t_id in last_compatible_tools
                     and child not in self.deprecated_tools
+                    and child != last_tool_name
                 ):
                     full_tool_id = self.all_tools[t_id][0]
                     pred_input_extensions, _ = self.__get_tool_extensions(trans, full_tool_id)
                     c_dict["name"] = self.all_tools[t_id][1]
                     c_dict["tool_id"] = full_tool_id
+                    c_dict["tool_score"] = score
                     c_dict["i_extensions"] = list(set(pred_input_extensions))
                     prediction_data["children"].append(c_dict)
                     break
@@ -267,18 +260,39 @@ class ToolRecommendations:
                 break
         return prediction_data
 
-    def __get_predicted_tools(self, base_tools, predictions, topk):
+    def __get_predicted_tools(self, pub_tools, predictions, last_tool_name, topk):
         """
         Get predicted tools. If predicted tools are less in number, combine them with published tools
         """
-        t_intersect = list(set(predictions).intersection(set(base_tools)))
-        t_diff = list(set(predictions).difference(set(base_tools)))
+        last_compatible_tools = list()
+        if last_tool_name in self.model_data_dictionary:
+            last_tool_name_id = self.model_data_dictionary[last_tool_name]
+            if last_tool_name_id in self.compatible_tools:
+                last_compatible_tools = [
+                    self.reverse_dictionary[t_id] for t_id in self.compatible_tools[last_tool_name_id]
+                ]
+        t_intersect = list(set(predictions).intersection(set(pub_tools)))
+        t_diff = list(set(predictions).difference(set(pub_tools)))
         t_intersect, u_intersect = self.__sort_by_usage(
             t_intersect, self.tool_weights_sorted, self.model_data_dictionary
         )
-        t_diff, u_diff = self.__sort_by_usage(t_diff, self.tool_weights_sorted, self.model_data_dictionary)
-        t_intersect.extend(t_diff)
-        u_intersect.extend(u_diff)
+        t_diff, u_diff = self.__sort_by_usage(
+            t_diff, self.tool_weights_sorted, self.model_data_dictionary
+        )
+        t_intersect_compat = list(set(last_compatible_tools).intersection(set(t_diff)))
+        # filter against rare bad predictions for any tool
+        if len(t_intersect_compat) > 0:
+            t_compat, u_compat = self.__sort_by_usage(
+                t_intersect_compat, self.tool_weights_sorted, self.model_data_dictionary
+            )
+        else:
+            t_compat, u_compat = self.__sort_by_usage(
+                last_compatible_tools, self.tool_weights_sorted, self.model_data_dictionary
+            )
+        t_intersect.extend(t_compat)
+        u_intersect.extend(u_compat)
+        t_intersect = t_intersect[:topk]
+        u_intersect = u_intersect[:topk]
         return t_intersect, u_intersect
 
     def __sort_by_usage(self, t_list, class_weights, d_dict):
@@ -297,17 +311,25 @@ class ToolRecommendations:
         Get predictions from published and normal workflows
         """
         last_base_tools = list()
+        weight_values = list(self.tool_weights_sorted.values())
+        wt_predictions = predictions * weight_values
         prediction_pos = np.argsort(predictions, axis=-1)
-        topk_prediction_pos = prediction_pos[-topk:]
+        wt_prediction_pos = np.argsort(wt_predictions, axis=-1)
+        topk_prediction_pos = list(prediction_pos[-topk:])
+        wt_topk_prediction_pos = list(wt_prediction_pos[-topk:])
         # get tool ids
+        wt_pred_tool_names = [self.reverse_dictionary[str(tool_pos)] for tool_pos in wt_topk_prediction_pos]
         pred_tool_names = [self.reverse_dictionary[str(tool_pos)] for tool_pos in topk_prediction_pos]
+        # exclude same tool as the last tool
+        pred_tool_names.extend(wt_pred_tool_names)
+        pred_tool_names = [item for item in pred_tool_names if item != last_tool_name]
         if last_tool_name in base_tools:
             last_base_tools = base_tools[last_tool_name]
             if type(last_base_tools).__name__ == "str":
                 # get published or compatible tools for the last tool in a sequence of tools
                 last_base_tools = last_base_tools.split(",")
         # get predicted tools
-        sorted_c_t, sorted_c_v = self.__get_predicted_tools(last_base_tools, pred_tool_names, topk)
+        sorted_c_t, sorted_c_v = self.__get_predicted_tools(last_base_tools, pred_tool_names, last_tool_name, topk)
         return sorted_c_t, sorted_c_v
 
     def __compute_tool_prediction(self, trans, tool_sequence):
@@ -353,8 +375,5 @@ class ToolRecommendations:
             pub_t, pub_v = self.__separate_predictions(
                 self.standard_connections, prediction, last_tool_name, weight_values, topk
             )
-            # remove duplicates if any
-            pub_t = list(dict.fromkeys(pub_t))
-            pub_v = list(dict.fromkeys(pub_v))
             prediction_data = self.__filter_tool_predictions(trans, prediction_data, pub_t, pub_v, last_tool_name)
         return prediction_data
