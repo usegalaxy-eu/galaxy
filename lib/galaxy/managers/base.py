@@ -356,7 +356,7 @@ class ModelManager(Generic[U]):
         """
         Gets a model by primary id.
         """
-        id_filter = self.model_class.table.c.id == id
+        id_filter = self.model_class.id == id
         return self.one(filters=id_filter)
 
     # .... multirow queries
