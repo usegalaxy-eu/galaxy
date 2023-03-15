@@ -1,7 +1,7 @@
 id: news
 type:
   - masthead
-activate: true
+activate: false
 
 icon: fa-bullhorn
 tooltip: See the Galaxy Release Notes
