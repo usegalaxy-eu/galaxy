@@ -107,6 +107,7 @@ class DatasetContentType(str, Enum):
     stats = "stats"
     data = "data"
 
+
 class DatasetStorageDetails(Model):
     object_store_id: Optional[str] = Field(
         description="The identifier of the destination ObjectStore for this dataset.",
