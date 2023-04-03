@@ -93,7 +93,7 @@ export default {
             const translateX = parseInt(clientW * 0.15);
             svgElem.setAttribute("viewBox", -translateX + " 0 " + 0.5 * clientW + " " + clientH);
             svgElem.setAttribute("preserveAspectRatio", "xMidYMid meet");
-            var d3Tree = d3.tree().size([clientH, clientW]);
+            const d3Tree = d3.tree().size([clientH, clientW]);
             root = d3.hierarchy(predictedTools, (d) => {
                 return d.children;
             });
