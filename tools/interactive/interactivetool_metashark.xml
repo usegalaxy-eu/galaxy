@@ -11,7 +11,8 @@
     </entry_points>
     <command use_shared_home="true"><![CDATA[
 
-        R -e "options('shiny.port'=3838,shiny.host='0.0.0.0')"
+        cd /build_zone &&
+        R -e "options('shiny.port'=3838,shiny.host='0.0.0.0');MetaShARK::runMetashark()"
 
     ]]>
     </command>
