@@ -27,7 +27,7 @@
     <help>
 <![CDATA[
 
-`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is a R Shiny App to automate metadata creation in Ecological Metadata Language (E>
+`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is an work in progress innovative R Shiny App to automate metadata creation in Ecological Metadata Language. Based on EML Assembly Line R package, MetaShARK allows you to produce EML metadata only from text files as csv or tsv, and allows you to provide metadata on data attributes, geographic, taxonomic and temporal coverages, authors, summary, keywords and methods. Futhermore, the 1.7.3 version alows you to add EML semantic annotation related to attributes names and/or keywords, based on terminological resources from Bioportal. This version of MetaShARK is provided "as is" for testing, as bugs can appear.
 
 ]]>
     </help>
