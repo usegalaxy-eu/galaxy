@@ -86,8 +86,7 @@ export default {
             const duration = 750;
             const maxTextLength = 20;
             const svg = d3.select("#tool-recommendation").append("svg").attr("class", "tree-size").append("g");
-            const gElem = svg._groups[0][0];
-            const svgElem = gElem.parentNode;
+            const svgElem = svg.node().parentElement;
             const clientH = svgElem.clientHeight;
             const clientW = svgElem.clientWidth;
             const translateX = parseInt(clientW * 0.15);
