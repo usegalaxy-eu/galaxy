@@ -75,6 +75,11 @@ def main():
                         if ports[key]["host"] == "0.0.0.0":
                             ports[key]["host"] = host_ip
                 if callback_url:
+                    #for retry in range(10):
+                    #    res = requests.post(callback_url, json={"container_runtime": ports}, timeout=DEFAULT_SOCKET_TIMEOUT)
+                    #    if res.status_code == 200:
+                    #        break
+                    #    time.sleep(retry * 2)
                     r = requests.post(callback_url, json={"container_runtime": ports}, timeout=DEFAULT_SOCKET_TIMEOUT)
                     r.raise_for_status()
                 else:
