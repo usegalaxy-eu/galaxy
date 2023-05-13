@@ -171,6 +171,7 @@ class CondorJobRunner(AsynchronousJobRunner):
                     cjs.job_wrapper.tool.tool_type != "interactive"
                     and os.stat(cjs.user_log).st_size == cjs.user_log_size
                 ):
+                    log.debug(f"({galaxy_id_tag}/{job_id}) job added to new_watched list")
                     new_watched.append(cjs)
                     continue
                 s1, s4, s7, s5, s9, log_size = summarize_condor_log(cjs.user_log, job_id)
@@ -178,6 +179,7 @@ class CondorJobRunner(AsynchronousJobRunner):
                 job_complete = s5
                 job_failed = s9
                 cjs.user_log_size = log_size
+                log.debug(f"({galaxy_id_tag}/{job_id}) job has the following states: running-{job_running}, complete-{job_complete}, failed-{job_failed} \n CJS.running is {cjs.running}")
             except Exception:
                 # so we don't kill the monitor thread
                 log.exception(f"({galaxy_id_tag}/{job_id}) Unable to check job status")
@@ -198,6 +200,7 @@ class CondorJobRunner(AsynchronousJobRunner):
                 # Will switching from RUNNING to QUEUED confuse Galaxy?
                 # cjs.job_wrapper.change_state( model.Job.states.QUEUED )
             job_state = cjs.job_wrapper.get_state()
+            log.debug(f"({galaxy_id_tag}/{job_id}) job state is {job_state}")
             if job_complete or job_state == model.Job.states.STOPPED:
                 if job_state != model.Job.states.DELETED:
                     external_metadata = not asbool(
@@ -215,6 +218,7 @@ class CondorJobRunner(AsynchronousJobRunner):
                 continue
             cjs.runnning = job_running
             new_watched.append(cjs)
+            log.debug(f"({galaxy_id_tag}/{job_id}) job has been added to new_watched list at the end of the loop")
         # Replace the watch list with the updated version
         self.watched = new_watched
 
