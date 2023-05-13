@@ -1,4 +1,4 @@
-<tool id="interactive_tool_divand_notebook" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="0.0.1" profile="22.05">
+<tool id="interactive_tool_divand" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="0.0.1" profile="22.05">
     <requirements>
         <container type="docker">abarth/divand-jupyterhub:galaxy-2023-04-25T0904</container>
     </requirements>
