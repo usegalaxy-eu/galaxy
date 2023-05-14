@@ -810,6 +810,8 @@ class AsynchronousJobRunner(BaseJobRunner, Monitors):
                 pass
             # Iterate over the list of watched jobs and check state
             try:
+                neww = [item.job_id for item in self.watched]
+                log.debug(f'bjoern: state of self.watched: {neww}')
                 self.check_watched_items()
             except Exception:
                 log.exception("Unhandled exception checking active jobs")
@@ -817,7 +819,9 @@ class AsynchronousJobRunner(BaseJobRunner, Monitors):
             time.sleep(self.app.config.job_runner_monitor_sleep)
 
     def monitor_job(self, job_state):
+        log.debug(f"job_id: {job_state.job_id} ... put job into the Queue")
         self.monitor_queue.put(job_state)
+        log.debug(f"job_id: {job_state.job_id} ... job is in the Queue")
 
     def shutdown(self):
         """Attempts to gracefully shut down the monitor thread"""
@@ -841,6 +845,8 @@ class AsynchronousJobRunner(BaseJobRunner, Monitors):
             if new_async_job_state:
                 new_watched.append(new_async_job_state)
         self.watched = new_watched
+        neww = [item.job_id for item in new_watched]
+        log.debug(f'bjoern: AsyncJobRunner: watch-list-id\n {neww}')
 
     # Subclasses should implement this unless they override check_watched_items all together.
     def check_watched_item(self, job_state):

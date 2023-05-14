@@ -265,6 +265,7 @@ class PulsarJobRunner(AsynchronousJobRunner):
         return JobDestination(runner="pulsar", params=url_to_destination_params(url))
 
     def check_watched_item(self, job_state):
+        log.debug(f"job_id {job_state.job_id} - {job_state} - check_watched_item {self.use_mq}")
         if self.use_mq:
             # Might still need to check pod IPs.
             job_wrapper = job_state.job_wrapper
@@ -296,6 +297,7 @@ class PulsarJobRunner(AsynchronousJobRunner):
             return self.check_watched_item_state(job_state)
 
     def check_watched_item_state(self, job_state):
+        log.debug(f"job_id {job_state.job_id} - {job_state} - check_watched_item_state")
         try:
             client = self.get_client_from_state(job_state)
             status = client.get_status()
@@ -311,7 +313,8 @@ class PulsarJobRunner(AsynchronousJobRunner):
         return job_state
 
     def _update_job_state_for_status(self, job_state, pulsar_status, full_status=None):
-        log.debug("(%s) Received status update: %s %s", job_state.job_id, type(pulsar_status), pulsar_status)
+        ##log.debug("(%s) Received status update: %s %s", job_state.job_id, type(pulsar_status), pulsar_status)
+        log.debug("(%s) Received status update: from %s to %s. job_state.running is %s", job_state.job_id, job_state.job_wrapper.get_state(), pulsar_status, job_state.running)
         if pulsar_status in ["complete", "cancelled"] or job_state.job_wrapper.get_state() == model.Job.states.STOPPED:
             self.mark_as_finished(job_state)
             return None
@@ -429,11 +432,12 @@ class PulsarJobRunner(AsynchronousJobRunner):
                 tool_directory_required_files=tool_directory_required_files,
             )
             external_job_id = pulsar_submit_job(client, client_job_description, remote_job_config)
-            log.info(f"Pulsar job submitted with job_id {external_job_id}")
+            log.debug(f"Pulsar job submitted with job_id {external_job_id}")
             job = job_wrapper.get_job()
             # Set the job destination here (unlike other runners) because there are likely additional job destination
             # params from the Pulsar client.
             # Flush with change_state.
+            log.debug(f"job_id: {job_wrapper.job_id} - external job_id {external_job_id}, {job} {job_wrapper}")
             job_wrapper.set_job_destination(job_destination, external_id=external_job_id, flush=False, job=job)
             job_wrapper.change_state(model.Job.states.QUEUED, job=job)
         except Exception:
@@ -446,6 +450,7 @@ class PulsarJobRunner(AsynchronousJobRunner):
         )
         pulsar_job_state.old_state = True
         pulsar_job_state.running = False
+        log.debug(f"job_id: {job_wrapper.job_id} - Pulsar Job state {pulsar_job_state} {pulsar_job_state.job_id}")
         self.monitor_job(pulsar_job_state)
 
     def __needed_features(self, client):
