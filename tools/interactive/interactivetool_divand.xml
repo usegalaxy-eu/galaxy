@@ -1,6 +1,6 @@
 <tool id="interactive_tool_divand" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="0.0.1" profile="22.05">
     <requirements>
-        <container type="docker">abarth/divand-jupyterhub:galaxy-2023-04-25T0904</container>
+        <container type="docker">quay.io/galaxy/divand-jupyterhub:galaxy-2023-04-25t0904-bag</container>
     </requirements>
     <entry_points>
         <entry_point name="DIVAnd Interactive Tool" requires_domain="True">
@@ -22,10 +22,13 @@
         mkdir -p ./jupyter/data &&
         mkdir -p ./jupyter/notebooks &&
 
-        #for $count, $file in enumerate($input):
-            #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\w\-\.\s]', '_', str($file.element_identifier))
-            ln -sf '$file' './jupyter/data/${cleaned_name}.${file.ext}' &&
-        #end for
+        #if $input:
+            #for $count, $file in enumerate($input):
+                #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\w\-\.\s]', '_', str($file.element_identifier))
+                ln -sf '$file' './jupyter/data/${cleaned_name}.${file.ext}' &&
+            #end for
+        #end if
+
 
         ## change into the directory where the notebooks are located
         cd ./jupyter/ &&
