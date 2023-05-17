@@ -32,4 +32,7 @@ Quality Control flags are graphically changed by the User.
 When changes are recorded, the history section is updated with the list of performed changes.
     ]]>
     </help>
+    <citations>
+        <citation type="doi">10.17882/48531</citation>
+    </citations>
 </tool>
