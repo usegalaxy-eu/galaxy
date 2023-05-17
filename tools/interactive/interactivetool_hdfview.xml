@@ -4,7 +4,7 @@
         <token name="@VERSION@">3.3.0</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/galaxy/hdfview-desktop-vnv:@VERSION@</container>
+        <container type="docker">quay.io/galaxy/hdfview-desktop-vnc:@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="Hdfview on $infile.display_name" requires_domain="True">
