@@ -13,9 +13,8 @@
     </entry_points>
     <command detect_errors="exit_code">
         <![CDATA[
-            cp '$infile' /root/Desktop/infile &&
+            cp '$infile' /root/Desktop/input &&
             bash /startup.sh
-            ##/opt/hdfview/bin/HDFView /root/infile
         ]]>
     </command>
     <inputs>
