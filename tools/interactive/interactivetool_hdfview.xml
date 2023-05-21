@@ -18,7 +18,7 @@
         ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="netcdf,h5" label="HDF file"/>
+        <param name="infile" type="data" format="netcdf,h5,hdf4" label="HDF file"/>
     </inputs>
     <outputs>
         <data name="outfile" format="txt" />
