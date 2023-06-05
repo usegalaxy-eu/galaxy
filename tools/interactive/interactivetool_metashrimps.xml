@@ -18,7 +18,7 @@
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" multiple="true" format="tabular,csv" optional="true"  label="Input biodiversity data file(s)"/>
+        <param name="infile" type="data" multiple="true" format="xml" optional="true"  label="Input metadata file writen using EML Ecological standard"/>
     </inputs>
     <outputs>
         <data name="outfile" format="txt" />
@@ -28,7 +28,7 @@
     <help>
 <![CDATA[
 
-`MetaShRIMPS <https://github.com/TanguyGen/metaCure>`_ is a R Shiny App to automate production of FAIR metrics and data pper sketche from Ecological Metadata Language based metadata documents
+`MetaShRIMPS <https://github.com/TanguyGen/metaCure>`_ is a R Shiny App to automate production of FAIR metrics and data paper sketche from Ecological Metadata Language based metadata documents
 
 ]]>
     </help>
