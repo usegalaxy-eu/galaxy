@@ -35,4 +35,13 @@
         `ODV <https://odv.awi.de/>`_ plots geo-referenced and other arrays from netCDF, HDF, GRIB, and other datasets.
     ]]>
     </help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{,
+            title = {Ocean Data View},
+            author = {Schlitzer Reiner},
+            year = {2023},
+            note = {https://odv.awi.de}
+        </citation>
+    </citations>
 </tool>
