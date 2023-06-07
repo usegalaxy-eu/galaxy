@@ -47,6 +47,10 @@ export interface paths {
          */
         put: operations["reload_toolbox_api_configuration_toolbox_put"];
     };
+    "/api/dataset_collection_element/{dce_id}": {
+        /** Content */
+        get: operations["content_api_dataset_collection_element__dce_id__get"];
+    };
     "/api/dataset_collections": {
         /** Create a new dataset collection instance. */
         post: operations["create_api_dataset_collections_post"];
@@ -107,6 +111,10 @@ export interface paths {
          * To get more information please check the source code.
          */
         get: operations["show_api_datasets__dataset_id__get"];
+    };
+    "/api/datasets/{dataset_id}/content/{content_type}": {
+        /** Retrieve information about the content of a dataset. */
+        get: operations["get_structured_content_api_datasets__dataset_id__content__content_type__get"];
     };
     "/api/datasets/{dataset_id}/converted": {
         /**
@@ -2335,6 +2343,12 @@ export interface components {
          * @description Represents a collection of elements contained in the dataset collection.
          */
         DatasetCollectionContentElements: components["schemas"]["DCESummary"][];
+        /**
+         * DatasetContentType
+         * @description For retrieving content from a structured dataset (e.g. HDF5)
+         * @enum {string}
+         */
+        DatasetContentType: "meta" | "attr" | "stats" | "data";
         /**
          * DatasetErrorMessage
          * @description Base model definition with common configuration used by all derived models.
@@ -7544,6 +7558,33 @@ export interface operations {
             };
         };
     };
+    content_api_dataset_collection_element__dce_id__get: {
+        /** Content */
+        parameters: {
+            /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+            header?: {
+                "run-as"?: string;
+            };
+            /** @description The encoded identifier of the dataset collection element. */
+            path: {
+                dce_id: string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                content: {
+                    "application/json": components["schemas"]["DCESummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_api_dataset_collections_post: {
         /** Create a new dataset collection instance. */
         parameters?: {
@@ -7909,6 +7950,34 @@ export interface operations {
             /** @description The encoded database identifier of the dataset. */
             path: {
                 dataset_id: string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_structured_content_api_datasets__dataset_id__content__content_type__get: {
+        /** Retrieve information about the content of a dataset. */
+        parameters: {
+            /** @description The user ID that will be used to effectively make this API call. Only admins and designated users can make API calls on behalf of other users. */
+            header?: {
+                "run-as"?: string;
+            };
+            /** @description The encoded database identifier of the dataset. */
+            path: {
+                dataset_id: string;
+                content_type: components["schemas"]["DatasetContentType"];
             };
         };
         responses: {

@@ -1809,7 +1809,12 @@ class Tool(Dictifiable):
                 # If the tool provides a `validate_input` hook, call it.
                 validate_input = self.get_hook("validate_input")
                 if validate_input:
-                    validate_input(request_context, errors, params, self.inputs)
+                    # hooks are so terrible ... this is specifically for https://github.com/galaxyproject/tools-devteam/blob/main/tool_collections/gops/basecoverage/operation_filter.py
+                    legacy_non_dce_params = {
+                        k: v.hda if isinstance(v, model.DatasetCollectionElement) and v.hda else v
+                        for k, v in params.items()
+                    }
+                    validate_input(request_context, errors, legacy_non_dce_params, self.inputs)
             all_errors.append(errors)
             all_params.append(params)
         unset_dataset_matcher_factory(request_context)
@@ -2415,7 +2420,9 @@ class Tool(Dictifiable):
             history = history or trans.get_history()
             if history is None and job is not None:
                 history = self.history_manager.get_owned(job.history.id, trans.user, current_history=trans.history)
-            if history is None:
+            # We can show the tool form if the current user is anonymous and doesn't have a history
+            user = trans.get_user()
+            if history is None and user is not None:
                 raise exceptions.MessageException("History unavailable. Please specify a valid history id")
 
         # build request context
@@ -2436,12 +2443,6 @@ class Tool(Dictifiable):
 
         # create parameter object
         params = Params(kwd, sanitize=False)
-
-        # expand incoming parameters (parameters might trigger multiple tool executions,
-        # here we select the first execution only in order to resolve dynamic parameters)
-        expanded_incomings, _ = expand_meta_parameters(trans, self, params.__dict__)
-        if expanded_incomings:
-            params.__dict__ = expanded_incomings[0]
 
         # do param translation here, used by datasource tools
         if self.input_translator:

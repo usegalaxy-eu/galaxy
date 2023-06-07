@@ -1074,6 +1074,13 @@ class BaseDatasetPopulator(BasePopulator):
         assert "id" in role, role
         return role["id"]
 
+    def total_disk_usage(self) -> float:
+        response = self._get("users/current")
+        response.raise_for_status()
+        user_object = response.json()
+        assert "total_disk_usage" in user_object
+        return user_object["total_disk_usage"]
+
     def create_role(self, user_ids: list, description: Optional[str] = None) -> dict:
         using_requirement("admin")
         payload = {
@@ -1389,6 +1396,8 @@ class BaseDatasetPopulator(BasePopulator):
         self.wait_for_download_ready(storage_request_id)
         if serve_file:
             return self._get_to_tempfile(f"short_term_storage/{storage_request_id}")
+        else:
+            return storage_request_id
 
     def get_history_export_tasks(self, history_id: str):
         headers = {"accept": "application/vnd.galaxy.task.export+json"}
