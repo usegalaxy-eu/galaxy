@@ -4,7 +4,7 @@
     <token name="@VERSION@">5.6.5</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/mariejo/docker_odv</container>
+        <container type="docker">quay.io/mariejo/docker_odv:5.6.5</container>
     </requirements>
     <entry_points>
         <entry_point name="ODV on $infile.display_name" requires_domain="True">
