@@ -1,5 +1,5 @@
 <tool id="interactive_tool_pampa" tool_type="interactive" name="pampa" version="0.0.1" profile="22.01">
-    <description>Performance Indicators of Marine Protected Areas for the management of coastal ecosystems, resources and their uses</description>
+    <description>occurences data analysis</description>
     <requirements>
         <container type="docker">ylebras/pampa:latest</container>
     </requirements>
@@ -10,7 +10,9 @@
         </entry_point>
     </entry_points>
     <command><![CDATA[
-        ln -s /srv/shiny-server/sample-apps/PAMPA/Results . &&
+        mkdir Results &&
+        mkdir /srv/shiny-server/sample-apps/PAMPA/Results/ &&
+        ln -s Results  /srv/shiny-server/sample-apps/PAMPA/Results/ &&
         mkdir -p /var/log/shiny-server &&
         chown shiny:shiny /var/log/shiny-server &&
 
