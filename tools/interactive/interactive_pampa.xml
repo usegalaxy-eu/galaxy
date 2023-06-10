@@ -11,8 +11,7 @@
     </entry_points>
     <command><![CDATA[
 
-        mkdir Results &&
-        ln -s /srv/shiny-server/sample-apps/PAMPA/Results Results &&
+        ln -s /srv/shiny-server/sample-apps/PAMPA/Results . &&
         mkdir -p /var/log/shiny-server &&
         chown shiny.shiny /var/log/shiny-server &&
 
