@@ -40,6 +40,8 @@
 
 `PAMPA <https://github.com/madelinm/Package_PAMPA>`_ is a R Shiny App to facilitate production of biodiversity metrics from observation files related to species
 
+To have outputs on your Galaxy history, once data tretment finished, one need to specify `/srv/shiny-server/sample-apps/PAMPA/` as "working directory" in the "Load data" tab of the PAMPA interface.
+
 ]]>
     </help>
     <citations>
