@@ -1,0 +1,55 @@
+<tool id="interactive_tool_pampa" tool_type="interactive" name="pampa" version="0.0.1" profile="22.01">
+    <description>Performance Indicators of Marine Protected Areas for the management of coastal ecosystems, resources and their uses</description>
+    <requirements>
+        <container type="docker">ylebras/pampa:latest</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="metashrimps visualisation" requires_domain="True">
+            <port>3838</port>
+            <url>/sample-apps/PAMPA/</url>
+        </entry_point>
+    </entry_points>
+    <command><![CDATA[
+
+        mkdir Results
+        ln -s /srv/shiny-server/sample-apps/PAMPA/Results Results
+        mkdir -p /var/log/shiny-server &&
+        chown shiny.shiny /var/log/shiny-server &&
+
+        exec shiny-server >> /var/log/shiny-server.log 2>&1
+    ]]>
+    </command>
+    <inputs>
+        <param name="unitobs" type="data" multiple="true" format="xml" optional="true"  label="Input unitobs file"/>
+        <param name="obs" type="data" multiple="true" format="xml" optional="true"  label="Input observation file"/>
+        <param name="ref" type="data" multiple="true" format="xml" optional="true"  label="Input reference file"/>
+    </inputs>
+    <outputs>
+        <data name="moy" from_work_dir="Results/MoyenneAnneeVisiteSite.csv" format="csv" />
+		<data name="nbre" from_work_dir="Results/NombreSiteAnnee.csv" format="csv" />
+		<data name="plan" from_work_dir="Results/PlanEchantillonnage_basique.csv" format="csv" />
+		<data name="table" from_work_dir="Results/TableEspeces.csv" format="csv" />
+		<data name="mettaille" from_work_dir="Results/UnitobsEspeceClassetailleMetriques.csv" format="csv" />
+		<data name="metsp" from_work_dir="Results/UnitobsEspeceMetriques.csv" format="csv" />
+		<data name="metunitobs" from_work_dir="Results/UnitobsMetriques.csv" format="csv" />
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+<![CDATA[
+
+`PAMPA <https://github.com/madelinm/Package_PAMPA>`_ is a R Shiny App to facilitate production of biodiversity metrics from observation files related to species
+
+]]>
+    </help>
+    <citations>
+           <citation type="bibtex">@misc{githubsurvey2023,
+           author       = {Mélanie Madelin, Yves Recht, Yvan Le Bras, Dominique Pelletier},
+           title        = {{Performance Indicators of Marine Protected Areas for the management of coastal ecosystems, resources and their uses}},
+           publisher    = {Github},
+           url          = {https://github.com/madelinm/Package_PAMPA},
+           year         = {2023}
+           }
+          }</citation>
+    </citations>
+</tool>
