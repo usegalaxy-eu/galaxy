@@ -18,7 +18,6 @@
         mkdir -p /root/Documents/ODV/data/output &&
         cp '$infile' '/root/Documents/ODV/data/$infile.display_name' &&
         cp /root/Documents/ODV/data/output/* output/ | true &&
-        cd output &&
         bash /startup.sh
     ]]>
     </command>
