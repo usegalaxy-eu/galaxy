@@ -14,7 +14,7 @@
     <command detect_errors="exit_code">
     <!-- see: https://odv.awi.de/fileadmin/user_upload/odv/misc/odvGuide.pdf -->
     <![CDATA[
-    	mkdir output &&
+    	ln -s  /root/Documents/ODV/data/output/ ./output/ &&
         mkdir -p /root/Documents/ODV/data/output &&
         cp '$infile' '/root/Documents/ODV/data/$infile.display_name' &&
         bash /startup.sh
