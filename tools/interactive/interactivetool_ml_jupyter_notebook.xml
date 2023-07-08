@@ -3,7 +3,7 @@
         <token name="@VERSION@">0.3</token>
     </macros>
     <requirements>
-        <container type="docker">docker.io/ktunc/docker-ml-jupyterlab:galaxy-integration-@VERSION@</container>
+        <container type="docker">quay.io/galaxy/docker-ml-jupyterlab:galaxy-integration-@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="GPU enabled Interactive Jupyter Notebook for Machine Learning" requires_domain="True">
