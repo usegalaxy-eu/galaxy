@@ -1,7 +1,7 @@
-<tool id="interactive_tool_metashrimps" tool_type="interactive" name="metashrimps" version="0.0.1" profile="22.01">
+<tool id="interactive_tool_metashrimps" tool_type="interactive" name="metashrimps" version="0.0.2" profile="22.01">
     <description>Metadata Shiny for Retroactive Information Management and Production of data paper Sketches</description>
     <requirements>
-        <container type="docker">ylebras/ms_metashrimps:latest</container>
+        <container type="docker">ylebras/ms_metashrimps:v2</container>
     </requirements>
     <entry_points>
         <entry_point name="metashrimps visualisation" requires_domain="True">
@@ -10,7 +10,7 @@
         </entry_point>
     </entry_points>
     <command><![CDATA[
-
+        sed -i 's?input\$file\$datapath?"'$inputfile'"?g' /srv/shiny-server/sample-apps/META/App_metadig/app.R &&
         mkdir -p /var/log/shiny-server &&
         chown shiny.shiny /var/log/shiny-server &&
 
