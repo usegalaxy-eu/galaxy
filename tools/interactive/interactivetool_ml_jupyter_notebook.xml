@@ -97,7 +97,10 @@ except FileNotFoundError:
         export HOME=/home/\$NB_USER/ &&
         export PATH=/home/\$NB_USER/.local/bin:\$PATH &&
         cp '${galaxy_input_startup_script}' /home/\$NB_USER/.ipython/profile_default/startup/02-load.py &&
+
+        ## Disable popups informing that "a new release is available"
         jupyter labextension disable "@jupyterlab/apputils-extension:announcements" &&
+
         #set $output_notebook_name = 'jupyterlab_notebook.ipynb'
         #if $mode.mode_select == 'scratch':
             cp -r /home/\$NB_USER/data ./ &&
