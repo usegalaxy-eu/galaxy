@@ -18,7 +18,7 @@
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" multiple="true" format="xml" optional="true"  label="Input metadata file writen using EML Ecological standard"/>
+        <param name="inputfile" type="data" multiple="true" format="xml" optional="true"  label="Input metadata file writen using EML Ecological standard"/>
     </inputs>
     <outputs>
         <data name="outfile" format="txt" />
