@@ -1,7 +1,7 @@
-<tool id="interactive_tool_metashark" tool_type="interactive" name="metashark" version="1.7.3" profile="22.01">
+<tool id="interactive_tool_metashark" tool_type="interactive" name="metashark" version="1.7.35" profile="22.01">
     <description>Metadata Shiny Automated Resource and Knowledge</description>
     <requirements>
-        <container type="docker">ylebras/metashark:1.7.3</container>
+        <container type="docker">ylebras/ms_annot_gis_patnat_dev_072023</container>
     </requirements>
     <entry_points>
         <entry_point name="metashark visualisation" requires_domain="True">
