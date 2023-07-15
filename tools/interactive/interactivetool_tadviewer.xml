@@ -4,7 +4,7 @@
         <xref type="bio.tools"></xref>
     </xrefs> -->
     <entry_points>
-        <entry_point name="tadviewer instance on $infiles.display_name">
+        <entry_point name="tadviewer instance on $infiles">
             <port>9000</port>
         </entry_point>
     </entry_points>
@@ -24,11 +24,11 @@
         <requirement type="docker">recetox/tad:latest</requirement>
     </requirements>
     <command detect_errors="exit_code"><![CDATA[
-    mkdir -p ./inputs
+    mkdir -p ./inputs &&
     #for $item in $infiles:
-        ln -s '$item' './inputs/${item.element_identifier}.${item.ext}'
+        ln -s '$item' './inputs/${item.element_identifier}.${item.ext}' &&
     #end for
-    npm start -- -d ./inputs >> '$logfile'
+    npm start -- -d ./inputs/ >> '$logfile'
     ]]></command>
     <inputs>
         <param name="infiles" type="data" multiple="true" format="csv,parquet" label="Tabular dataset."/>
