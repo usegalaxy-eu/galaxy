@@ -50,7 +50,6 @@
 .. class:: infomark
 
 **What it does**
-
 The tool visualized tabular data which can be sorted, filtered and aggregated with different functions.
 It also implements an SQL engine which allows executing SQL queries on the data to further refine and inspect it.
 
