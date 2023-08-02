@@ -1,4 +1,4 @@
-<tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@">
+<tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@" profile="22.01">
     <description>interactive geographic information system (GIS)</description>
     <macros>
         <token name="@VERSION@">3.32</token>
@@ -13,9 +13,9 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-        mkdir -p /root/Documents/QGIS/data/output &&
-        ln -s  /root/Documents/QGIS/data/output/ ./output/ &&
-        cp '$infile' '/root/Documents/QGIS/data/$infile.display_name' &&
+        export HOME=\$PWD &&
+        mkdir -p ./output &&
+        cp '$infile' './$infile.display_name' &&
         /init
     ]]>
     </command>
@@ -23,7 +23,7 @@
         <param name="infile" type="data" format="netcdf,h5" label="netcdf"/>
     </inputs>
     <outputs>
- 	<data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
+    <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
         <collection name="outputs" type="list" label="QGIS outputs">
             <discover_datasets pattern="__name_and_ext__" directory="output" />
         </collection>
