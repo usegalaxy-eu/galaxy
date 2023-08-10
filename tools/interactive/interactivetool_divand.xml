@@ -1,6 +1,10 @@
-<tool id="interactive_tool_divand" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="0.0.1" profile="22.05">
+<tool id="interactive_tool_divand_notebook" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="@VERSION@" profile="22.05">
+    <description>Data-Interpolating Variational Analysis in n dimensions</description>
+    <macros>
+        <token name="@VERSION@">0.0.5</token>
+    </macros>
     <requirements>
-        <container type="docker">quay.io/galaxy/divand-jupyterhub:galaxy-2023-04-25t0904-bag</container>
+        <container type="docker">quay.io/galaxy/divand-jupyter-lab:@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="DIVAnd Interactive Tool" requires_domain="True">
@@ -38,7 +42,7 @@
         #if $mode.mode_select == 'scratch'
             ## copy all notebooks, workflows and data
             ## cp -r '$__tool_directory__/default_notebook.ipynb' ./notebooks &&
-            cp -r /home/\$NB_USER/notebooks/ ./notebooks &&
+            cp -r /home/\$NB_USER/notebooks/ ./ &&
 
             ## provide all rights to copied files
             jupyter lab --allow-root --no-browser &&
@@ -85,8 +89,6 @@
         </test>
     </tests>
     <help><![CDATA[
-
-
 The notebooks in this Jupyter Lab environment allows to explore programmatic access to `DIVAnd <https://gher-uliege.github.io/DIVAnd-presentation/#1>`_'s package.
 
 Why such notebooks?
@@ -130,6 +132,8 @@ There are example Notebooks written in Julia. They are now organised into 5 cate
 
 If you want more informations about the functions and parameters see also the `documentations here <https://gher-uliege.github.io/DIVAnd.jl/latest/index.html>`_.
    ]]></help>
+    <citations>
+        <citation type="doi">doi:10.5194/gmd-7-225-2014</citation>
+    </citations>
 </tool>
-
 
