@@ -1,7 +1,10 @@
-<tool id="interactive_tool_source" tool_type="interactive" name="Interactive Source Notebooks" version="0.0.1">
+<tool id="interactive_tool_source" tool_type="interactive" name="Interactive Source Notebooks" version=@VERSION@ profile="22.05">
     <description>Sea Observations Utility for Reprocessing, Calibration and Evaluation</description>
+    <macros>
+        <token name="@VERSION@">0.0.2</token>
+    </macros>
     <requirements>
-        <container type="docker">docker.io/library/source-jupyterhub</container>
+        <container type="docker">quay.io/galaxy/coastal-source-headless:@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="Source Interactive Tool" requires_domain="True">
