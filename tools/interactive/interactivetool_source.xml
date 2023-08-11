@@ -1,4 +1,4 @@
-<tool id="interactive_tool_source" tool_type="interactive" name="Interactive Source Notebooks" version=@VERSION@ profile="22.05">
+<tool id="interactive_tool_source" tool_type="interactive" name="Interactive Source Notebooks" version="@VERSION@" profile="22.05">
     <description>Sea Observations Utility for Reprocessing, Calibration and Evaluation</description>
     <macros>
         <token name="@VERSION@">0.0.2</token>
