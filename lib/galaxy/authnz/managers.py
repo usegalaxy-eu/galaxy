@@ -332,7 +332,7 @@ class AuthnzManager:
             return True
         except Exception as e:
             msg = f"An error occurred when refreshing user token: {e}"
-            log.error(msg)
+            log.debug(msg)
             return False
 
     def refresh_expiring_oidc_tokens(self, trans, user=None):
