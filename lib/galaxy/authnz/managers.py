@@ -340,8 +340,9 @@ class AuthnzManager:
             if refreshed:
                 log.debug(f"Refreshed user token via `{auth.provider}` identity provider")
             return True
-        except Exception:
-            log.exception("An error occurred when refreshing user token")
+        except Exception as e:
+            msg = f"An error occurred when refreshing user token: {e}"
+            log.debug(msg)
             return False
 
     def refresh_expiring_oidc_tokens(self, trans, user=None):
