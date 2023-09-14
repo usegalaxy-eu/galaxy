@@ -76,6 +76,9 @@
     </inputs>
     <outputs>
         <data name="jupyter_notebook" format="ipynb" label="Executed SOURCE Notebook"></data>
+        <collection name="output_collection" type="list" label="GPU JupyterLab notebook output collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true"/>
+        </collection>
     </outputs>
     <tests>
         <test expect_num_outputs="1">
