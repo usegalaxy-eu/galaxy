@@ -41,7 +41,8 @@
 
         #if $mode.mode_select == 'scratch'
             ## copy all notebooks, workflows and data
-            ## cp -r '$__tool_directory__/default_notebook.ipynb' ./notebooks &&
+            cp '$__tool_directory__/default_notebook.ipynb' ./ipython_galaxy_notebook.ipynb &&
+            jupyter trust ./ipython_galaxy_notebook.ipynb &&
             cp -r /home/\$NB_USER/notebooks/ ./ &&
 
             ## provide all rights to copied files
@@ -79,6 +80,9 @@
     </inputs>
     <outputs>
         <data name="jupyter_notebook" format="ipynb" label="Executed DIVAnd Notebook"></data>
+        <collection name="output_collection" type="list" label="GPU JupyterLab notebook output collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true"/>
+        </collection>
     </outputs>
     <tests>
         <test expect_num_outputs="1">
