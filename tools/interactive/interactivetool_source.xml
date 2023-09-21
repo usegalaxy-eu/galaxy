@@ -23,6 +23,7 @@
         #import re
         export GALAXY_WORKING_DIR=`pwd` &&
         mkdir -p ./jupyter/outputs/ &&
+        mkdir -p ./jupyter/inputs/ &&
         mkdir -p ./jupyter/data &&
         mkdir -p ./jupyter/notebooks &&
 
@@ -79,6 +80,9 @@
         <data name="jupyter_notebook" format="ipynb" label="Executed SOURCE Notebook"></data>
         <collection name="output_collection" type="list" label="JupyterLab notebook output collection">
             <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true"/>
+        </collection>
+        <collection name="input_collection" type="list" label="JupyterLab notebook input collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/inputs" visible="false"/>
         </collection>
     </outputs>
     <tests>
