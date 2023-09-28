@@ -1,7 +1,7 @@
 <tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@" profile="22.01">
     <description>interactive geographic information system (GIS)</description>
     <macros>
-        <token name="@VERSION@">3.22</token>
+        <token name="@VERSION@">3.22.1</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/qgis-headless:@VERSION@</container>
