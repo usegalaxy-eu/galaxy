@@ -16,6 +16,7 @@
     <![CDATA[
         export HOME=\$PWD &&
         mkdir -p ./outputs &&
+        chown 1000:1000 ./outputs && ## the app user of the container
         ## the /opt/qupath/infile.tiff file is loaded automatically into the application
         ln -s '$infile' '/opt/qupath/infile.tiff' &&
         /init
