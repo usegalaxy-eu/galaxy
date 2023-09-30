@@ -15,7 +15,10 @@
     <![CDATA[
         export HOME=\$PWD &&
         mkdir -p ./output &&
-        cp '$infile' './$infile.display_name' &&
+        chown 1000:1000 ./output/ && ## change permission for the app user
+        #if $infile:
+            cp '$infile' './$infile.display_name' &&
+        #end if
         /init
     ]]>
     </command>
