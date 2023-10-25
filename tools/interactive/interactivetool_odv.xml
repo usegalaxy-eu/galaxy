@@ -8,7 +8,7 @@
         <container type="docker">quay.io/bgruening/odv-headless:v@VERSION@</container>
     </requirements>
     <entry_points>
-        <entry_point name="ODV on $infile.display_name" requires_domain="True">
+        <entry_point name="ODV" requires_domain="True">
             <port>5800</port>
         </entry_point>
     </entry_points>
@@ -19,14 +19,16 @@
         mkdir -p Documents/ODV/.temp/ &&
         mkdir -p Documents/ODV/data/outputs &&
         chmod 777 Documents/ODV/ -R &&
-        cp '$infile' './Documents/ODV/data/$infile.display_name' &&
+        #for $infile in $infiles:
+            yes | cp '$infile' './Documents/ODV/data/$infile.display_name' &&
+        #end if
         /init ;
         mv ./Documents/ODV/data/outputs/ ./output &&
         rm ./Documents -rf
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="netcdf,tabular" multiple="true" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
+        <param name="infiles" type="data" format="netcdf,tabular" multiple="true" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
     </inputs>
     <outputs>
         <!--data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" /-->
