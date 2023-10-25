@@ -21,7 +21,7 @@
         chmod 777 Documents/ODV/ -R &&
         #for $infile in $infiles:
             yes | cp '$infile' './Documents/ODV/data/$infile.display_name' &&
-        #end if
+        #end for
         /init ;
         mv ./Documents/ODV/data/outputs/ ./output &&
         rm ./Documents -rf
