@@ -6,6 +6,7 @@ from subprocess import (
     CalledProcessError,
     check_call,
 )
+from typing import Optional
 
 from galaxy.util import (
     commands,
@@ -68,15 +69,21 @@ def build_submit_description(executable, output, error, user_log, query_params):
     return "\n".join(submit_description)
 
 
-def condor_submit(submit_file):
+def condor_submit(submit_file, prefix: Optional[str] = None, command: Optional[str] = None):
     """
-    Submit a condor job described by the given file. Parse an external id for
-    the submission or return None and a reason for the failure.
+    Submit a condor job described by the given file. Parse an external id for the submission or return None and a reason
+    for the failure.
+
+    Optionally, specify a prefix to prepend to the `condor_submit` call (for example, to call a binary on a specific
+    path), or override the command used to submit jobs.
     """
+    prefix = prefix or ""
+    command = command or "condor_submit"
+
     external_id = None
     failure_message = None
     try:
-        condor_message = commands.execute(("condor_submit", submit_file))
+        condor_message = commands.execute(f"{prefix}{command} {submit_file}", shell=True)
     except commands.CommandLineException as e:
         failure_message = unicodify(e)
     else:
@@ -87,14 +94,19 @@ def condor_submit(submit_file):
     return external_id, failure_message
 
 
-def condor_stop(external_id):
+def condor_stop(external_id, prefix: Optional[str] = None, command: Optional[str] = None):
     """
-    Stop running condor job and return a failure_message if this
-    fails.
+    Stop running condor job and return a failure_message if this fails.
+
+    Optionally, specify a prefix to prepend to the `condor_rm` call (for example, to call a binary on a specific path),
+    or override the command used to stop jobs.
     """
+    prefix = prefix or ""
+    command = command or "condor_rm"
+
     failure_message = None
     try:
-        check_call(("condor_rm", external_id))
+        check_call(f"{prefix}{command} {external_id}", shell=True)
     except CalledProcessError:
         failure_message = "condor_rm failed"
     except Exception as e:
