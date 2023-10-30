@@ -94,13 +94,13 @@ def shell_process(cmds: Union[List[str], str], env: Optional[Dict[str, str]] = N
     return p
 
 
-def execute(cmds, input=None):
+def execute(cmds, input=None, shell=False):
     """Execute commands and throw an exception on a non-zero exit.
     if input is not None then the string is sent to the process' stdin.
 
     Return the standard output if the commands are successful
     """
-    return _wait(cmds, input=input, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return _wait(cmds, input=input, shell=shell, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 def argv_to_str(command_argv, quote=True):
