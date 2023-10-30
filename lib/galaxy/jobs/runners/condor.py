@@ -53,6 +53,24 @@ class CondorJobRunner(AsynchronousJobRunner):
 
     runner_name = "CondorRunner"
 
+    def __init__(self, app, nworkers, **kwargs):
+        """Start the job runner."""
+        runner_param_specs = {
+            "prefix": dict(map=str, default=""),
+            # String to prepend to HTCondor command line tool invocations. Defaults to an empty string.
+            "condor_rm_cmd": dict(map=str, default="condor_rm"),
+            # Command to invoke for stopping jobs. Defaults to "condor_rm".
+            "condor_ssh_to_job_cmd": dict(map=str, default="condor_ssh_to_job"),
+            # Command to invoke to execute commands in a worker node. Defaults to "condor_ssh_to_job".
+            "condor_submit_cmd": dict(map=str, default="condor_submit"),
+            # Command to invoke for submitting jobs. Defaults to "condor_submit".
+        }
+
+        kwargs["runner_param_specs"] = kwargs.get("runner_param_specs", dict())
+        kwargs["runner_param_specs"].update(runner_param_specs)
+
+        super().__init__(app, nworkers, **kwargs)
+
     def queue_job(self, job_wrapper):
         """Create job script and submit it to the DRM"""
 
@@ -134,7 +152,9 @@ class CondorJobRunner(AsynchronousJobRunner):
 
         log.debug(f"({galaxy_id_tag}) submitting file {executable}")
 
-        external_job_id, message = condor_submit(submit_file)
+        external_job_id, message = condor_submit(
+            submit_file, prefix=self.runner_params.get("prefix"), command=self.runner_params.get("condor_submit_cmd")
+        )
         if external_job_id is None:
             log.debug(f"condor_submit failed for job {job_wrapper.get_id_tag()}: {message}")
             if self.app.config.cleanup_job == "always":
@@ -252,11 +272,17 @@ class CondorJobRunner(AsynchronousJobRunner):
                     self._kill_container(job_wrapper)
                 except Exception as e:
                     log.warning(f"stop_job(): {job.id}: trying to kill container failed. ({e})")
-                    failure_message = condor_stop(external_id)
+                    failure_message = condor_stop(
+                        external_id,
+                        prefix=self.runner_params.get("prefix"),
+                        command=self.runner_params.get("condor_rm_cmd"),
+                    )
                     if failure_message:
                         log.debug(f"({external_id}). Failed to stop condor {failure_message}")
         else:
-            failure_message = condor_stop(external_id)
+            failure_message = condor_stop(
+                external_id, prefix=self.runner_params.get("prefix"), command=self.runner_params.get("condor_rm_cmd")
+            )
             if failure_message:
                 log.debug(f"({external_id}). Failed to stop condor {failure_message}")
 
@@ -302,7 +328,10 @@ class CondorJobRunner(AsynchronousJobRunner):
                     return self._run_command(cont.container_info["commands"][command], external_id)[0]
 
     def _run_command(self, command, external_job_id):
-        command = f"condor_ssh_to_job {external_job_id} {command}"
+        command = (
+            f"{self.runner_params.get('prefix', '')}"
+            f"{self.runner_params.get('condor_ssh_to_job_cmd')} {external_job_id} {command}"
+        )
 
         p = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, close_fds=True, preexec_fn=os.setpgrp

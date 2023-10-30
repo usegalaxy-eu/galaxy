@@ -192,7 +192,8 @@ The value of *ppn=* is used by PBS to define the environment variable `$PBS_NCPU
 
 ### Condor
 
-Runs jobs via the [HTCondor](https://research.cs.wisc.edu/htcondor/) DRM.  There are no configurable parameters.  Galaxy's interface is via calls to HTCondor's command line tools, rather than via an API.
+Runs jobs via the [HTCondor](https://research.cs.wisc.edu/htcondor/) DRM. Galaxy interfaces with HTCondor via calls to
+HTCondor's command line tools, rather than via an API.
 
 ```xml
 <plugins>
@@ -203,7 +204,9 @@ Runs jobs via the [HTCondor](https://research.cs.wisc.edu/htcondor/) DRM.  There
 </destinations>
 ```
 
-Galaxy will submit jobs to HTCondor as the "galaxy" user (or whatever user the Galaxy server runs as).  In order for vanilla job execution to work as expected, your cluster should be configured with a common UID_DOMAIN to allow Galaxy's jobs to run as "galaxy" everywhere (instead of "nobody").
+Galaxy will submit jobs to HTCondor as the "galaxy" user (or whatever user the Galaxy server runs as).  In order for
+vanilla job execution to work as expected, your cluster should be configured with a common UID_DOMAIN to allow Galaxy's
+jobs to run as "galaxy" everywhere (instead of "nobody").
 
 If you need to add additional parameters to your condor submission, you can do so by supplying `<param/>`s:
 
@@ -215,6 +218,22 @@ If you need to add additional parameters to your condor submission, you can do s
     </destination>
 </destinations>
 ```
+
+The runner accepts the following optional parameters.
+
+``prefix``
+: A string that will be to prepended to HTCondor command line tool invocations. Defaults to an empty string. Note that
+  the runner **does not include a space** between the prefix and the command, so most likely you want to add a space
+  a the end of your `prefix`.
+
+``condor_rm_cmd``
+: Command to invoke for stopping jobs. Defaults to "condor_rm".
+
+``condor_ssh_to_job_cmd``
+: Command to invoke to execute other commands in a worker node. Defaults to "condor_ssh_to_job".
+
+``condor_submit_cmd``
+: Command to invoke for submitting jobs. Defaults to "condor_submit".
 
 ### Pulsar
 
