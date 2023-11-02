@@ -1,0 +1,6 @@
+<display id="avivator_zarr" version="1.0.0" name="display at">
+    <link id="main" name="Avivator">
+        <url>http://avivator.gehlenborglab.org/?image_url=${qp($zarr_file.url)}</url>
+        <param type="data" name="zarr_file" url="galaxy_${DATASET_HASH}.zarr" allow_cors="true"/>
+    </link>
+</display>
