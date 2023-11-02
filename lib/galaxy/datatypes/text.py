@@ -85,6 +85,40 @@ class Html(Text):
 
 
 @build_sniff_from_prefix
+class Zarr(Text):
+    """Class describing a zarr dataset"""
+    
+    edam_format = "format_3915"
+    file_ext = "zarr"
+
+    def set_peek(self, dataset: DatasetProtocol, **kwd) -> None:
+        if not dataset.dataset.purged:
+            dataset.peek = "Zarr file"
+            dataset.blurb = nice_size(dataset.get_size())
+        else:
+            dataset.peek = "file does not exist"
+            dataset.blurb = "file purged from disk"
+    
+    def sniff_prefix(self, file_prefix: FilePrefix) -> bool:
+        """
+        Determines whether the file is in zarr format
+
+        >>> from galaxy.datatypes.sniff import get_test_fname
+        >>> fname = get_test_fname( 'complete.bed' )
+        >>> Zarr().sniff( fname )
+        False
+        >>> fname = get_test_fname( 'test.zarr' )
+        >>> Zarr().sniff( fname )
+        True
+        """
+        headers = iter_headers(file_prefix, None)
+        for hdr in headers:
+            if hdr and hdr[0].lower().find("<html>") >= 0:
+                return True
+        return False
+
+
+@build_sniff_from_prefix
 class Json(Text):
     edam_format = "format_3464"
     file_ext = "json"
