@@ -99,10 +99,6 @@ class Zarr(Text):
             dataset.peek = "file does not exist"
             dataset.blurb = "file purged from disk"
     
-    def get_mime(self) -> str:
-        """Returns the mime type of the datatype"""
-        return "text/html"
-
     def sniff_prefix(self, file_prefix: FilePrefix) -> bool:
         """
         Determines whether the file is in zarr format
