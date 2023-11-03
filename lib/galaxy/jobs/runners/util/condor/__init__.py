@@ -70,11 +70,11 @@ def build_submit_description(executable, output, error, user_log, query_params):
 
 def condor_submit(submit_file, prefix: Optional[str] = None, command: Optional[str] = None):
     """
-    Submit a condor job described by the given file. Parse an external id for
-    the submission or return None and a reason for the failure.
+    Submit a condor job described by the given file. Parse an external id for the submission or return None and a reason
+    for the failure.
 
-    Optionally, specify a prefix to prepend to the `condor_submit` call (for
-    example, to call a binary on a specific path).
+    Optionally, specify a prefix to prepend to the `condor_submit` call (for example, to call a binary on a specific
+    path), or override the command used to submit jobs.
     """
     prefix = prefix or ""
     command = command or "condor_submit"
@@ -95,11 +95,10 @@ def condor_submit(submit_file, prefix: Optional[str] = None, command: Optional[s
 
 def condor_stop(external_id, prefix: Optional[str] = None, command: Optional[str] = None):
     """
-    Stop running condor job and return a failure_message if this
-    fails.
+    Stop running condor job and return a failure_message if this fails.
 
-    Optionally, specify a prefix to prepend to the `condor_rm` call (for
-    example, to call a binary on a specific path).
+    Optionally, specify a prefix to prepend to the `condor_rm` call (for example, to call a binary on a specific path),
+    or override the command used to stop jobs.
     """
     prefix = prefix or ""
     command = command or "condor_rm"
