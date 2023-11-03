@@ -222,7 +222,9 @@ If you need to add additional parameters to your condor submission, you can do s
 The runner accepts the following optional parameters.
 
 ``prefix``
-: A string that will be to prepended to HTCondor command line tool invocations. Defaults to an empty string.
+: A string that will be to prepended to HTCondor command line tool invocations. Defaults to an empty string. Note that
+  the runner **does not include a space** between the prefix and the command, so most likely you want to add a space
+  a the end of your `prefix`.
 
 ``condor_rm_cmd``
 : Command to invoke for stopping jobs. Defaults to "condor_rm".
