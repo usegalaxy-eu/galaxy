@@ -46,7 +46,7 @@
                 <param name="infiles" type="data" format="netcdf,tabular" multiple="true" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
             </when>
             <when value="zip">
-                <param name="folder" type="data" format="zip" multiple="true" label="ODV collection in a zip folder." help="Must contain the specific arborescence with file.odv and folder.Data"/>
+                <param name="folder" type="data" format="zip" multiple="true" label="ODV collection in a zip folder." help="Must contain the specific folder structure with file.odv and folder.Data"/>
             </when>
         </conditional>
     </inputs>
