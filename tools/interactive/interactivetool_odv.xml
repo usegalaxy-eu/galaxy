@@ -1,4 +1,3 @@
-
 <tool id="interactive_tool_odv" tool_type="interactive" name="ODV" version="@VERSION@">
     <description>interactive plotting tool for geo-referenced data</description>
     <macros>
@@ -19,16 +18,37 @@
         mkdir -p Documents/ODV/.temp/ &&
         mkdir -p Documents/ODV/data/outputs &&
         chmod 777 Documents/ODV/ -R &&
-        #for $infile in $infiles:
-            yes | cp '$infile' './Documents/ODV/data/$infile.display_name' &&
-        #end for
+        #if $method.type == 'own_data' :
+            #for $infile in $method.infiles:
+                yes | cp '$infile' './Documents/ODV/galaxy/data/$infile.display_name' &&
+            #end for
+        #end if
+        #if $method.type == 'zip' :
+            #import re
+            
+            #set zip_file_path = $method.folder
+            #set source_folder_name = re.sub('[^\s\w\-]', '_', str($zip_file_path)) 
+        
+            unzip "$zip_file_path" -d './Documents/ODV/galaxy/data/$source_folder_name' &&
+        #end if
         /init ;
         mv ./Documents/ODV/data/outputs/ ./output &&
         rm ./Documents -rf
     ]]>
     </command>
     <inputs>
-        <param name="infiles" type="data" format="netcdf,tabular" multiple="true" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
+        <conditional name="method">
+            <param name="type" type="select" label="Select if you are using a ODV collection in a zip folder or if you have your own raw data">
+                <option value="zip">The data you are using are a ODV collection in a zip folder</option>
+                <option value="own_data">The data you are using are Netcdf or tabular text files</option>
+            </param>
+            <when value="own_data">
+                <param name="infiles" type="data" format="netcdf,tabular" multiple="true" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
+            </when>
+            <when value="zip">
+                <param name="folder" type="data" format="zip" multiple="true" label="ODV collection in a zip folder." help="Must contain the specific arborescence with file.odv and folder.Data"/>
+            </when>
+        </conditional>
     </inputs>
     <outputs>
         <!--data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" /-->
