@@ -16,7 +16,8 @@
     <![CDATA[
         export HOME=\$PWD &&
         mkdir -p Documents/ODV/.temp/ &&
-        mkdir -p Documents/ODV/data/outputs &&
+        mkdir -p Documents/ODV/galaxy/outputs &&
+        mkdir -p Documents/ODV/galaxy/data &&
         chmod 777 Documents/ODV/ -R &&
         #if $method.type == 'own_data' :
             #for $infile in $method.infiles:
@@ -32,7 +33,7 @@
             unzip "$zip_file_path" -d './Documents/ODV/galaxy/data/$source_folder_name' &&
         #end if
         /init ;
-        mv ./Documents/ODV/data/outputs/ ./output &&
+        mv ./Documents/ODV/galaxy/outputs/ ./output &&        
         rm ./Documents -rf
     ]]>
     </command>
