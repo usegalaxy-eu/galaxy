@@ -4,7 +4,7 @@
     <token name="@VERSION@">0.0.1</token>
     </macros>
     <requirements>
-        <container type="docker">sha256:7cef971d840d54c614c5d47890733bb560a4f86ea704469c92de4d30397e471d </container>
+        <container type="docker">quay.io/bgruening/holoviz-jupyterlab:v@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="Holoviews" requires_domain="True">
