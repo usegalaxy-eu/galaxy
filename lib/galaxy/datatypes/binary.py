@@ -1538,9 +1538,9 @@ class Anndata(H5):
             if "obs" in dataset.metadata.layers_names:
                 tmp = anndata_file["obs"]
                 obs_index = None
-                if "index" in tmp:
+                if "index" in tmp.dtype.names or "index" in tmp:
                     obs_index = "index"
-                elif "_index" in tmp:
+                elif "_index" in tmp.dtype.names or "_index" in tmp:
                     obs_index = "_index"
                 # Determine cell labels
                 if obs_index:
@@ -1578,9 +1578,9 @@ class Anndata(H5):
             if "var" in dataset.metadata.layers_names:
                 tmp = anndata_file["var"]
                 var_index = None
-                if "index" in tmp:
+                if "index" in tmp.dtype.names or "index" in tmp:
                     var_index = "index"
-                elif "_index" in tmp:
+                elif "_index" in tmp.dtype.names or "_index" in tmp:
                     var_index = "_index"
                 # We never use var_names
                 # dataset.metadata.var_names = tmp[var_index]
