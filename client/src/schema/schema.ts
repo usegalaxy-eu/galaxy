@@ -1640,7 +1640,6 @@ export interface components {
             action_name: string;
             /**
              * Link
-             * Format: uri
              * @description The link to be opened when the button is clicked.
              */
             link: string;
@@ -2274,6 +2273,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             elements_from?: components["schemas"]["ElementsFromType"];
             /**
              * Ext
@@ -3724,6 +3725,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             elements_from?: components["schemas"]["ElementsFromType"];
             /**
              * Ext
@@ -3953,6 +3956,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             elements_from?: components["schemas"]["ElementsFromType"];
             /**
              * Ext
@@ -6458,6 +6463,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             /** Elements */
             elements: (
                 | (
@@ -7075,6 +7082,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             elements_from?: components["schemas"]["ElementsFromType"];
             /**
              * Ext
@@ -7136,6 +7145,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             elements_from?: components["schemas"]["ElementsFromType"];
             /**
              * Ext
@@ -7498,6 +7509,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             elements_from?: components["schemas"]["ElementsFromType"];
             /**
              * Ext
@@ -8385,6 +8398,8 @@ export interface components {
              * @default false
              */
             deferred?: boolean;
+            /** Description */
+            description?: string;
             elements_from?: components["schemas"]["ElementsFromType"];
             /**
              * Ext
