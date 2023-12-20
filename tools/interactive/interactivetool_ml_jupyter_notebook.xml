@@ -1,6 +1,6 @@
 <tool id="interactive_tool_ml_jupyter_notebook" tool_type="interactive" name="GPU-enabled Interactive Jupyter Notebook for Machine Learning" version="@VERSION@" profile="22.01">
     <macros>
-        <token name="@VERSION@">0.3</token>
+        <token name="@VERSION@">0.4</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/docker-ml-jupyterlab:galaxy-integration-@VERSION@</container>
