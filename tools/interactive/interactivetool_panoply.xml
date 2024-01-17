@@ -34,7 +34,7 @@
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="netcdf,h5" multiple="true" label="netcdf"/>
+        <param name="infiles" type="data" format="netcdf,h5" multiple="true" label="netcdf"/>
     </inputs>
     <outputs>
         <collection name="outputs" type="list" label="Panoply outputs">
