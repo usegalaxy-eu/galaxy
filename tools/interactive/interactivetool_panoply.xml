@@ -7,7 +7,7 @@
         <container type="docker">quay.io/nordicesmhub/docker-panoply:@VERSION@</container>
     </requirements>
     <entry_points>
-        <entry_point name="Panoply on $infile.display_name" requires_domain="True">
+        <entry_point name="Panoply" requires_domain="True">
             <port>5800</port>
         </entry_point>
     </entry_points>
