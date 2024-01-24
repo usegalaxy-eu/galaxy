@@ -19,7 +19,9 @@
     </environment_variables>
     <command><![CDATA[
 
-        /usr/bin/shiny-server.sh
+        chown shiny.shiny /var/log/shiny-server &&
+
+        exec shiny-server >> /var/log/shiny-server.log 2>&1
 
     ]]>
     </command>
