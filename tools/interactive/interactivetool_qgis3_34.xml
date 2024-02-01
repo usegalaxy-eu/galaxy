@@ -14,7 +14,7 @@
     <command detect_errors="exit_code">
     <![CDATA[
         export HOME=\$PWD &&
-        mkdir -p./galaxy/data &&
+        mkdir -p ./galaxy/data &&
         mkdir -p ./galaxy/output &&
         chown 1000:1000 ./galaxy/output/ && ## change permission for the app user
         #if $infiles:
