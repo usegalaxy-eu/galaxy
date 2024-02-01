@@ -1,13 +1,13 @@
 <tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@" profile="22.01">
     <description>interactive geographic information system (GIS)</description>
     <macros>
-        <token name="@VERSION@">3.32</token>
+        <token name="@VERSION@">3.34</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/qgis-headless:@VERSION@</container>
     </requirements>
     <entry_points>
-        <entry_point name="QGIS on $infile.display_name" requires_domain="True">
+        <entry_point name="QGIS on $infiles" requires_domain="True">
             <port>5800</port>
         </entry_point>
     </entry_points>
@@ -16,14 +16,16 @@
         export HOME=\$PWD &&
         mkdir -p ./output &&
         chown 1000:1000 ./output/ && ## change permission for the app user
-        #if $infile:
-            cp '$infile' './$infile.display_name' &&
+        #if $infiles:
+            #for $infile in $infiles:
+                yes | cp '$infile' './Documents/ODV/galaxy/data/$infiles' &&
+            #end for
         #end if
         /init
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="data" optional="true" label="netcdf"/>
+        <param name="infile" type="data" format="data" optional="true" label="Input data"/>
     </inputs>
     <outputs>
         <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
@@ -34,6 +36,8 @@
     <tests>
     </tests>
     <help><![CDATA[
+        QGIS is a professional GIS application that is built on top of and proud to be itself Free and Open Source Software (FOSS). 
+        Create, edit, visualise, analyse and publish geospatial information. For more user information https://docs.qgis.org/3.34/en/docs/user_manual/
     ]]>
     </help>
     <citations>
