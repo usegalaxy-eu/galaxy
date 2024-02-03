@@ -19,7 +19,7 @@
         chown 1000:1000 ./galaxy/output/ && ## change permission for the app user
         #if $infiles:
             #for $infile in $infiles:
-                yes | cp '$infile' './galaxy/data/$infile' &&
+                yes | cp '$infile' './galaxy/data/$infile.display_name' &&
             #end for
         #end if
         /init
