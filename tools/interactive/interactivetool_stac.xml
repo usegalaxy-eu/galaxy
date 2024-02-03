@@ -1,0 +1,42 @@
+<tool id="interactive_tool_stac" tool_type="interactive" name="STAC catalog" version="@VERSION@">
+    <description>for searching, aggregating and downloading data</description>
+    <macros>
+    <token name="@VERSION@">2.11.0</token>
+    </macros>
+    <requirements>
+         <container type="docker">quay.io/galaxy/stac-browser:v1</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="STAC" requires_domain="True">
+            <port>8080</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        sh /docker-entrypoint.sh nginx &&
+        tail -f /var/log/nginx/error.log 
+    ]]>
+    </command>
+    <outputs>
+        <data name="stac" format="txt" label="STAC tool" />
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        This is a Spatio-Temporal Asset Catalog (STAC) browser for static catalogs. Minimal support for APIs is implemented, but it not the focus of the Browser and may lead to issues. It attempts to surface all included data in a user-centric way (an approach which can inform how data is represented in the evolving spec). It is implemented as a single page application (SPA) for ease of development and to limit the overall number of catalog reads necessary when browsing (as catalogs may be nested and do not necessarily contain references to their parents).
+
+        This package has also been published to npm as @radiantearth/stac-browser.
+
+        It's not officially supported, but you may also be able to use it for certain OGC API - Records and OGC API - Features compliant servers.
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{,
+            title = {radiantearth - Stac Browser},
+            author = {Radiant Earth},
+            year = {2024},
+            note = https://github.com/radiantearth/stac-browser}
+        </citation>
+    </citations>
+</tool>
