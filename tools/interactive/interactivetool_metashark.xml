@@ -1,7 +1,7 @@
-<tool id="interactive_tool_metashark" tool_type="interactive" name="metashark" version="1.7.35" profile="22.01">
+<tool id="interactive_tool_metashark" tool_type="interactive" name="metashark" version="1.7.5" profile="22.01">
     <description>Metadata Shiny Automated Resource and Knowledge</description>
     <requirements>
-        <container type="docker">ylebras/metashark:1.7.35</container>
+        <container type="docker">ylebras/metashark:1.7.5</container>
     </requirements>
     <entry_points>
         <entry_point name="metashark visualisation" requires_domain="True">
@@ -27,7 +27,7 @@
     <help>
 <![CDATA[
 
-`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is an work in progress innovative R Shiny App to automate metadata creation in Ecological Metadata Language. Based on EML Assembly Line R package, MetaShARK allows you to produce EML metadata only from text files as csv or tsv, and allows you to provide metadata on data attributes, geographic, taxonomic and temporal coverages, authors, summary, keywords and methods. Futhermore, the 1.7.3 version alows you to add EML semantic annotation related to attributes names and/or keywords, based on terminological resources from Bioportal. This version of MetaShARK is provided "as is" for testing, as bugs can appear.
+`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is an work in progress innovative R Shiny App to automate metadata creation in Ecological Metadata Language. Based on EML Assembly Line R package, MetaShARK allows you to produce EML metadata only from text files as csv or tsv, and allows you to provide metadata on data attributes, geographic, taxonomic and temporal coverages, authors, summary, keywords and methods. Futhermore, the 1.7.3 version alows you to add EML semantic annotation related to attributes names and/or keywords, based on terminological resources from Bioportal. This version of MetaShARK is provided "as is" for testing, as bugs can appear. Infrastructure hosting this app, people and organizations developping this app can't be responsible of any issues or errors from the app.
 
 ]]>
     </help>
