@@ -27,7 +27,9 @@
     <help>
 <![CDATA[
 
-`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is an work in progress innovative R Shiny App to automate metadata creation in Ecological Metadata Language. Based on EML Assembly Line R package, MetaShARK allows you to produce EML metadata only from text files as csv or tsv, and allows you to provide metadata on data attributes, geographic, taxonomic and temporal coverages, authors, summary, keywords and methods. Futhermore, the 1.7.3 version alows you to add EML semantic annotation related to attributes names and/or keywords, based on terminological resources from Bioportal. This version of MetaShARK is provided "as is" for testing, as bugs can appear. Infrastructure hosting this app, people and organizations developping this app can't be responsible of any issues or errors from the app.
+`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is an work in progress innovative R Shiny App to automate metadata creation in Ecological Metadata Language. Based on EML Assembly Line R package, MetaShARK allows you to produce EML metadata from text files as .csv (comma as separator) or .tsv (tabular as separator), geographical vector (GeoJSON  and shapefile), geographical raster (GeoTiff) or any kind of other types of data files.  MetaShaRK allows you to provide metadata on data attributes, geographic, taxonomic and temporal coverages, authors, summary, keywords and methods. Futhermore, the 1.7.5 version alows you to add EML semantic annotation related to attributes names and/or keywords, based on terminological resources from Bioportal. This version of MetaShARK is provided "as is" for testing, as bugs can appear. Infrastructure hosting this app, people and organizations developping this app can't be responsible of any issues or errors from the app.
+
+Depending on the operating system and web browser used, attributes level information inference can failed depending on file extensions. We thus recommend to use .csv extension for comma separated files, .tsv for tabular files and .geoJSON for dedicated spatial vector files. 
 
 ]]>
     </help>
