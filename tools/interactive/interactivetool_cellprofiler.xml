@@ -50,9 +50,9 @@
     </inputs>
     
     <outputs>
-	    <collection name="cp_output" type="list" label="CellProfiler output">
-	        <discover_datasets pattern="__name_and_ext__" directory="home/output" />
-	    </collection>
+	<collection name="cp_output" type="list" label="CellProfiler output">
+	    <discover_datasets pattern="__name_and_ext__" directory="home/output" />
+	</collection>
     </outputs>
     
     <tests>
