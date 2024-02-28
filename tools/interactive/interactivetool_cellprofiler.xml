@@ -13,7 +13,7 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-	##export MPLCONFIGDIR=\$TEMP &&
+	export MPLCONFIGDIR=\$TEMP &&
         export HOME=\$PWD &&
 		    
         mkdir -p ./home ./home/output ./home/input &&
@@ -21,7 +21,6 @@
         #for $i,$filename in enumerate($infiles):
 	    ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
         #end for
-
               
         #if str($input_type.existing) == "existing":
 	    cp '${input_type.pipeline_file}' ./home/output/'$input_type.pipeline_file.element_identifier'.cppipe &&
@@ -50,9 +49,9 @@
     </inputs>
     
     <outputs>
-	    <collection name="cp_output" type="list" label="CellProfiler output">
-	        <discover_datasets pattern="__name_and_ext__" directory="home/output" />
-	    </collection>
+	<collection name="cp_output" type="list" label="CellProfiler output">
+	    <discover_datasets pattern="__name_and_ext__" directory="home/output" />
+	</collection>
     </outputs>
     
     <tests>
