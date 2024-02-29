@@ -1,5 +1,5 @@
-<tool id="interactive_tool_napari" tool_type="interactive" name="napari" version="@VERSION@+galaxy0" profile="23.1">
-	<description>cell image analysis software</description>
+<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="23.1">
+	<description>interactive tool</description>
     <macros>
         <token name="@VERSION@">0.4.18</token>
     </macros>
