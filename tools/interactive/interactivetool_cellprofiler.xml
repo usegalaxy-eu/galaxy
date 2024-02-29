@@ -13,7 +13,7 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-	#export MPLCONFIGDIR=\$TEMP &&
+	export MPLCONFIGDIR=\$TEMP &&
         export HOME=\$PWD &&
 		    
         mkdir -p ./home ./home/output ./home/input &&
