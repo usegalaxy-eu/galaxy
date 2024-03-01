@@ -1,7 +1,7 @@
 <tool id="interactive_tool_ideal" tool_type="interactive" name="IDEAL" version="1.0.0" profile="23.1">
     <description>Interactive Differential Expression AnaLysis in RNA-seq data</description>
     <requirements>
-        <container type="docker">quay.io/federicomarini/ideal:v0.1</container>
+        <container type="docker">quay.io/federicomarini/ideal:v0.2</container>
     </requirements>
     <entry_points>
         <entry_point name="IDEAL" requires_domain="True">
@@ -15,10 +15,9 @@
     export SHINY_INPUT_DIR=\$PWD/shiny_input &&
     export SHINY_OUTPUT_DIR=\$PWD/shiny_output &&
 
-    ln -sf '$input' '$SHINY_INPUT_DIR' &&
-    /app_setup.R &&
+    ln -sf '$input' '\$SHINY_INPUT_DIR' &&
 
-    ./shiny_output/ideal_env.
+    Rscript /app_setup.R
 
     ]]>
     </command>
