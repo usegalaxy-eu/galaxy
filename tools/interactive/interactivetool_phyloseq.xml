@@ -4,7 +4,7 @@
         <container type="docker">quay.io/federicomarini/shinyphyloseq:v0.1</container>
     </requirements>
     <entry_points>
-        <entry_point name="IDEAL" requires_domain="True">
+        <entry_point name="Phyloseq" requires_domain="True">
             <!-- This port is exposed by the docker container -->
             <port>3838</port>
         </entry_point>
