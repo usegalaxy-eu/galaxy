@@ -50,7 +50,11 @@
 
             ## provide all rights to copied files
             jupyter lab --allow-root --no-browser &&
-            cp ./*.ipynb '$jupyter_notebook'
+            cp ./*.ipynb '$jupyter_notebook' &&
+            
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
         #else
             #set $noteboook_name = re.sub('[^\w\-\.\s]', '_', str($mode.ipynb.element_identifier))
             cp '$mode.ipynb' './${noteboook_name}.ipynb' &&
@@ -61,7 +65,11 @@
             #else
                 jupyter lab --allow-root --no-browser --NotebookApp.shutdown_button=True &&
             #end if
-            cp './${noteboook_name}.ipynb' '$jupyter_notebook'
+            cp './${noteboook_name}.ipynb' '$jupyter_notebook' &&
+            
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
         #end if
     ]]>
     </command>
