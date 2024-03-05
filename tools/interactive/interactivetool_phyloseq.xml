@@ -1,7 +1,7 @@
 <tool id="interactive_tool_phyloseq" tool_type="interactive" name="Phyloseq" version="1.0.0" profile="23.1">
     <description>Explore microbiome profiles</description>
     <requirements>
-        <container type="docker">quay.io/federicomarini/shinyphyloseq:v0.1</container>
+        <container type="docker">quay.io/bgruening/shinyphyloseq:v0.1</container>
     </requirements>
     <entry_points>
         <entry_point name="Phyloseq" requires_domain="True">
