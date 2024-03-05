@@ -47,7 +47,11 @@
 
             ## provide all rights to copied files
             jupyter lab --allow-root --no-browser &&
-            cp ./*.ipynb '$jupyter_notebook'
+            cp ./*.ipynb '$jupyter_notebook' &&
+            
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
         #else
             #set $noteboook_name = re.sub('[^\w\-\.\s]', '_', str($mode.ipynb.element_identifier))
             cp '$mode.ipynb' './${noteboook_name}.ipynb' &&
@@ -58,7 +62,11 @@
             #else
                 jupyter lab --allow-root --no-browser --NotebookApp.shutdown_button=True &&
             #end if
-            cp './${noteboook_name}.ipynb' '$jupyter_notebook'
+            cp './${noteboook_name}.ipynb' '$jupyter_notebook' &&
+            
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
         #end if
     ]]>
     </command>
@@ -79,9 +87,12 @@
 
     </inputs>
     <outputs>
-        <data name="jupyter_notebook" format="ipynb" label="Executed DIVAnd Notebook"></data>
-        <collection name="output_collection" type="list" label="GPU JupyterLab notebook output collection">
-            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true"/>
+        <data name="jupyter_notebook" format="ipynb" label="Executed DIVAnd Notebook"/>
+        <collection name="output_netcdf" type="list" label="DIVAnd netcdf outputs">
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.nc" directory="jupyter/outputs" format="netcdf"/>
+        </collection>
+        <collection name="output_all" type="list" label="DIVAnd all outputs">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs"/>
         </collection>
     </outputs>
     <tests>
