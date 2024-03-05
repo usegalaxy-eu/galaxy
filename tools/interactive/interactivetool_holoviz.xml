@@ -30,7 +30,7 @@
 
         #for $count, $file in enumerate($input):
             #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\w\-\.\s]', '_', str($file.element_identifier))
-            ln -sf '$file' './jupyter/data/${cleaned_name}.${file.ext}' &&
+            ln -sf '$file' './jupyter/data/${cleaned_name}' &&
         #end for
 
         ## change into the directory where the notebooks are located
