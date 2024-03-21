@@ -7,7 +7,7 @@
         <container type="docker">quay.io/nordicesmhub/docker-panoply:@VERSION@</container>
     </requirements>
     <entry_points>
-        <entry_point name="Panoply on $infile.display_name" requires_domain="True">
+        <entry_point name="Panoply" requires_domain="True">
             <port>5800</port>
         </entry_point>
     </entry_points>
@@ -17,7 +17,9 @@
         mkdir /config/home  &&
         mkdir /config/home/output &&
         export HOME=/config/home &&
-        cp '$infile' '/config/home/$infile.display_name' &&
+        #for $infile in $infiles:
+            cp '$infile' '/config/home/$infile.display_name' &&
+        #end for
         mkdir /config/home/.gissjava &&
         cd /config/home/.gissjava    &&
         tar xvf /opt/PanoplyJ/colorbars.tar &&
@@ -32,7 +34,7 @@
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="netcdf,h5" label="netcdf"/>
+        <param name="infiles" type="data" format="netcdf,h5" multiple="true" label="netcdf"/>
     </inputs>
     <outputs>
         <collection name="outputs" type="list" label="Panoply outputs">
