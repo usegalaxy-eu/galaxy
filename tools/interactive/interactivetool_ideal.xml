@@ -1,0 +1,51 @@
+<tool id="interactive_tool_ideal" tool_type="interactive" name="IDEAL" version="1.0.0" profile="23.1">
+    <description>Interactive Differential Expression AnaLysis in RNA-seq data</description>
+    <requirements>
+        <container type="docker">quay.io/federicomarini/ideal:v0.2</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="IDEAL" requires_domain="True">
+            <!-- This port is exposed by the docker container -->
+            <port>3838</port>
+        </entry_point>
+    </entry_points>
+    <command><![CDATA[
+    mkdir -p ./shiny_input ./shiny_output &&
+
+    export SHINY_INPUT_DIR=\$PWD/shiny_input &&
+    export SHINY_OUTPUT_DIR=\$PWD/shiny_output &&
+
+    ln -sf '$input' '\$SHINY_INPUT_DIR' &&
+
+    Rscript /app_setup.R
+
+    ]]>
+    </command>
+    <inputs>
+        <param name="input" type="data" format="rdata" label="Some R object"
+            help="I need some help here, how to create this object from within Galaxy"/>
+    </inputs>
+    <outputs>
+        <collection name="output_collection" type="list" label="RData collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="./shiny_output" visible="false"/>
+        </collection>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1"/>
+    </tests>
+    <help><![CDATA[
+
+**Overview**
+
+Interactive Differential Expression AnaLysis in RNA-seq data. IDEAL is a Bioconductor package containing a Shiny application for
+analyzing RNA-Seq data in the context of differential expression.
+This enables an interactive and at the same time reproducible analysis, keeping the functionality accessible, and yet providing
+a comprehensive selection of graphs and tables to mine the dataset at hand.
+
+Full documentation: https://github.com/federicomarini/ideal
+
+]]></help>
+    <citations>
+        <citation type="doi">10.1186/s12859-020-03819-5</citation>
+    </citations>
+</tool>

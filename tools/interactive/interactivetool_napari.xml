@@ -1,0 +1,49 @@
+<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="23.1">
+	<description>interactive tool</description>
+    <macros>
+        <token name="@VERSION@">0.4.18</token>
+    </macros>
+    <requirements>
+	    <container type="docker">quay.io/sunyi000/napari-galaxy:v0.4.18</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Napari" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        export HOME=\$PWD &&
+        ## Create a directory where the app user has access
+        mkdir -p ./output ./input &&
+
+        #for $i, $filename in enumerate($infile):
+              ln -s '$filename' './input/${filename.element_identifier}.${filename.ext}' &&
+        #end for
+	/init
+
+    ]]>
+    </command>
+    <inputs>
+	<param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" label="Images" />
+
+    </inputs>
+    
+    <outputs>
+	    <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt"/>
+    </outputs>
+    
+    <tests>
+    </tests>
+    
+    <help><![CDATA[
+	    Napari is a Python library for n-dimensional image visualisation, annotation, and analysis. With napari you can:
+
+            - view and explore 2D, 3D, and higher-dimensional arrays on a canvas;
+
+            - overlay derived data such as points, polygons, segmentations, and more;
+
+            - annotate and edit derived datasets, using standard data structures such as NumPy or Zarr arrays, allowing you to seamlessly weave exploration, computation, and annotation together in imaging data analysis.
+]]>
+    </help>
+</tool>

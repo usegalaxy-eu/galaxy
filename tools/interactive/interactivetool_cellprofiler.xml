@@ -1,0 +1,63 @@
+<tool id="interactive_tool_cellprofiler" tool_type="interactive" name="Run CellProfiler" version="@VERSION@+galaxy0" profile="23.1">
+	<description>interactive tool</description>
+    <macros>
+        <token name="@VERSION@">4.2.6</token>
+    </macros>
+    <requirements>
+	    <container type="docker">quay.io/sunyi000/cellprofiler-galaxy:v4.2.6</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Cellprofiler" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+	      export MPLCONFIGDIR=\$TEMP &&
+        export HOME=\$PWD &&
+		    
+        mkdir -p ./home ./home/output ./home/input &&
+        chown -R 1000:1000 ./home &&
+        #for $i,$filename in enumerate($infiles):
+	          ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
+        #end for
+              
+        #if str($input_type.existing) == "existing":
+	          cp '${input_type.pipeline_file}' \$HOME/home/output/'$input_type.pipeline_file.element_identifier'.cppipe &&
+	          echo "cellprofiler -r --pipeline \$HOME/home/output/'$input_type.pipeline_file.element_identifier'.cppipe -i \$HOME/home/input -o \$HOME/home/output " > \$HOME/home/cellprofiler_galaxy &&
+	          chmod +x \$HOME/home/cellprofiler_galaxy &&
+	          cp \$HOME/home/cellprofiler_galaxy '/bin' &&
+        #end if
+
+	/init 
+    ]]>
+    </command>
+    <inputs>
+	<param name="infiles" type="data" multiple="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" label="Images" />
+
+        <conditional name="input_type">
+            <param name="existing" type="select" label="Do you have an existing pipeline?">
+                <option value="new">Start a new pipeline</option>
+                <option value="existing">Modify an existing project</option>
+            </param>
+            <when value="new">
+            </when>
+            <when value="existing">
+                <param name="pipeline_file" type="data" format="txt" label="Existing CellProfiler pipeline" />
+            </when>
+        </conditional>
+    </inputs>
+    
+    <outputs>
+	      <collection name="cp_output" type="list" label="CellProfiler output">
+	          <discover_datasets pattern="__name_and_ext__" directory="home/output" />
+	      </collection>
+    </outputs>
+    
+    <tests>
+    </tests>
+    
+    <help><![CDATA[
+]]>
+    </help>
+</tool>
