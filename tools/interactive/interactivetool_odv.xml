@@ -1,0 +1,80 @@
+<tool id="interactive_tool_odv" tool_type="interactive" name="ODV" version="@VERSION@">
+    <description>interactive plotting tool for geo-referenced data</description>
+    <macros>
+    <token name="@VERSION@">5.6.5.1</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/bgruening/odv-headless:v@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="ODV" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <!-- see: https://odv.awi.de/fileadmin/user_upload/odv/misc/odvGuide.pdf -->
+    <![CDATA[
+        export HOME=\$PWD &&
+        mkdir -p Documents/ODV/.temp/ &&
+        mkdir -p Documents/ODV/galaxy/outputs &&
+        mkdir -p Documents/ODV/galaxy/data &&
+        chmod 777 Documents/ODV/ -R &&
+        #if $method.type == 'own_data' :
+            #for $infile in $method.infiles:
+                yes | cp '$infile' './Documents/ODV/galaxy/data/$infile.display_name' &&
+            #end for
+        #end if
+        #if $method.type == 'zip' :
+            #import re
+            
+            #set zip_file_path = $method.folder
+            #set source_folder_name = re.sub('[^\s\w\-]', '_', str($zip_file_path)) 
+        
+            unzip "$zip_file_path" -d './Documents/ODV/galaxy/data/$source_folder_name' &&
+        #end if
+        /init ;
+        mv ./Documents/ODV/galaxy/outputs/ ./output &&        
+        rm ./Documents -rf &&
+        cd ./output &&
+        sleep 2 &&
+        for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
+    ]]>
+    </command>
+    <inputs>
+        <conditional name="method">
+            <param name="type" type="select" label="Select if you are using a ODV collection in a zip folder or if you have your own raw data">
+                <option value="zip">The data you are using are a ODV collection in a zip folder</option>
+                <option value="own_data">The data you are using are Netcdf or tabular text files</option>
+            </param>
+            <when value="own_data">
+                <param name="infiles" type="data" format="netcdf,tabular" multiple="true" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
+            </when>
+            <when value="zip">
+                <param name="folder" type="data" format="zip" multiple="true" label="ODV collection in a zip folder." help="Must contain the specific folder structure with file.odv and folder.Data"/>
+            </when>
+        </conditional>
+    </inputs>
+    <outputs>
+        <collection name="outputs_netcdf" type="list" label="ODV netcdf outputs">
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.nc" directory="./output" format="netcdf"/>
+        </collection>
+        <collection name="outputs_all" type="list" label="ODV all outputs">
+            <discover_datasets pattern="__designation_and_ext__" directory="./output"/>
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        `ODV <https://odv.awi.de/>`_ plots geo-referenced and other arrays from netCDF, HDF, GRIB, and other datasets. For now, Galaxy is supporting only netCDF and text files as odv text file as input.
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{,
+            title = {Ocean Data View},
+            author = {Schlitzer Reiner},
+            year = {2023},
+            note = {https://odv.awi.de}
+        </citation>
+    </citations>
+</tool>
