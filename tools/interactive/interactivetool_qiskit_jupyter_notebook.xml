@@ -1,12 +1,11 @@
-<tool id="interactive_tool_ml_jupyter_notebook" tool_type="interactive" name="GPU-enabled Interactive Jupyter Notebook for Machine Learning" version="@VERSION@" profile="22.01">
-    <macros>
-        <token name="@VERSION@">0.4</token>
-    </macros>
+<tool id="interactive_tool_qiskit_jupyter_notebook" tool_type="interactive" name="Qiskit Jupyter notebook" version="0.0.1" profile="22.01">
+    <description>interactive tool</description>
     <requirements>
-        <container type="docker">quay.io/galaxy/docker-ml-jupyterlab:galaxy-integration-@VERSION@</container>
+        <container type="docker">thepineapplepirate/qiskit_galaxy:1.0.0</container>
+     	<!-- files for this docker image can be found at https://github.com/thepineapplepirate/qiskit-jupyter-galaxy_docker.git -->
     </requirements>
     <entry_points>
-        <entry_point name="GPU enabled Interactive Jupyter Notebook for Machine Learning" requires_domain="True">
+        <entry_point name="Qiskit Jupyter Notebook" requires_domain="True">
             <port>8888</port>
             <url>ipython/lab</url>
         </entry_point>
@@ -17,7 +16,7 @@
         <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
         <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
         <environment_variable name="DISABLE_AUTH">true</environment_variable>
-        <environment_variable name="API_KEY" inject="api_key" />
+        <environment_variable name="API_KEY" inject="api_key"/>
     </environment_variables>
     <configfiles>
         <inputs name="inputs" filename="galaxy_inputs.json" data_style="staging_path_and_source_path"/>
@@ -43,6 +42,7 @@ for user_input in json.load(open(galaxy_inputs, "r")).get("user_inputs", []):
         for input_value_dict in input_values:
             path, filename = os.path.split(input_value_dict['staging_path'])
             input_value_dict2 = {"path": os.path.join(base_data_staging_path, input_name, path, filename), "metadata_files": []}
+            ## TODO: enable passing in all metadata values; ideally just handed off from original json creation
             path = os.path.join(data_staging_path, input_name, path)
             os.makedirs(path, exist_ok=True)
             try:
@@ -67,52 +67,72 @@ with open(os.path.join(data_staging_path, galaxy_inputs), "w") as fh:
         </configfile>
         <configfile name="galaxy_input_startup_script"><![CDATA[
 import json, os
+import shutil
+
+import galaxy_ie_helpers
+
 from galaxy_ie_helpers import get
 from galaxy_ie_helpers import put
 from galaxy_ie_helpers import get_galaxy_connection
-HISTORY_ID = os.environ.get('HISTORY_ID', None)
+
+from bioblend.galaxy.histories import HistoryClient
+
+hid = os.environ.get('DATASET_HID', None)
+HISTORY_ID = history_id = os.environ['HISTORY_ID']
+if hid not in ('None', None):
+    galaxy_ie_helpers.get(int(hid))
+    shutil.copy('/import/%s' % hid, '/import/ipython_galaxy_notebook.ipynb')
+
+additional_ids = os.environ.get("ADDITIONAL_IDS", "")
+if additional_ids:
+    gi = galaxy_ie_helpers.get_galaxy_connection(history_id=history_id, obj=False)
+    hc = HistoryClient(gi)
+    history = hc.show_history(history_id, contents=True)
+    additional_ids = additional_ids.split(",")
+    for hda in history:
+        if hda["id"] in additional_ids:
+            galaxy_ie_helpers.get(int(hda["hid"]))
+
 try:
     GALAXY_INPUTS = json.load(open(os.path.join(os.environ.get("GALAXY_WORKING_DIR", ""), "jupyter", "galaxy_inputs", "galaxy_inputs.json")))
 except FileNotFoundError:
     GALAXY_INPUTS = {}
         ]]>
     </configfile>
+    <configfile name="qiskitrc"><![CDATA[
+[ibmq]
+token = $__user__.extra_preferences.get('ibmq_account|token', "TOKEN_NOT_SET")
+url = $__user__.extra_preferences.get('ibmq_account|url', "https://auth.quantum-computing.ibm.com/api")
+verify = True
+                ]]>
+            </configfile>
     </configfiles>
-    
     <command><![CDATA[
-        ## Check if the node has GPU. Activate CPU or GPU version of tensorflow
-        if nvidia-smi 2> /dev/null; then
-            echo An NVDIA GPU was detected. ;
-            ln -s \$PYTHON_LIB_PATH/tensorflow-GPU-cached \$PYTHON_LIB_PATH/tensorflow ;
-        else
-            echo No compatible GPU present. ;
-            ln -s \$PYTHON_LIB_PATH/tensorflow-CPU-cached \$PYTHON_LIB_PATH/tensorflow ;
-        fi &&
-
         python staging_script.py &&
         export GALAXY_WORKING_DIR=`pwd` &&
-        mkdir -p ./jupyter/outputs &&
+        mkdir -p ./jupyter/outputs/collection &&
         mkdir -p ./jupyter/galaxy_inputs &&
+
+        ## change into the directory where the notebooks are located
         cd ./jupyter/ &&
-        export HOME=/home/\$NB_USER/ &&
-        export PATH=/home/\$NB_USER/.local/bin:\$PATH &&
-        cp '${galaxy_input_startup_script}' /home/\$NB_USER/.ipython/profile_default/startup/02-load.py &&
+        export HOME=/home/jovyan/ &&
+        export PATH=/home/jovyan/.local/bin:\$PATH &&
+        cp '${galaxy_input_startup_script}' /home/jovyan/.ipython/profile_default/startup/01-load.py &&
 
-        ## Disable popups informing that "a new release is available"
-        jupyter labextension disable "@jupyterlab/apputils-extension:announcements" &&
+        mkdir -p /home/jovyan/.qiskit && cp '${qiskitrc}' /home/jovyan/.qiskit/qiskitrc &&
+        mkdir -p Qiskit_Resources &&
+        ln -s /home/jovyan/qiskit Qiskit_Resources/ &&
 
-        #set $output_notebook_name = 'jupyterlab_notebook.ipynb'
+        #set $output_notebook_name = 'qiskit_galaxy_notebook.ipynb'
         #if $mode.mode_select == 'scratch':
-            cp -r /home/\$NB_USER/data ./ &&
-            cp -r /home/\$NB_USER/elyra ./ &&
-            cp -r /home/\$NB_USER/notebooks ./ &&
-            cp -r /home/\$NB_USER/usecases ./ &&
-            cp -r /home/\$NB_USER/home_page.ipynb ./ &&
-            jupyter lab --no-browser --NotebookApp.shutdown_button=True
+            ## copy default notebook
+            cp '$__tool_directory__/default_notebook.ipynb' ${output_notebook_name} &&
+            jupyter trust ${output_notebook_name} &&
+            jupyter lab --allow-root --no-browser --ServerApp.quit_button=True &&
         #else:
             #import re
             #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($mode.ipynb.element_identifier))
-            #if not $cleaned_name.endswith(".ipynb"'$jupyter_notebook'):
+            #if not $cleaned_name.endswith(".ipynb"):
                 #set $cleaned_name = "%s.ipynb" % $cleaned_name
             #end if
             cp '$mode.ipynb' '${cleaned_name}' &&
@@ -120,23 +140,23 @@ except FileNotFoundError:
 
             #if $mode.run_it:
                 jupyter nbconvert --to notebook --execute --output '${output_notebook_name}' --allow-errors '${cleaned_name}' &&
-                cp '${output_notebook_name}' '$jupyter_notebook'
             #else:
                 #set $output_notebook_name = $cleaned_name
-                jupyter lab --no-browser --NotebookApp.shutdown_button=True
+                jupyter lab --allow-root --no-browser --ServerApp.quit_button=True &&
             #end if
         #end if
+        cp '${output_notebook_name}' '$jupyter_notebook'
     ]]>
     </command>
     <inputs>
         <conditional name="mode">
-            <param name="mode_select" type="select" label="Do you already have a notebook?" help="Select a set of default notebooks or load an existing one.">
-                <option value="scratch">Start with default notebooks</option>
-                <option value="previous">Load an existing notebook</option>
+            <param name="mode_select" type="select" label="Do you already have a notebook?" help="If not, no problem we will provide you with a default one.">
+                <option value="scratch">Start with a fresh notebook</option>
+                <option value="previous">Load a previous notebook</option>
             </param>
             <when value="scratch"/>
             <when value="previous">
-                <param name="ipynb" type="data" format="ipynb" label="IPython Notebook" required="true"/>
+                <param name="ipynb" type="data" format="ipynb" label="IPython Notebook"/>
                 <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one." help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
             </when>
         </conditional>
@@ -243,26 +263,52 @@ except FileNotFoundError:
         </repeat>
     </inputs>
     <outputs>
-        <data name="jupyter_notebook" format="ipynb" label="Executed GPU JupyterLab Notebook"/>
-        <collection name="output_collection" type="list" label="GPU JupyterLab notebook output collection">
-            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="false"/>
+        <data name="jupyter_notebook" format="ipynb" label="Executed JupyTool Notebook"/>
+        <data name="output_dataset" format="data">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true" assign_primary_output="true"/>
+        </data>
+        <collection name="output_collection" type="list" label="JupyTool output collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs/collection" visible="false"/>
         </collection>
     </outputs>
     <tests>
         <test expect_num_outputs="1">
-            <param name="mode" value="previous" />
-            <param name="ipynb" value="test.ipynb" />
-            <param name="run_it" value="true" />
+            <param name="mode" value="previous"/>
+            <param name="ipynb" value="test.ipynb"/>
+            <param name="run_it" value="true"/>
             <output name="jupyter_notebook" file="test.ipynb" ftype="ipynb"/>
         </test>
     </tests>
     <help><![CDATA[
-        JupyterLab is a next-generation web-based user interface for Project Jupyter. JupyterLab enables you to work with documents and activities such as Jupyter notebooks, text editors,
-        terminals, and custom components in a flexible, integrated, and extensible manner.
+    Welcome to the **Qiskit JupyTool**! This tool incorporates the entire Qiskit stack, including tutorials and supplemental resources. This tool is an extension
+    of the standard **JupyTool**, so a full functionality of Jupyter lab is also included. You can create, run, and share custom Galaxy tools based upon Jupyter Notebooks.
 
-        Galaxy offers you to use JupyterLab directly in Galaxy accessing and interacting with Galaxy datasets as you like. A very common use-case is to
-        do the heavy lifting such as performing computation on GPUs and data reduction steps in Galaxy and the plotting and more `interactive` part on smaller datasets in Jupyter Lab.
+    Qiskit is a python based, open-source software stack for quantum computing on IBM quantum systems. When run, the Jupyter lab instance includes directories
+    for many resources and relevant tutorials, including the introductory materials for building quantum circuits, to using quantum algorithms like Variational Quantum Eigensolvers (VQE), 
+    Quantum Approximate Optimization Algorithm (QAOA), as well as Grover's algorithm. The associated docker image contains most relevant Qiskit modules including:
+    qiskit-aer, qiskit-dynamics, qiskit-experiments, qiskit-finance, qiskit-ibm-experiment, qiskit-ibm-provider, qiskit-ibm-runtime, qiskit-ibmq-provider,
+    qiskit-machine-learning, qiskit-nature, qiskit-optimization, qiskit_research, qiskit-terra, qiskit-xyz2pdb. So, this tool provides the necessary resources for
+    beginners and experienced users of Qiskit alike. Users can readily run their scripts with quantum simulators on the backend (qasm, aer, etc.), or run on actual quantum hardware. For the latter, users 
+    need to have an account with IBM quantum lab and pass their signature API token by pasting it in their user preferences on this Galaxy instance (User -> preferences -> manage information). Instructions for 
+    specifying the quantum backend can be found at https://qiskit.org/ecosystem/ibm-runtime/how_to/backends.html.  
 
-        You can start with a new JupyterLab notebook from scratch and wait until the job starts running. Running job will provide you a link which can be opened in the same or another browser tab. This link opens JupyterLab notebook which can be used to prototype machine learning solutions.
+    The Jupyter Notebook is an open-source web application that allows you to create and share documents that contain live code, equations,
+    visualizations and narrative text. Uses include: data cleaning and transformation, numerical simulation, statistical modeling, data visualization,
+    machine learning, and much more.   
+
+    Galaxy offers you the use of Jupyter Notebooks directly in Galaxy accessing and interacting with Galaxy datasets as you like. A very common use-case is to
+    do the heavy lifting and data reduction steps in Galaxy and the plotting and more `interactive` part on smaller datasets in Jupyter.
+
+    You can start with a new Jupyter notebook from scratch or load an already existing one, e.g. from your colleague and execute it on your dataset.
+    You can specify any number of user-defined inputs using the repeat input, providing `name` value, selecting the type of input, and then providing values.
+
+    You can make the Qiskit JupyTool reusable in a workflow, by allowing the user to specify input values for the defined input blocks.
+    Inputs can be accessed by `name` from the automatically provided `GALAXY_INPUTS` dictionary.
+    Outputs can be written automatically to the user's history by writing to the `outputs` directory for one individual file or to the `outputs/collection` directory for multiple files.
+    Using collection tools, you can parse out the individual elements from the collection, as needed.
+
+    For backwards compatibility, you can import data into the notebook via a predefined `get()` function and write results back to Galaxy with a `put()` function.
+    
+    .. image:: https://upload.wikimedia.org/wikipedia/commons/5/51/Qiskit-Logo.svg
     ]]></help>
 </tool>
