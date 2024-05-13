@@ -13,6 +13,6 @@ def fork_safe_write(path: str, contents: str):
     # file is open for writing.
     with open(path, "w", encoding="utf-8") as f:
         f.write(unicodify(contents))
-        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-    with open(path) as f:
-        fcntl.flock(f.fileno(), fcntl.LOCK_SH)
+        #fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+    #with open(path) as f:
+    #    fcntl.flock(f.fileno(), fcntl.LOCK_SH)
