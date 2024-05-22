@@ -109,6 +109,9 @@ except FileNotFoundError:
             cp -r /home/\$NB_USER/usecases ./ &&
             cp -r /home/\$NB_USER/home_page.ipynb ./ &&
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
+        #elif $mode.mode_select == 'github':
+            git clone $mode.github_url &&
+            jupyter lab --no-browser --NotebookApp.shutdown_button=True
         #else:
             #import re
             #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($mode.ipynb.element_identifier))
@@ -132,9 +135,13 @@ except FileNotFoundError:
         <conditional name="mode">
             <param name="mode_select" type="select" label="Do you already have a notebook?" help="Select a set of default notebooks or load an existing one.">
                 <option value="scratch">Start with default notebooks</option>
+                <option value="github">Start with a GitHub repository</option>
                 <option value="previous">Load an existing notebook</option>
             </param>
             <when value="scratch"/>
+            <when value="github">
+                <param name="github_url" type="text" value="" label="GitHub URL" optional="False"/>
+            </when>
             <when value="previous">
                 <param name="ipynb" type="data" format="ipynb" label="IPython Notebook" required="true"/>
                 <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one." help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
