@@ -141,7 +141,7 @@ except FileNotFoundError:
             </param>
             <when value="scratch"/>
             <when value="pull_repo">
-                <param name="repo_url" type="text" value="" label="Online code repository (Git-based) URL" optional="False" help="Provide URL of Git-based code repository (for example, GitHub repository URL)" />
+                <param name="repo_url" type="text" value="" label="Online code repository (Git-based) URL" optional="False" help="Provide URL of Git-based code repository (for example: GitHub repository URL such as https://github.com/anuprulez/gpu_jupyterlab_ct_image_segmentation)"/>
             </when>
             <when value="previous">
                 <param name="ipynb" type="data" format="ipynb" label="IPython Notebook" required="true"/>
