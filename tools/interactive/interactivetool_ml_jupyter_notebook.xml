@@ -110,7 +110,8 @@ except FileNotFoundError:
             cp -r /home/\$NB_USER/home_page.ipynb ./ &&
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
         #elif $mode.mode_select == 'github':
-            git clone $mode.github_url &&
+            cp /home/\$NB_USER/home_page.ipynb ./ &&
+            git clone $mode.repo_url &&
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
         #else:
             #import re
@@ -135,12 +136,12 @@ except FileNotFoundError:
         <conditional name="mode">
             <param name="mode_select" type="select" label="Do you already have a notebook?" help="Select a set of default notebooks or load an existing one.">
                 <option value="scratch">Start with default notebooks</option>
-                <option value="github">Start with a GitHub repository</option>
+                <option value="pull_repo">Start with a code repository</option>
                 <option value="previous">Load an existing notebook</option>
             </param>
             <when value="scratch"/>
-            <when value="github">
-                <param name="github_url" type="text" value="" label="GitHub URL" optional="False"/>
+            <when value="pull_repo">
+                <param name="repo_url" type="text" value="" label="Online code repository (Git-based) URL" optional="False" help="Provide URL of Git-based code repository (for example: GitHub repository URL such as https://github.com/anuprulez/gpu_jupyterlab_ct_image_segmentation)"/>
             </when>
             <when value="previous">
                 <param name="ipynb" type="data" format="ipynb" label="IPython Notebook" required="true"/>
