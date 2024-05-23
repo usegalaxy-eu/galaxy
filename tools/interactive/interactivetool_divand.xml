@@ -1,7 +1,7 @@
 <tool id="interactive_tool_divand" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="@VERSION@" profile="22.05">
     <description>Data-Interpolating Variational Analysis in n dimensions</description>
     <macros>
-        <token name="@VERSION@">0.0.5</token>
+        <token name="@VERSION@">0.0.6</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/divand-jupyter-lab:@VERSION@</container>
