@@ -15,7 +15,7 @@
     export SHINY_INPUT_DIR=\$PWD/shiny_input &&
     export SHINY_OUTPUT_DIR=\$PWD/shiny_output &&
 
-    ln -sf '$input' '\$SHINY_INPUT_DIR' &&
+    ln -sf '$input' \$SHINY_INPUT_DIR &&
 
     Rscript /app_setup.R
 
