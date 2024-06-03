@@ -1,0 +1,69 @@
+<tool id="interactive_tool_audiolabeler" tool_type="interactive" name="NEAL" version="0.1">
+    <description>Nature+Energy Audio Labeller audio data annotation tool</description>
+    <requirements>
+        <container type="docker">ylebras/neal-docker:latest</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Audio Labeler" requires_domain="True">
+            <port>3838</port>
+            <url>/sample-apps/audio/</url>
+        </entry_point>
+    </entry_points>
+    <command><![CDATA[
+
+        #import re
+        #for $count, $file in enumerate($input):
+            #set $cleaned_name = re.sub('[^\w\-\.\s]', '_', str($file.element_identifier))
+            cp '$file' '/opt/shiny-server/samples/sample-apps/audio/www/tmp/${cleaned_name}' &&
+        #end for
+
+        #if $mode.mode_select == 'curation':
+            cp '$mode.inputlabel' /opt/shiny-server/samples/sample-apps/audio/labels/labels_tmp.csv &&
+        #end if
+
+        exec shiny-server >> /var/log/shiny-server.log 2>&1
+
+    ]]>
+    </command>
+    <inputs>
+        <param name="input" type="data" multiple="true" format="wav" label="Input sound data file(s) in wav format"/>
+        
+        <conditional name="mode">
+            <param name="mode_select" type="select" label="Do you already have a labels file?" help="This need to conform to formatting as described in help section">
+                <option value="labeling">Start with a fresh labels file</option>
+                <option value="curation">Load a previous labels file</option>
+            </param>
+            <when value="labeling"/>
+            <when value="curation">
+                <param name="inputlabel" type="data" format="csv" label="Input sound data labels file in csv format"/>
+            </when>
+        </conditional>
+    </inputs>
+    <outputs>
+        <data name="outfile" format="txt" />
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+<![CDATA[
+
+`NEAL (Nature+Energy Audio Labeller) <https://github.com/gibbona1/neal>`_ is an open-source interactive audio data annotation tool based on R Shiny.
+
+label file format:
+
+"date_time","file_name","start_time","end_time","start_freq","end_freq","class_label","call_type","confidence","notes","labeler","id"
+"2022-05-21 21:19:54","1_SMU05115_20211104_064902_start_39_16.wav",4.9825037303551,5.829261426746,0.53573887350619,4.3165341640833,"Meadow Pipit",NA,1,NA,"Anthony",4
+"2022-05-21 22:25:56","1_SMU05115_20211104_064902_start_39_16.wav",5.4647543215773,6.6376032643079,6.2302700519063,8.6107707904178,"Weather Noise",NA,1,NA,"Anthony",9
+"2022-05-21 22:26:36","2_RICHFIELDMET_20211218_111120.wav",2.6209644325282,4.3674997777827,4.3165341640833,6.4636524772505,"Eurasian Magpie",NA,1,NA,"Anthony",4
+]]>
+    </help>
+    <citations>
+           <citation type="bibtex">@misc{githubsurvey2022,
+           author       = {ANTHONY THOMAS GIBBONS},
+           title        = {{NEAL (Nature+Energy Audio Labeller) R Shiny app}},
+           publisher    = {Github},
+           url          = {https://github.com/gibbona1/neal}
+           }
+          }</citation>
+    </citations>
+</tool>
