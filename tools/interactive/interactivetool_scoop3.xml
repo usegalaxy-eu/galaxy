@@ -1,0 +1,38 @@
+<tool id="interactive_tool_scoop3_argo" tool_type="interactive" name="Scoop3-Argo" version="@VERSION@">
+    <description>Interactive visual quality control of Argo netCDF files</description>
+    <macros>
+        <token name="@VERSION@">1.40</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/scoop3-ubuntu-desktop-lxde-vnc:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Scoop on $infile.display_name" requires_domain="True">
+            <port>80</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        cp '$infile' /root/Desktop/infile.nc &&
+        bash /startup.sh
+    ]]>
+    </command>
+    <inputs>
+        <param name="infile" type="data" format="netcdf" label="netcdf"/>
+    </inputs>
+    <outputs>
+        <data name="outfile" format="txt" />
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        Scoop-Argo visual quality control vizualises a series of Argo floats NetCDF cycle files.
+The data are displayed in interactive graphics, with bathymetry, climatology and geographic maps environmental informations.
+Quality Control flags are graphically changed by the User.
+When changes are recorded, the history section is updated with the list of performed changes.
+    ]]>
+    </help>
+    <citations>
+        <citation type="doi">10.17882/48531</citation>
+    </citations>
+</tool>
