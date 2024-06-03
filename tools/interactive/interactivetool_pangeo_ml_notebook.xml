@@ -1,9 +1,9 @@
-<tool id="interactive_tool_pangeo_notebook" tool_type="interactive" name="Interactive Pangeo Notebook" version="22.01" profile="22.01">
+<tool id="interactive_tool_pangeo_ml_notebook" tool_type="interactive" name="Interactive Pangeo Machine Learning Notebook" version="23.0" profile="23.0">
     <requirements>
-        <container type="docker">quay.io/nordicesmhub/docker-pangeo-notebook:2023.02.27</container>
+        <container type="docker">quay.io/nordicesmhub/docker-pangeo-ml-notebook:2023.02.27</container>
     </requirements>
     <entry_points>
-        <entry_point name="Pangeo Interactive Tool" requires_domain="True">
+        <entry_point name="Pangeo Machine Learning Interactive Tool" requires_domain="True">
             <port>8888</port>
             <url>ipython/lab</url>
         </entry_point>
@@ -84,7 +84,7 @@
         </test>
     </tests>
     <help>
-    The Pangeo Notebook is based on Pangeo, an open and inclusive community platform for Big Data geoscience. 
+    The Pangeo Machine Learning Notebook is based on Pangeo ml-notebook. Pangeo is an open and inclusive community platform for Big Data geoscience. 
 
     Galaxy offers you to use Pangeo Notebooks directly in Galaxy accessing and interacting with Galaxy datasets as you like. A very common use-case is to
     do the heavy lifting and data reduction steps in Galaxy and the plotting and more `interactive` part on smaller datasets in Jupyter.
@@ -94,9 +94,9 @@
 
     You can import data into the notebook via a predefined `get()` function and write results back to Galaxy with a `put()` function.
 
-    The Pangeo notebook is developed and maintained by the [Pangeo](https://pangeo.io/) community. 
-    A new version of Galaxy Pangeo JupyterLab is deployed whenever a new Pangeo notebook docker image is made available by the Pangeo community.
-    The list of packages is available at [Pangeo docker images](https://github.com/pangeo-data/pangeo-docker-images/tree/master/pangeo-notebook).
+    The Pangeo Machine Learning notebook is developed and maintained by the [Pangeo](https://pangeo.io/) community. 
+    A new version of Galaxy Pangeo Machine Learning JupyterLab is deployed when a new Pangeo ml-notebook docker image is made available by the Pangeo community.
+    The list of packages is available at [Pangeo docker images](https://github.com/pangeo-data/pangeo-docker-images/tree/master/ml-notebook).
 
     </help>
 </tool>
