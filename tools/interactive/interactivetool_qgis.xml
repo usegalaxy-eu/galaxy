@@ -1,0 +1,50 @@
+<tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@" profile="22.01">
+    <description>interactive geographic information system (GIS)</description>
+    <macros>
+        <token name="@VERSION@">3.32</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/qgis-headless:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="QGIS on $infile.display_name" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        export HOME=\$PWD &&
+        mkdir -p ./output &&
+        chown 1000:1000 ./output/ && ## change permission for the app user
+        #if $infile:
+            cp '$infile' './$infile.display_name' &&
+        #end if
+        /init
+    ]]>
+    </command>
+    <inputs>
+        <param name="infile" type="data" format="data" optional="true" label="netcdf"/>
+    </inputs>
+    <outputs>
+        <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
+        <collection name="outputs" type="list" label="QGIS outputs">
+            <discover_datasets pattern="__name_and_ext__" directory="output" />
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{QGIS_software,
+              title = {QGIS Geographic Information System},
+              author = {{QGIS Development Team}},
+              organization = {QGIS Association},
+              year = {%Y},
+              url = {https://www.qgis.org},
+            }
+        </citation>
+    </citations>
+</tool>
