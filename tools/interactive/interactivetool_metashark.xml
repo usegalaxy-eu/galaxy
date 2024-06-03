@@ -1,7 +1,7 @@
-<tool id="interactive_tool_metashark" tool_type="interactive" name="metashark" version="1.7" profile="22.01">
+<tool id="interactive_tool_metashark" tool_type="interactive" name="metashark" version="1.7.5" profile="22.01">
     <description>Metadata Shiny Automated Resource and Knowledge</description>
     <requirements>
-        <container type="docker">eliearnaud/metashark:1.7.0</container>
+        <container type="docker">ylebras/metashark:1.7.5</container>
     </requirements>
     <entry_points>
         <entry_point name="metashark visualisation" requires_domain="True">
@@ -9,16 +9,15 @@
             <url>/</url>
         </entry_point>
     </entry_points>
-    <command><![CDATA[
+    <command use_shared_home="true"><![CDATA[
 
-        mkdir -p /srv/shiny-server/data/ &&
-        cp '$infile' /srv/shiny-server/data/inputdata.txt &&
+        cd /build_zone &&
         R -e "options('shiny.port'=3838,shiny.host='0.0.0.0');MetaShARK::runMetashark()"
 
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" multiple="true" format="tabular,csv" label="Input biodiversity data file(s)"/>
+        <!--param name="infile" type="data" multiple="true" format="tabular,csv" optional="true" label="Input biodiversity data file(s)"/-->
     </inputs>
     <outputs>
         <data name="outfile" format="txt" />
@@ -28,18 +27,9 @@
     <help>
 <![CDATA[
 
-`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is a R Shiny App to automate metadata creation in Ecological Metadata Language (E>
+`MetaShARK <https://github.com/earnaud/MetaShARK-v2>`_ is an work in progress innovative R Shiny App to automate metadata creation in Ecological Metadata Language. Based on EML Assembly Line R package, MetaShARK allows you to produce EML metadata from text files as .csv (comma as separator) or .tsv (tabular as separator), geographical vector (GeoJSON  and shapefile), geographical raster (GeoTiff) or any kind of other types of data files.  MetaShaRK allows you to provide metadata on data attributes, geographic, taxonomic and temporal coverages, authors, summary, keywords and methods. Futhermore, the 1.7.5 version alows you to add EML semantic annotation related to attributes names and/or keywords, based on terminological resources from Bioportal. This version of MetaShARK is provided "as is" for testing, as bugs can appear. Infrastructure hosting this app, people and organizations developping this app can't be responsible of any issues or errors from the app.
 
-Example input file (csv ot tabular)::
-
-"ID"    "x"     "y"     "test"
-01      -60.291838      46.328137       2
-02      -114.58927      35.022485       3
-03      -93.37406       30.00586        4
-04      -79.336288      43.682218       5
-05      -109.156024     31.904185       2
-06      -71.098031      42.297408       9
-07      -110.927215     32.18203        12
+Depending on the operating system and web browser used, attributes level information inference can failed depending on file extensions. We thus recommend to use .csv extension for comma separated files, .tsv for tabular files and .geoJSON for dedicated spatial vector files. 
 
 ]]>
     </help>

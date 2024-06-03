@@ -1,0 +1,131 @@
+<tool id="interactive_tool_source" tool_type="interactive" name="Interactive Source Notebooks" version="@VERSION@" profile="22.05">
+    <description>Sea Observations Utility for Reprocessing, Calibration and Evaluation</description>
+    <macros>
+        <token name="@VERSION@">0.0.2</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/coastal-source-jupyter-lab:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Source Interactive Tool" requires_domain="True">
+            <port>8888</port>
+            <url>ipython/lab</url>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID" strip="True">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+    </environment_variables>
+    <command detect_errors="aggressive"><![CDATA[
+        #import re
+        export GALAXY_WORKING_DIR=`pwd` &&
+        mkdir -p ./jupyter/outputs/ &&
+        mkdir -p ./jupyter/inputs/ &&
+        mkdir -p ./jupyter/data &&
+        mkdir -p ./jupyter/notebooks &&
+
+        #for $count, $file in enumerate($input):
+            #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\w\-\.\s]', '_', str($file.element_identifier))
+            ln -sf '$file' './jupyter/data/${cleaned_name}' &&
+        #end for
+
+        ## change into the directory where the notebooks are located
+        cd ./jupyter/ &&
+        export HOME=/home/jovyan/ &&
+        export PATH=/home/jovyan/.local/bin:\$PATH &&
+
+        #if $mode.mode_select == 'scratch'
+            ## copy all notebooks, workflows and data
+            cp '$__tool_directory__/default_notebook.ipynb' ./ipython_galaxy_notebook.ipynb &&
+            jupyter trust ./ipython_galaxy_notebook.ipynb &&
+            cp -r /home/\$NB_USER/notebooks/ ./ &&
+
+            ## provide all rights to copied files
+            jupyter lab --allow-root --no-browser &&
+            cp ./*.ipynb '$jupyter_notebook' &&
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
+        #else
+            #set $noteboook_name = re.sub('[^\w\-\.\s]', '_', str($mode.ipynb.element_identifier))
+            cp '$mode.ipynb' './${noteboook_name}.ipynb' &&
+            jupyter trust './${noteboook_name}.ipynb' &&
+            #if $mode.run_it
+                jupyter nbconvert --to notebook --execute --output ./ipython_galaxy_notebook.ipynb --allow-errors  ./*.ipynb &&
+                #set $noteboook_name = 'ipython_galaxy_notebook'
+            #else
+                jupyter lab --allow-root --no-browser --NotebookApp.shutdown_button=True &&
+            #end if
+            cp './${noteboook_name}.ipynb' '$jupyter_notebook' &&
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
+        #end if
+    ]]>
+    </command>
+     <inputs>
+        <conditional name="mode">
+            <param name="mode_select" type="select" label="Do you already have a notebook?" help="If not, no problem we will provide you with a default one.">
+                <option value="scratch">Start with a fresh notebook</option>
+                <option value="previous">Load a previous notebook</option>
+            </param>
+            <when value="scratch"/>
+            <when value="previous">
+                <param name="ipynb" type="data" format="ipynb" label="IPython Notebook"/>
+                <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one."
+                    help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
+            </when>
+        </conditional>
+        <param name="input" multiple="true" type="data" optional="true" label="Include data into the environment"/>
+
+    </inputs>
+    <outputs>
+        <data name="jupyter_notebook" format="ipynb" label="Executed SOURCE Notebook"></data>
+        <collection name="output_collection" type="list" label="JupyterLab notebook output collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true"/>
+        </collection>
+        <collection name="input_collection" type="list" label="JupyterLab notebook input collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/inputs" visible="false"/>
+        </collection>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1">
+            <param name="mode" value="previous" />
+            <param name="ipynb" value="test.ipynb" />
+            <param name="run_it" value="true" />
+            <output name="jupyter_notebook" file="test.ipynb" ftype="ipynb"/>
+        </test>
+    </tests>
+    <help><![CDATA[
+The notebooks in this Jupyter Lab environment allows to explore programmatic access to `SOURCE <https://doi.org/10.3389/fmars.2021.750387>`_'s package.
+
+Why such notebooks?
+-------------------
+
+The package Sea Observations Utility for Reprocessing, Calibration and Evaluation (SOURCE) is a Python 3.x package which has been developed within the framework of RITMARE project (http://www.ritmare.it) by the oceanography team in Istituto Nazionale di Geofisica e Vulcanologia INGV (http://www.ingv.it).
+
+SOURCE aims to manage jobs with in situ observations and model data from Ocean General Circulation Models (OGCMs) in order to:
+
+    Assess the quality of sea observations using original quality flags and reprocessing the data using global range check, spike removal, stuck value test and recursive statistic quality check;
+    return optimized daily and hourly time series of specific EOV (Essential Ocean Variables);
+    extract and aggregate in time model data at specific locations and depths;
+    evaluate OGCMs accuracy in terms of difference and absolute error.
+
+SOURCE is written in Python, an interpreted programming language highly adopted in the last decade because it is versatile, ease-to-use and fast to develop. SOURCE is developed and maintained as a module and it benefits from Python's open source utilities, such as:
+
+    Vectorized numerical data analysis (numPy, sciPy, ObsPy and pandas);
+    machine learning tools (scikit-learn);
+    hierarchical data storage (netCDF-4) (HDF-5 extension);
+    relational metadata storage using Structured Query Language (SQL) as management system.
+
+SOURCE is relocatable in the sense that it can be adapted to any basin worldwide, provided that the input data follow a specific standard format.
+   ]]></help>
+    <citations>
+        <citation type="doi">https://doi.org/10.3389/fmars.2021.750387</citation> 
+    </citations>
+</tool>
+
+
