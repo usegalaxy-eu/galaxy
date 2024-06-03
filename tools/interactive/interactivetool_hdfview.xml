@@ -1,0 +1,33 @@
+<tool id="interactive_tool_hdfview" name="Interactive Hdfview tool" tool_type="interactive" version="@TOOL_VERSION@">
+    <description>Desktop application to display netcdf, hdf4 or hdf5 files</description>
+    <macros>
+        <token name="@VERSION@">3.3.0</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/hdfview-desktop-vnc:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Hdfview on $infile.display_name" requires_domain="True">
+            <port>80</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+        <![CDATA[
+            cp '$infile' /root/Desktop/input &&
+            bash /startup.sh
+        ]]>
+    </command>
+    <inputs>
+        <param name="infile" type="data" format="netcdf,h5,hdf4" label="HDF file"/>
+    </inputs>
+    <outputs>
+        <data name="outfile" format="txt" />
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+        <![CDATA[
+            Hdfview : https://www.hdfgroup.org/
+        ]]>
+    </help>
+</tool>
