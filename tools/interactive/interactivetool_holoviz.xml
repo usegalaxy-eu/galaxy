@@ -1,0 +1,121 @@
+<tool id="interactive_tool_holoviz" tool_type="interactive" name="Holoviz" version="@VERSION@">
+    <description>High-level tools to simplify visualization in Python</description>
+    <macros>
+    <token name="@VERSION@">0.0.1</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/holoviz-jupyterlab:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Holoviews" requires_domain="True">
+            <port>8888</port>
+            <url>ipython/lab</url>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+    </environment_variables>
+    <command detect_errors="aggressive"><![CDATA[
+        #import re
+        export GALAXY_WORKING_DIR=`pwd` &&
+        mkdir -p ./jupyter/outputs/ &&
+        mkdir -p ./jupyter/data &&
+        mkdir -p ./jupyter/notebooks/geoviews &&
+        mkdir -p ./jupyter/notebooks/holoviews &&
+        mkdir -p ./jupyter/notebooks/hvplot &&
+
+        #for $count, $file in enumerate($input):
+            #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\w\-\.\s]', '_', str($file.element_identifier))
+            ln -sf '$file' './jupyter/data/${cleaned_name}' &&
+        #end for
+
+        ## change into the directory where the notebooks are located
+        cd ./jupyter/ &&
+        export HOME=/home/jovyan/ &&
+        export PATH=/home/jovyan/.local/bin:\$PATH &&
+
+        #if $mode.mode_select == 'scratch'
+            ## copy all notebooks, workflows and data
+            cp '$__tool_directory__/default_notebook.ipynb' ./ipython_galaxy_notebook.ipynb &&
+            jupyter trust ./ipython_galaxy_notebook.ipynb &&
+            cp -r /home/\$NB_USER/geoviews/examples/* ./notebooks/geoviews/ &&
+            cp -r /home/\$NB_USER/holoviews/examples/* ./notebooks/holoviews/ &&
+            cp -r /home/\$NB_USER/hvplot/examples/* ./notebooks/hvplot/ &&
+
+            ## provide all rights to copied files
+            jupyter lab --allow-root --no-browser &&
+            cp ./*.ipynb '$jupyter_notebook' &&
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
+        #else
+            #set $noteboook_name = re.sub('[^\w\-\.\s]', '_', str($mode.ipynb.element_identifier))
+            cp '$mode.ipynb' './${noteboook_name}.ipynb' &&
+            jupyter trust './${noteboook_name}.ipynb' &&
+            #if $mode.run_it
+                jupyter nbconvert --to notebook --execute --output ./ipython_galaxy_notebook.ipynb --allow-errors  ./*.ipynb &&
+                #set $noteboook_name = 'ipython_galaxy_notebook'
+            #else
+                jupyter lab --allow-root --no-browser --NotebookApp.shutdown_button=True &&
+            #end if
+            cp './${noteboook_name}.ipynb' '$jupyter_notebook' &&
+            cd outputs/ &&
+            sleep 2 &&
+            for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
+        #end if
+    ]]>
+    </command>
+     <inputs>
+        <conditional name="mode">
+            <param name="mode_select" type="select" label="Do you already have a notebook?" help="If not, no problem we will provide you with a default one.">
+                <option value="scratch">Start with a fresh notebook</option>
+                <option value="previous">Load a previous notebook</option>
+            </param>
+            <when value="scratch"/>
+            <when value="previous">
+                <param name="ipynb" type="data" format="ipynb" label="Notebook"/>
+                <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one."
+                    help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
+            </when>
+        </conditional>
+        <param name="input" multiple="true" type="data" optional="true" label="Include data into the environment"/>
+    </inputs>
+    <outputs>
+        <data name="jupyter_notebook" format="ipynb" label="Executed Holoviz"></data>
+        <collection name="output_collection" type="list" label="Holoviz notebook output collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true"/>
+        </collection>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1">
+            <param name="mode" value="previous" />
+            <param name="ipynb" value="test.ipynb" />
+            <param name="run_it" value="true" />
+            <output name="jupyter_notebook" file="test.ipynb" ftype="ipynb"/>
+        </test>
+    </tests>
+    <help><![CDATA[
+    A set of jupyter notebooks from the HoloViz ecosystem a set of high-level tools to simplify visualization in Python (more informations https://holoviz.org/).
+    
+    Three set of notebooks :
+    	- HoloViews is an open-source Python library designed to make data analysis and visualization seamless and simple. With HoloViews, you can usually express what you want to do in very few lines of code, letting you focus on what you are trying to explore and convey, not on the process of plotting. Check out the HoloViews web site for extensive examples and documentation (https://holoviews.org/).
+    	- HvPlot provides a familiar, high-level API for visualization. The API is based on the familiar Pandas .plot API and the innovative .interactive API.
+    		- It supports a wide range of data sources including Pandas, XArray, Dask, Streamz, Intake, GeoPandas and NetworkX.  
+    		- It supports the plotting backends Bokeh, Matplotlib and Plotly.
+    		- It exposes the powerful tools from the HoloViz ecosystem in a familiar and convenient API.
+    	- GeoViews is a Python library that makes it easy to explore and visualize any data that includes geographic locations. It has particularly powerful support for multidimensional meteorological and oceanographic datasets, such as those used in weather, climate, and remote sensing research, but is useful for almost anything that you would want to plot on a map !
+    ]]></help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{,
+            title = {Holoviz : High-level tools to simplify visualization in Python},
+            author = {The Holoviz community},
+            year = {2023},
+            note = {https://holoviz.org}
+        </citation>
+    </citations>
+</tool>
