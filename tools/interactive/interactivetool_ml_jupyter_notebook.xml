@@ -109,7 +109,7 @@ except FileNotFoundError:
             cp -r /home/\$NB_USER/usecases ./ &&
             cp -r /home/\$NB_USER/home_page.ipynb ./ &&
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
-        #elif $mode.mode_select == 'github':
+        #elif $mode.mode_select == 'pull_repo':
             cp /home/\$NB_USER/home_page.ipynb ./ &&
             git clone $mode.repo_url &&
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
