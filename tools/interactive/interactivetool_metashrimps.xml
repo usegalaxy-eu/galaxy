@@ -1,0 +1,45 @@
+<tool id="interactive_tool_metashrimps" tool_type="interactive" name="metashrimps" version="0.0.2" profile="22.01">
+    <description>Metadata Shiny for Retroactive Information Management and Production of data paper Sketches</description>
+    <requirements>
+        <container type="docker">ylebras/ms_metashrimps:v2</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="metashrimps visualisation" requires_domain="True">
+            <port>3838</port>
+            <url>/sample-apps/META/App_metadig/</url>
+        </entry_point>
+    </entry_points>
+    <command><![CDATA[
+        sed -i 's?input\$file\$datapath?"'$inputfile'"?g' /srv/shiny-server/sample-apps/META/App_metadig/app.R &&
+        mkdir -p /var/log/shiny-server &&
+        chown shiny.shiny /var/log/shiny-server &&
+
+        exec shiny-server >> /var/log/shiny-server.log 2>&1
+    ]]>
+    </command>
+    <inputs>
+        <param name="inputfile" type="data" multiple="true" format="xml" optional="true"  label="Input metadata file writen using EML Ecological standard"/>
+    </inputs>
+    <outputs>
+        <data name="outfile" format="txt" />
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+<![CDATA[
+
+`MetaShRIMPS <https://github.com/TanguyGen/metaCure>`_ is a R Shiny App to automate production of FAIR metrics and data paper sketche from Ecological Metadata Language based metadata documents
+
+]]>
+    </help>
+    <citations>
+           <citation type="bibtex">@misc{githubsurvey2023,
+           author       = {Tanguy Genthon},
+           title        = {{Metadata Shiny for Retroactive Information Management and Production of data paper Sketches}},
+           publisher    = {Github},
+           url          = {https://github.com/TanguyGen/metaCure},
+           year         = {2023}
+           }
+          }</citation>
+    </citations>
+</tool>

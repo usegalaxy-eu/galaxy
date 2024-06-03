@@ -1,0 +1,55 @@
+<tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@" profile="22.01">
+    <description>interactive geographic information system (GIS)</description>
+    <macros>
+        <token name="@VERSION@">3.34</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/qgis-headless:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="QGIS" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        export HOME=\$PWD &&
+        mkdir -p ./galaxy/data &&
+        mkdir -p ./galaxy/output &&
+        chown 1000:1000 ./galaxy/output/ && ## change permission for the app user
+        #if $infiles:
+            #for $infile in $infiles:
+                yes | cp '$infile' './galaxy/data/$infile.display_name' &&
+            #end for
+        #end if
+        /init
+    ]]>
+    </command>
+    <inputs>
+        <param name="infiles" type="data" format="data" optional="true" multiple="true" label="Input data"/>
+    </inputs>
+    <outputs>
+        <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
+        <collection name="outputs" type="list" label="QGIS outputs">
+            <discover_datasets pattern="__name_and_ext__" directory="output" />
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        QGIS is a professional GIS application that is built on top of and proud to be itself Free and Open Source Software (FOSS). 
+        Create, edit, visualise, analyse and publish geospatial information. For more user information https://docs.qgis.org/3.34/en/docs/user_manual/
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{QGIS_software,
+              title = {QGIS Geographic Information System},
+              author = {{QGIS Development Team}},
+              organization = {QGIS Association},
+              year = {%Y},
+              url = {https://www.qgis.org},
+            }
+        </citation>
+    </citations>
+</tool>
