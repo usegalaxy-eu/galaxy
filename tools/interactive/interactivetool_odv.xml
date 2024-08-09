@@ -1,10 +1,10 @@
 <tool id="interactive_tool_odv" tool_type="interactive" name="ODV" version="@VERSION@">
     <description>interactive plotting tool for geo-referenced data</description>
     <macros>
-    <token name="@VERSION@">5.6.5.1</token>
+    <token name="@VERSION@">v5.7.2</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/bgruening/odv-headless:v@VERSION@</container>
+        <container type="docker">quay.io/bgruening/odv-headless:@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="ODV" requires_domain="True">
@@ -20,9 +20,13 @@
         mkdir -p Documents/ODV/galaxy/data &&
         chmod 777 Documents/ODV/ -R &&
         #if $method.type == 'own_data' :
-            #for $infile in $method.infiles:
-                yes | cp '$infile' './Documents/ODV/galaxy/data/$infile.display_name' &&
-            #end for
+            #for $i, $infile in enumerate($method.infiles):
+                #if $infile.ext == "netcdf":
+                    cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}_${i}.nc' &&
+                #else if $infile.ext == "tabular":
+                    cp '$infile' './Documents/ODV/galaxy/data/$infile.display_name' &&
+                #end if
+            #end for  
         #end if
         #if $method.type == 'zip' :
             #import re
