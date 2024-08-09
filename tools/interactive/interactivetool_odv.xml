@@ -23,6 +23,8 @@
             #for $i, $infile in enumerate($method.infiles):
                 #if $infile.ext == "netcdf":
                     cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}_${i}.nc' &&
+                #else if $infile.ext == "tabular":
+                    cp '$infile' './Documents/ODV/galaxy/data/$infile.display_name' &&
                 #end if
             #end for  
         #end if
