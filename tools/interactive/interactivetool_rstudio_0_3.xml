@@ -4,14 +4,13 @@
         <container type="docker">quay.io/galaxy/docker-rstudio-notebook:23.1</container>
     </requirements>
     <entry_points>
-        <entry_point name="RStudio" requires_domain="True">
+        <entry_point name="RStudio" requires_domain="False" requires_path_in_header_named="X-RStudio-Root-Path">
             <port>8787</port>
             <url>/</url>
         </entry_point>
     </entry_points>
     <environment_variables>
-        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
-        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="HISTORY_ID" strip="True">${__app__.security.encode_id($jupyter_notebook.history_id)}</environment_variable> <!-- FIXME: Warning: The use of __app__ is deprecated and will break backward compatibility in the near future -->
         <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
         <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
         <environment_variable name="DEBUG">true</environment_variable>
@@ -19,8 +18,7 @@
         <environment_variable name="API_KEY" inject="api_key" />
     </environment_variables>
     <command><![CDATA[
-        chmod 777 \$TMPDIR &&
-        #import re
+        #chmod 777 \$TMPDIR &&
         export GALAXY_WORKING_DIR=`pwd` &&
         mkdir -p ./rstudio/outputs/ &&
         mkdir -p ./rstudio/data &&
@@ -28,13 +26,11 @@
         ## change into the directory where the notebooks are located
         cd ./rstudio/ &&
 
-        ##sed -i 's|/monitor.*||g' /etc/services.d/nginx/run &&
-        ##/etc/init.d/syslog-ng start &&
         /init &
-        ##rstudio-server start &&
         sleep 5 &&
         chmod 777 /tmp -R &&
-        tail -f /var/log/rstudio/rstudio-server/rserver.log
+        tail --retry -f /var/log/rstudio/rstudio-server/rserver.log
+
     ]]>
     </command>
     <inputs>
