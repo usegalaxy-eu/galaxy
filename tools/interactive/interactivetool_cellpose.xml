@@ -1,0 +1,41 @@
+<tool id="interactive_tool_cellpose" tool_type="interactive" name="CellPose Interactive" version="@VERSION@+galaxy0" profile="23.1">
+    <description>a generalist algorithm for cellular segmentation and restoration</description>
+    <macros>
+        <token name="@VERSION@">3.0.11</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/sunyi000/cellpose-galaxy:v3.0.11</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="CellPose" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        export HOME=\$PWD &&
+            
+        mkdir -p ./home ./home/cp_working_dir &&
+        chown -R 1000:1000 ./home &&
+        #for $i,$filename in enumerate($infiles):
+        ln -s '$filename' './home/cp_working_dir/${filename.element_identifier}.${filename.ext}' &&
+        #end for
+              
+    /init 
+    ]]>
+    </command>
+    <inputs>
+        <param name="infiles" type="data" multiple="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" label="Images" />
+    </inputs>
+    
+    <outputs>
+        <collection name="cp_output" type="list" label="CellPose output">
+            <discover_datasets pattern="__name_and_ext__" directory="./home/cp_working_dir" />
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+]]>
+    </help>
+</tool>
