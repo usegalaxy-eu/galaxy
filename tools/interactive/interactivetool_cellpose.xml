@@ -31,7 +31,7 @@
     
     <outputs>
         <collection name="cp_output" type="list" label="CellPose output">
-		<discover_datasets pattern="(?P&lt;name&gt;.*)(_masks\..*|_outlines\..*|\.npy|\.zip|_flows\..*)$" directory="./home/cp_working_dir" />
+		<discover_datasets pattern="__name_and_ext__" directory="./home/cp_working_dir" />
 	</collection>
     </outputs>
     
