@@ -13,10 +13,10 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-        export HOME=\$PWD &&
+        export HOME=\$PWD/home/ &&
             
         mkdir -p ./home ./home/cp_working_dir &&
-        chown -R 1000:1000 ./home &&
+        chmod -R 777 ./home &&
         #for $i,$filename in enumerate($infiles):
         ln -s '$filename' './home/cp_working_dir/${filename.element_identifier}.${filename.ext}' &&
         #end for
