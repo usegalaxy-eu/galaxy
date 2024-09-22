@@ -1,0 +1,54 @@
+<tool id="interactive_tool_pampa" tool_type="interactive" name="pampa" version="0.0.1" profile="22.01">
+    <description>Performance Indicators of Marine Protected Areas for the management of coastal ecosystems, resources and their uses</description>
+    <requirements>
+        <container type="docker">ylebras/pampa:test</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="pampa analysis" requires_domain="True">
+            <port>3838</port>
+            <url>/sample-apps/PAMPA/</url>
+        </entry_point>
+    </entry_points>
+    <command><![CDATA[
+        mkdir Outputs &&
+        chmod -R 777 Outputs &&
+        sed -i 's?input\$load_ws_written?"'`pwd`'/Outputs/"?g' /srv/shiny-server/sample-apps/PAMPA/R/mod_load_files.R &&
+
+        ls > log.txt &&
+        mkdir -p /var/log/shiny-server &&
+        chown shiny.shiny /var/log/shiny-server &&
+        exec shiny-server >> /var/log/shiny-server.log 2>&1
+
+   ]]>
+    </command>
+    <inputs>
+        <!--param name="unitobs" type="data" format="tabular" optional="true"  label="Input unitobs file"/>
+        <param name="obs" type="data" format="tabular" optional="true"  label="Input observation file"/>
+        <param name="ref" type="data" format="tabular" optional="true"  label="Input reference file"/-->
+    </inputs>
+    <outputs>
+        <data name="log" from_work_dir="log.txt" format="txt"  />
+        <collection type="list" name="outputs_pampa" label="Pampa outputs">
+            <discover_datasets pattern="__name_and_ext__" directory="Outputs/Results/" visible="false"/>
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+<![CDATA[
+
+`PAMPA <https://github.com/madelinm/Package_PAMPA>`_ is a R Shiny App to facilitate production of biodiversity metrics from observation files related to species
+
+]]>
+    </help>
+    <citations>
+           <citation type="bibtex">@misc{githubsurvey2023,
+           author       = {Mélanie Madelin, Yves Recht, Yvan Le Bras, Dominique Pelletier},
+           title        = {{Performance Indicators of Marine Protected Areas for the management of coastal ecosystems, resources and their uses}},
+           publisher    = {Github},
+           url          = {https://github.com/madelinm/Package_PAMPA},
+           year         = {2023}
+           }
+          }</citation>
+    </citations>
+</tool>
