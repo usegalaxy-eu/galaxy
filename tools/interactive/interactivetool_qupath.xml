@@ -2,7 +2,7 @@
 <tool id="interactive_tool_qupath" tool_type="interactive" name="QuPath" version="@VERSION@" profile="22.05">
     <description>interactive Open Software for Bioimage Analysis</description>
     <macros>
-        <token name="@VERSION@">0.4.3</token>
+        <token name="@VERSION@">0.5.1</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/qupath-headless:@VERSION@</container>
