@@ -307,9 +307,6 @@ class NotificationCreateRequest(GenericNotificationCreate[int]):
     )
 
 
-NotificationRecipients = GenericNotificationRecipients[int]
-
-
 NotificationCreateRequestBody = GenericNotificationCreate[DecodedDatabaseIdField]
 
 

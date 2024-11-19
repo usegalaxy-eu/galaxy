@@ -54,6 +54,7 @@ from galaxy.model.scoped_session import galaxy_scoped_session
 from galaxy.schema.notifications import (
     AnyNotificationContent,
     BroadcastNotificationCreateRequest,
+    GenericNotificationRecipients,
     MandatoryNotificationCategory,
     MessageNotificationContent,
     NewSharedItemNotificationContent,
@@ -62,7 +63,6 @@ from galaxy.schema.notifications import (
     NotificationChannelSettings,
     NotificationCreateData,
     NotificationCreateRequest,
-    NotificationRecipients,
     NotificationVariant,
     PersonalNotificationCategory,
     UpdateUserNotificationPreferencesRequest,
@@ -82,7 +82,7 @@ class CleanupResultSummary(NamedTuple):
 
 
 class NotificationRecipientResolverStrategy(Protocol):
-    def resolve_users(self, recipients: NotificationRecipients) -> List[User]:
+    def resolve_users(self, recipients: GenericNotificationRecipients[int]) -> List[User]:
         pass
 
 
@@ -538,12 +538,12 @@ class NotificationManager:
 
 
 class NotificationRecipientResolver:
-    """Resolves a set of NotificationRecipients to a list of unique users using a specific strategy."""
+    """Resolves a set of GenericNotificationRecipients[int] to a list of unique users using a specific strategy."""
 
     def __init__(self, strategy: NotificationRecipientResolverStrategy):
         self.strategy = strategy
 
-    def resolve(self, recipients: NotificationRecipients) -> List[User]:
+    def resolve(self, recipients: GenericNotificationRecipients[int]) -> List[User]:
         """Given individual user, group and roles ids as recipients, obtains the unique list of users.
 
         The resulting list will contain only unique users even if the same user id might have been provided more
@@ -558,7 +558,7 @@ class DefaultStrategy(NotificationRecipientResolverStrategy):
     def __init__(self, sa_session: galaxy_scoped_session):
         self.sa_session = sa_session
 
-    def resolve_users(self, recipients: NotificationRecipients) -> List[User]:
+    def resolve_users(self, recipients: GenericNotificationRecipients[int]) -> List[User]:
         unique_user_ids: Set[int] = set(recipients.user_ids)
 
         all_group_ids, all_role_ids = self._expand_group_and_roles_ids(
@@ -637,7 +637,7 @@ class DefaultStrategy(NotificationRecipientResolverStrategy):
 
 
 class RecursiveCTEStrategy(NotificationRecipientResolverStrategy):
-    def resolve_users(self, recipients: NotificationRecipients) -> List[User]:
+    def resolve_users(self, recipients: GenericNotificationRecipients[int]) -> List[User]:
         # TODO Implement resolver using recursive CTEs?
         return []
 

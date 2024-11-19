@@ -27,12 +27,12 @@ from galaxy.model import (
 from galaxy.schema.notifications import (
     BroadcastNotificationContent,
     BroadcastNotificationCreateRequest,
+    GenericNotificationRecipients,
     NotificationBroadcastUpdateRequest,
     NotificationCategorySettings,
     NotificationChannelSettings,
     NotificationCreateData,
     NotificationCreateRequest,
-    NotificationRecipients,
     NotificationVariant,
     PersonalNotificationCategory,
     UpdateUserNotificationPreferencesRequest,
@@ -78,7 +78,7 @@ class NotificationManagerBaseTestCase(NotificationsBaseTestCase):
         notification_data = NotificationCreateData(**data)
 
         request = NotificationCreateRequest(
-            recipients=NotificationRecipients.model_construct(
+            recipients=GenericNotificationRecipients[int].model_construct(
                 user_ids=[user.id for user in users],
             ),
             notification=notification_data,
@@ -494,7 +494,7 @@ class TestNotificationRecipientResolver(NotificationsBaseTestCase):
             groups=[group1],
         )
 
-        recipients = NotificationRecipients.model_construct(
+        recipients = GenericNotificationRecipients[int].model_construct(
             user_ids=[users[9].id],
             group_ids=[group3.id],
             role_ids=[role3.id],

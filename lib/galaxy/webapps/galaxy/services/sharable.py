@@ -25,10 +25,10 @@ from galaxy.model import (
 )
 from galaxy.schema.fields import DecodedDatabaseIdField
 from galaxy.schema.notifications import (
+    GenericNotificationRecipients,
     NewSharedItemNotificationContent,
     NotificationCreateData,
     NotificationCreateRequest,
-    NotificationRecipients,
     PersonalNotificationCategory,
     SharableItemType,
 )
@@ -206,7 +206,7 @@ class SharedItemNotificationFactory:
     ) -> NotificationCreateRequest:
         user_ids = [user.id for user in users_to_notify]
         request = NotificationCreateRequest(
-            recipients=NotificationRecipients.model_construct(user_ids=user_ids),
+            recipients=GenericNotificationRecipients[int].model_construct(user_ids=user_ids),
             notification=NotificationCreateData(
                 source=SharedItemNotificationFactory.source,
                 variant="info",
