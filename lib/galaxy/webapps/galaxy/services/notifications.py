@@ -64,7 +64,7 @@ class NotificationService(ServiceBase):
             recipients=payload.recipients,
             galaxy_url=galaxy_url,
         )
-        return self.send_notification_internal(request)
+        return self.send_notification_internal(request, force_sync=True)
 
     def send_notification_internal(
         self, request: NotificationCreateRequest, force_sync: bool = False
