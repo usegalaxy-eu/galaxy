@@ -36,7 +36,7 @@ const STATIC_PLUGIN_BUILD_IDS = [
     "tiffviewer",
     "ts_visjs",
 ];
-const INSTALL_PLUGIN_BUILD_IDS = ["cytoscape", "ngl", "msa", "openlayers", "venn", "vizarr"]; // todo: derive from XML
+const INSTALL_PLUGIN_BUILD_IDS = ["cytoscape", "ngl", "msa", "openlayers", "venn", "vitessce", "vizarr"]; // todo: derive from XML
 const DIST_PLUGIN_BUILD_IDS = ["new_user"];
 const PLUGIN_BUILD_IDS = Array.prototype.concat(DIST_PLUGIN_BUILD_IDS, STATIC_PLUGIN_BUILD_IDS);
 
