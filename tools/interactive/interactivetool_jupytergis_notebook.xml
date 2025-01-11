@@ -5,7 +5,7 @@
     <entry_points>
         <entry_point name="Jupyter Interactive GIS Tool" label="jupytergis" requires_domain="False" requires_path_in_url="True">
             <port>8888</port>
-            <url>ipython/lab</url>
+            <url>lab</url>
         </entry_point>
     </entry_points>
     <environment_variables>
