@@ -1,9 +1,9 @@
 <tool id="interactive_tool_jupytergis_notebook" tool_type="interactive" name="Interactive JupyterGIS Notebook" version="0.1" profile="23.01">
     <requirements>
-        <container type="docker">quay.io/annefou/docker-jupytergis-notebook:0.1.7.4</container>
+        <container type="docker">quay.io/bgruening/docker-jupyter-notebook:2025.01</container>
     </requirements>
     <entry_points>
-        <entry_point name="Jupyter InteractiveGIS Tool" label="GIS" requires_domain="False" requires_path_in_url="True">
+        <entry_point name="Jupyter Interactive GIS Tool" label="jupytergis" requires_domain="False" requires_path_in_url="True">
             <port>8888</port>
             <url>ipython/lab</url>
         </entry_point>
@@ -14,7 +14,7 @@
         <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
         <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
         <environment_variable name="API_KEY" inject="api_key"/>
-        <environment_variable name="EP_PATH" inject="entry_point_path_for_label">jupytool</environment_variable>
+        <environment_variable name="EP_PATH" inject="entry_point_path_for_label">jupytergis</environment_variable>
     </environment_variables>
     <configfiles>
         <inputs name="inputs" filename="galaxy_inputs.json" data_style="staging_path_and_source_path"/>
