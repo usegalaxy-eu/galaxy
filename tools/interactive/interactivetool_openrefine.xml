@@ -1,7 +1,7 @@
 <tool id="interactive_tool_openrefine" tool_type="interactive" name="OpenRefine" version="0.2">
     <description>Working with messy data</description>
     <requirements>
-        <container type="docker">ylebras/openrefine-docker</container>
+        <container type="docker">ylebras/openrefine-docker:2024</container>
     </requirements>
     <entry_points>
         <entry_point name="Openrefine visualisation" requires_domain="False" requires_path_in_url="False">
