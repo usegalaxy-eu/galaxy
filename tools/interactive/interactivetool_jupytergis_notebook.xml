@@ -1,11 +1,12 @@
 <tool id="interactive_tool_jupytergis_notebook" tool_type="interactive" name="Interactive JupyterGIS Notebook" version="0.1" profile="23.01">
     <requirements>
-        <container type="docker">quay.io/bgruening/docker-jupyter-notebook:2025.01</container>
+        <container type="docker">quay.io/bgruening/docker-jupytergis-notebook:2025.01</container>
     </requirements>
     <entry_points>
-        <entry_point name="Jupyter Interactive GIS Tool" label="jupytergis" requires_domain="False" requires_path_in_url="True">
+       <!-- needs to be requires_domain="True" because the GIX extension creates URL like:
+                 https://usegalaxy.eu/jupytergis_core/proxy?url=https://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_500k.zip -->
+        <entry_point name="Jupyter Interactive GIS Tool" label="jupytergis" requires_domain="True">
             <port>8888</port>
-            <url>lab</url>
         </entry_point>
     </entry_points>
     <environment_variables>
@@ -81,7 +82,7 @@ except FileNotFoundError:
         export GALAXY_WORKING_DIR=`pwd` &&
         mkdir -p ./jupyter/outputs/collection &&
         mkdir -p ./jupyter/galaxy_inputs &&
-        export PROXY_PREFIX=\${EP_PATH%/ipython*} &&
+        export PROXY_PREFIX=\${EP_PATH} &&
 
         ## change into the directory where the notebooks are located
         cd ./jupyter/ &&
