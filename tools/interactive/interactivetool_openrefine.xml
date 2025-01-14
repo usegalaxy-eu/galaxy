@@ -17,7 +17,7 @@
     </environment_variables>
     <configfiles>
         <configfile name="start_openrefine"><![CDATA[
-exec /openrefine/refine -i 0.0.0.0 -m \$GALAXY_MEMORY_MB &
+exec /openrefine/refine -i 0.0.0.0 -m \${GALAXY_MEMORY_MB}m &
 
 ##Check if openrefine is up to work
 STATUS=\$(curl --include 'http://127.0.0.1:3333' 2>&1)
