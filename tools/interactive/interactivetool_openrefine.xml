@@ -1,4 +1,4 @@
-<tool id="interactive_tool_openrefine" tool_type="interactive" name="OpenRefine" version="0.2">
+<tool id="interactive_tool_openrefine" tool_type="interactive" name="OpenRefine" version="0.3">
     <description>Working with messy data</description>
     <requirements>
         <container type="docker">ylebras/openrefine-docker:2024</container>
@@ -11,17 +11,17 @@
     <environment_variables>
         <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
         <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
-        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">443</environment_variable>
         <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
         <environment_variable name="API_KEY" inject="api_key" />
     </environment_variables>
     <configfiles>
         <configfile name="start_openrefine"><![CDATA[
-exec /OpenRefine/refine -i 0.0.0.0 -m \${GALAXY_MEMORY_MB}M &
+exec /openrefine/refine -i 0.0.0.0 -m \$GALAXY_MEMORY_MB &
 
 ##Check if openrefine is up to work
 STATUS=\$(curl --include 'http://127.0.0.1:3333' 2>&1)
-while [[ \${STATUS} =~ "refused" ]]
+while [[ ! \${STATUS} =~ "OpenRefine" ]]
 do
   echo "Waiting for openrefine: \$STATUS \n"
   STATUS=\$(curl --include 'http://127.0.0.1:3333' 2>&1)
@@ -40,10 +40,10 @@ cat '$start_openrefine' &&
 bash '$start_openrefine' &&
 
 ## Createnew project with the dataset
-cd /refine-python &&
+cd /openrefine &&
 
 #if $infile:
-    python openrefine_create_project_API.py '/import/input.tabular' &&
+    bash bash-refine/myworkflow.sh &&
 #end if
 
 tail -f /dev/null
@@ -81,3 +81,4 @@ Example input file (TAB separated)::
 ]]>
     </help>
 </tool>
+
