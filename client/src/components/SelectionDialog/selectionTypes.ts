@@ -19,6 +19,7 @@ export interface SelectionItem {
     isLeaf: boolean;
     url: string;
     _rowVariant?: SelectionState;
+    initialCurrentPage?: number;
 }
 
 export interface ItemsProviderContext {
