@@ -16,6 +16,7 @@ export interface SelectionItem {
     details: string;
     isLeaf: boolean;
     url: string;
+    initialCurrentPage?: number;
 }
 
 export interface ItemsProviderContext {
