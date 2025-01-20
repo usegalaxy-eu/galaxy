@@ -38,6 +38,7 @@ interface Props {
     selectAllIcon?: string;
     showSelectIcon?: boolean;
     title?: string;
+    watchOnPageChanges?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -60,6 +61,7 @@ const props = withDefaults(defineProps<Props>(), {
     selectAllIcon: SELECTION_STATES.UNSELECTED,
     showSelectIcon: false,
     title: "",
+    watchOnPageChanges: true,
 });
 
 const emit = defineEmits<{
@@ -103,7 +105,7 @@ function selectionIcon(variant: string) {
 /** Resets pagination when a filter/search word is entered **/
 function filtered(items: Array<SelectionItem>) {
     if (props.itemsProvider === undefined) {
-        currentPage.value = 1;
+        resetPagination();
     }
 }
 
@@ -123,22 +125,25 @@ function formatTime(value: string) {
     }
 }
 
-watch(
-    () => props.items,
-    () => {
-        filtered(props.items);
-    }
-);
+function resetPagination(toInitialPage = 1) {
+    currentPage.value = toInitialPage;
+}
 
-watch(
-    () => props.providerUrl,
-    () => {
-        // We need to reset the current page when drilling down sub-folders
-        if (props.itemsProvider !== undefined) {
-            currentPage.value = 1;
+defineExpose({
+    currentPage,
+    resetPagination,
+});
+
+if (props.watchOnPageChanges) {
+    watch(
+        () => props.items,
+        () => {
+            if (props.itemsProvider === undefined) {
+                resetPagination();
+            }
         }
-    }
-);
+    );
+}
 </script>
 
 <template>
