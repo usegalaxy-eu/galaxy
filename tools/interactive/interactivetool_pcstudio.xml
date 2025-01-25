@@ -4,7 +4,7 @@
         <token name="@VERSION@">1.3.1</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/galaxy/qupath-headless:@VERSION@</container>
+        <container type="docker">quay.io/galaxy/docker-pcstudio:@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="PhysiCell Studio" requires_domain="True">
@@ -38,5 +38,6 @@ A graphical tool to create, execute, and visualize a multicellular model using P
     </help>
     <citations>
         <citation type="doi">10.1371/journal.pcbi.1005991</citation>
+        <citation type="doi">10.46471/gigabyte.128</citation>      
     </citations>
 </tool>
