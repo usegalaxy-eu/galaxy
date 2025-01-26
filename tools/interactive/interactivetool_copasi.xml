@@ -13,18 +13,19 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-        mkdir -p ./outputs &&
-        ## create artificial output, TODO for later
-        touch ./outputs/result.smbl &&
+        mkdir -p /data/outputs &&
+        #if $infile:
+            ln -s '$infile' /data/infile.sbml &&
+        #end if
         chown 1000:1000 ./output && ## the app user of the container
         /init
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="smbl" optional="true" label="Input file in SMBL format"/>
+        <param name="infile" type="data" format="sbml" optional="true" label="Input file in SMBL format"/>
     </inputs>
     <outputs>
-        <data name="final_smbl" format="smbl" label="${tool.name} on ${on_string}" from_work_dir="./outputs/result.smbl"/>
+        <data name="final_smbl" format="sbml" label="${tool.name} on ${on_string}" from_work_dir="/data/outputs/result.smbl"/>
         <!--collection name="outputs" type="list" label="PhysiCell outputs">
             <discover_datasets pattern="__name_and_ext__" directory="outputs" />
         </collection-->
