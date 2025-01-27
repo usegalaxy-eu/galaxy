@@ -19,7 +19,7 @@
         #end if
         chown 1000:1000 /data/outputs && ## the app user of the container
         /init &&
-        cp /data/outputs/result.smbl '$final_sbml'
+        cp /data/outputs/result.xml '$final_sbml' || true
     ]]>
     </command>
     <inputs>
