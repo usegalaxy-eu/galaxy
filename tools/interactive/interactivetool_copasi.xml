@@ -17,7 +17,7 @@
         #if $infile:
             ln -s '$infile' /data/infile.sbml &&
         #end if
-        chown 1000:1000 /data/output && ## the app user of the container
+        chown 1000:1000 /data/outputs && ## the app user of the container
         /init
     ]]>
     </command>
