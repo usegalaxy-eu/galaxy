@@ -1,0 +1,49 @@
+<tool id="interactive_tool_cellxgene_mouse_sciatic_nerve" tool_type="interactive" name="Interactive Mouse Sciatic Nerve CellxGene Environment" version="0.0.1">
+    <requirements>
+	    <container type="docker">quay.io/bgruening/cellxgene-mouse-sciatic-nerve:1.1.1-1</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="CellxGene Single Cell Visualisation on sciatic verves data (complete)" requires_domain="True">
+            <port>8080</port>
+        </entry_point>
+        <entry_point name="CellxGene Single Cell Visualisation on sciatic verves data (adipocytes)" requires_domain="True">
+            <port>8081</port>
+        </entry_point>
+        <entry_point name="CellxGene Single Cell Visualisation on sciatic verves data (macrophages)" requires_domain="True">
+            <port>8082</port>
+        </entry_point>
+    </entry_points>
+    <stdio>
+		<regex match="WARNING"
+			   source="both"
+			   level="warning"
+			   description="cellxgene warnings"
+			   />
+    </stdio>
+    <command><![CDATA[
+        docker run -d
+        #if $data == "all":
+        -p 8080:8080
+        #if $data == "adipo":
+        -p 8081:8081
+        #else
+        -p 8082:8082
+        #end if
+        quay.io/bgruening/cellxgene-mouse-sciatic-nerve:1.1.1-1
+    ]]>
+    </command>
+    <inputs>
+        <param name="data" type="select" label="dataset" help="Please select the dataset to visualise">
+            <option value="all">Complete dataset</option>
+            <option value="adipo">Adipocytes (2nd layer clustering)</option>
+            <option value="macro">Macrophages (2nd layer clustering)</option>
+        </param>
+    </inputs>
+    <outputs>
+    </outputs>
+    <tests>
+    </tests>
+<help><![CDATA[
+This tool provides an interactive environment to visualise single cell RNA-seq data from mouse sciatic nerve. The data is clustered into 2nd layer clusters, which can be visualised separately. The complete dataset can also be visualised. The tool provides a web interface to interact with the data.
+]]></help>
+</tool>
