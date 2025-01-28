@@ -8,7 +8,7 @@
         </entry_point>
     </entry_points>
     <stdio>
-    <regex match="WARNING" source="both" level="warning"cdescription="cellxgene warnings"/>
+        <regex match="WARNING" source="both" level="warning" description="cellxgene warnings"/>
     </stdio>
     <command><![CDATA[
     #if $data == "complete":
