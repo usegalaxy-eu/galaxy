@@ -3,39 +3,29 @@
 	    <container type="docker">quay.io/bgruening/cellxgene-mouse-sciatic-nerve:1.1.1-1</container>
     </requirements>
     <entry_points>
-        <entry_point name="Mouse sciatic nerve complete dataset" requires_domain="True">
+        <entry_point name="Mouse sciatic nerve $data dataset" requires_domain="True">
             <port>80</port>
-        </entry_point>
-        <entry_point name="Second level clustering of adipocytes cluster" requires_domain="True">
-            <port>81</port>
-        </entry_point>
-        <entry_point name="Second level clustering of Macrophages cluster" requires_domain="True">
-            <port>82</port>
         </entry_point>
     </entry_points>
     <stdio>
-		<regex match="WARNING"
-			   source="both"
-			   level="warning"
-			   description="cellxgene warnings"
-			   />
+    <regex match="WARNING" source="both" level="warning"cdescription="cellxgene warnings"/>
     </stdio>
     <command><![CDATA[
-        #if $data == "all":
-    cellxgene launch --host 0.0.0.0 --port 80  "/data/all_final_population.h5ad"   &&
-        #else if $data == "adipo":
-    cellxgene launch --host 0.0.0.0 --port 81  "/data/adipo.h5ad"   &&
-        #else:
-    cellxgene launch --host 0.0.0.0 --port 82  "/data/macro.h5ad"   &&
-        #end if
+    #if $data == "complete":
+        cellxgene launch --host 0.0.0.0 --port 80  "/data/all_final_population.h5ad"   &&
+    #else if $data == "Adipocytes":
+        cellxgene launch --host 0.0.0.0 --port 80  "/data/adipo.h5ad"   &&
+    #else:
+        cellxgene launch --host 0.0.0.0 --port 80  "/data/macro.h5ad"   &&
+    #end if
     echo "Running of cellxgene-mouse-sciatic-nerve, please cite ..." > result.txt
     ]]>
     </command>
     <inputs>
         <param name="data" type="select" label="dataset" help="Please select the dataset to visualise">
-            <option value="all">Complete dataset</option>
-            <option value="adipo">Adipocytes (2nd layer clustering)</option>
-            <option value="macro">Macrophages (2nd layer clustering)</option>
+            <option value="complete">Complete dataset</option>
+            <option value="Adipocytes">Adipocytes (2nd layer clustering)</option>
+            <option value="Macrophages">Macrophages (2nd layer clustering)</option>
         </param>
     </inputs>
     <outputs>
