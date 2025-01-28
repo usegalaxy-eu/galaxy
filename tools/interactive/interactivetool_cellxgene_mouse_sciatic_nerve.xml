@@ -1,0 +1,39 @@
+<tool id="interactive_tool_cellxgene_mouse_sciatic_nerve" tool_type="interactive" name="Interactive Mouse Sciatic Nerve CellxGene Environment" version="0.0.1">
+    <requirements>
+	    <container type="docker">quay.io/bgruening/cellxgene-mouse-sciatic-nerve:1.1.1-1</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Mouse sciatic nerve $data dataset" requires_domain="True">
+            <port>80</port>
+        </entry_point>
+    </entry_points>
+    <stdio>
+    <regex match="WARNING" source="both" level="warning"cdescription="cellxgene warnings"/>
+    </stdio>
+    <command><![CDATA[
+    #if $data == "complete":
+        cellxgene launch --host 0.0.0.0 --port 80  "/data/all_final_population.h5ad"   &&
+    #else if $data == "Adipocytes":
+        cellxgene launch --host 0.0.0.0 --port 80  "/data/adipo.h5ad"   &&
+    #else:
+        cellxgene launch --host 0.0.0.0 --port 80  "/data/macro.h5ad"   &&
+    #end if
+    echo -e "Visualising the mouse sciatic nerve single-cell RNAseq dataset.\nTitle: FGF signaling modulates a chondrocyte-like state of peripheral nerve fibroblast during aging.\nIf you are using this dataset please cite; Hortells L. et al (2025)\nThe h5ad files can be accessed from zenodo; 10.5281/zenodo.14743352" > result.txt
+    ]]>
+    </command>
+    <inputs>
+        <param name="data" type="select" label="dataset" help="Please select the dataset to visualise">
+            <option value="complete">Complete dataset</option>
+            <option value="Adipocytes">Adipocytes (2nd layer clustering)</option>
+            <option value="Macrophages">Macrophages (2nd layer clustering)</option>
+        </param>
+    </inputs>
+    <outputs>
+        <data name="out_file1" format="txt" from_work_dir="result.txt" />
+    </outputs>
+    <tests>
+    </tests>
+<help><![CDATA[
+This tool provides an interactive environment to visualise single cell RNA-seq data from mouse sciatic nerve. The data is clustered into 2nd layer clusters, which can be visualised separately. The complete dataset can also be visualised. The tool provides a web interface to interact with the data.
+]]></help>
+</tool>
