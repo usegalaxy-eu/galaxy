@@ -22,7 +22,7 @@
     </stdio>
     <command><![CDATA[
         #if $data == "all":
-    cellxgene launch --host 0.0.0.0 --port 80  "data/all_final_population.h5ad"   &&
+    cellxgene launch --host 0.0.0.0 --port 80  "/data/all_final_population.h5ad"   &&
         #else if $data == "adipo":
     cellxgene launch --host 0.0.0.0 --port 81  "/data/adipo.h5ad"   &&
         #else:
