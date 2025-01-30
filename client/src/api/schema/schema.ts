@@ -9270,7 +9270,7 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "ftp" | "posix" | "s3fs" | "azure" | "onedata" | "webdav" | "dropbox" | "googledrive";
+            type: "ftp" | "posix" | "s3fs" | "azure" | "onedata" | "webdav" | "dropbox" | "googledrive" | "elabftw";
             /** Variables */
             variables?:
                 | (
@@ -17647,7 +17647,7 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "ftp" | "posix" | "s3fs" | "azure" | "onedata" | "webdav" | "dropbox" | "googledrive";
+            type: "ftp" | "posix" | "s3fs" | "azure" | "onedata" | "webdav" | "dropbox" | "googledrive" | "elabftw";
             /** Uri Root */
             uri_root: string;
             /**
