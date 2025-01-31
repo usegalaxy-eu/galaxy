@@ -33,6 +33,7 @@
         <collection name="user_generated" type="list" label="CellxGene user annotations and gene sets">
             <discover_datasets pattern="__name_and_ext__" directory="annotation_files/"/>
         </collection>
+
     </outputs>
     <tests>
     </tests>
@@ -46,6 +47,5 @@ How to use this tool:
 2. Click on the "Run tool" button.
 3. Wait for a few seconds for the tool to start.
 4. click on the eye icon to open the visualization in a new tab. (or alternatively, click on the "Interactive tools" bottom on the top left corner of the page and select the tool from the list)
-
 ]]></help>
 </tool>
