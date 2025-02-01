@@ -1,6 +1,6 @@
-<tool id="interactive_tool_cellxgene_mouse_sciatic_nerve" tool_type="interactive" name="Interactive Mouse Sciatic Nerve CellxGene Environment" version="0.0.1">
+<tool id="interactive_tool_cellxgene_mouse_sciatic_nerve" tool_type="interactive" name="Interactive Mouse Sciatic Nerve CellxGene Environment" version="1.1">
     <requirements>
-	    <container type="docker">quay.io/bgruening/cellxgene-mouse-sciatic-nerve:1.1.1-1</container>
+	    <container type="docker">quay.io/bgruening/cellxgene-mouse-sciatic-nerve:1.1.1-2</container>
     </requirements>
     <entry_points>
         <entry_point name="Mouse sciatic nerve $data dataset" requires_domain="True">
@@ -12,17 +12,17 @@
     </stdio>
     <command><![CDATA[
     #if $data == "complete":
-        cellxgene launch --host 0.0.0.0 --port 80  "/data/all_final_population.h5ad"   &&
+        cellxgene launch --host 0.0.0.0 --port 80  --title mouse_sciatic_nerve --user-generated-data-dir annotation_files "/data/all_final_population.h5ad"   &&
     #else if $data == "Adipocytes":
-        cellxgene launch --host 0.0.0.0 --port 80  "/data/adipo.h5ad"   &&
+        cellxgene launch --host 0.0.0.0 --port 80  --title mouse_sciatic_nerve_adipocytes --user-generated-data-dir annotation_files "/data/adipo.h5ad"   &&
     #else:
-        cellxgene launch --host 0.0.0.0 --port 80  "/data/macro.h5ad"   &&
+        cellxgene launch --host 0.0.0.0 --port 80  --title mouse_sciatic_nerve_macrophages --user-generated-data-dir annotation_files "/data/macro.h5ad"   &&
     #end if
-    echo -e "Visualising the mouse sciatic nerve single-cell RNAseq dataset.\nTitle: FGF signaling modulates a chondrocyte-like state of peripheral nerve fibroblast during aging.\nIf you are using this dataset please cite; Hortells L. et al (2025)\nThe h5ad files can be accessed from zenodo; 10.5281/zenodo.14743352" > result.txt
+    echo -e "Visualizing the mouse sciatic nerve single-cell RNAseq dataset.\nTitle: FGF signaling modulates a chondrocyte-like state of peripheral nerve fibroblast during aging.\nIf you are using this dataset please cite; Stefanovska D. et al (2025)\nThe h5ad files can be accessed from zenodo; 10.5281/zenodo.14743352" > result.txt
     ]]>
     </command>
     <inputs>
-        <param name="data" type="select" label="dataset" help="Please select the dataset to visualise">
+        <param name="data" type="select" label="dataset" help="Please select the dataset to visualize">
             <option value="complete">Complete dataset</option>
             <option value="Adipocytes">Adipocytes (2nd layer clustering)</option>
             <option value="Macrophages">Macrophages (2nd layer clustering)</option>
@@ -30,10 +30,22 @@
     </inputs>
     <outputs>
         <data name="out_file1" format="txt" from_work_dir="result.txt" />
+        <collection name="user_generated" type="list" label="CellxGene user annotations and gene sets">
+            <discover_datasets pattern="__name_and_ext__" directory="annotation_files/"/>
+        </collection>
+
     </outputs>
     <tests>
     </tests>
 <help><![CDATA[
-This tool provides an interactive environment to visualise single cell RNA-seq data from mouse sciatic nerve. The data is clustered into 2nd layer clusters, which can be visualised separately. The complete dataset can also be visualised. The tool provides a web interface to interact with the data.
+This tool provides an interactive environment to visualize single cell RNA-seq data from mouse sciatic nerve. The data is clustered into 2nd layer clusters, which can be visualized separately. The complete dataset can also be visualized. The tool provides a web interface to interact with the data.
+
+Title: FGF signaling modulates a chondrocyte-like state of peripheral nerve fibroblast during aging.
+
+How to use this tool:
+1. Select the dataset you want to visualize.
+2. Click on the "Run tool" button.
+3. Wait for a few seconds for the tool to start.
+4. click on the eye icon to open the visualization in a new tab. (or alternatively, click on the "Interactive tools" bottom on the top left corner of the page and select the tool from the list)
 ]]></help>
 </tool>
