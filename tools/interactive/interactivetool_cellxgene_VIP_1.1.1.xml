@@ -1,6 +1,6 @@
 <tool id="interactive_tool_cellxgene_vip" tool_type="interactive" name="Interactive CellXgene VIP Environment" version="1.1.1">
     <requirements>
-        <container type="docker">quay.io/bgruening/cellxgene-vip:1.0.0</container>
+        <container type="docker">quay.io/bgruening/cellxgene-vip:1.0.1</container>
     </requirements>
     <entry_points>
         <entry_point name="Cellxgene-VIP Single Cell Visualization on $infile.display_name" requires_domain="True">
@@ -101,9 +101,9 @@ Then cellxgene will allow searches by genes in that field.
 Selecting the layer
 -------------------
 
-It can happen that the AnnData object contains multiple layers, for example
+It can happen that the AnnData object contains multiple layers, for example,
 one with the raw counts and another with the normalized counts. You can select
-which layer to use as the matrix for cellxgene. By default cellxgene will use the X slot, but
+which layer to use as the matrix for cellxgene. By default, cellxgene will use the X slot, but
 that slot might not contain the matrix that you want to visualize.
 
 Outputs
