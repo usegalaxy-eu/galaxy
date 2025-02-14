@@ -128,7 +128,7 @@ class InvenioRDMFilesSource(RDMFilesSource):
         self._scheme_regex = re.compile(rf"^{self.get_scheme()}?://{self.id}|^{DEFAULT_SCHEME}://{self.id}")
 
     def get_scheme(self) -> str:
-        return "invenio"
+        return self.scheme if self.scheme and self.scheme != DEFAULT_SCHEME else "invenio"
 
     def score_url_match(self, url: str):
         if match := self._scheme_regex.match(url):
