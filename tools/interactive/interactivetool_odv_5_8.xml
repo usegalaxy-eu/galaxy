@@ -1,0 +1,133 @@
+<tool id="interactive_tool_odv" tool_type="interactive" name="ODV" version="@VERSION@">
+    <description>interactive plotting tool for geo-referenced data</description>
+    <macros>
+    <token name="@VERSION@">5.8.0</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/bgruening/odv-headless:v@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="ODV" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <!-- see: https://odv.awi.de/fileadmin/user_upload/odv/misc/odvGuide.pdf -->
+    <![CDATA[
+        export HOME=\$PWD &&
+        mkdir -p Documents/ODV/.temp/ &&
+        mkdir -p Documents/ODV/galaxy/outputs &&
+        mkdir -p Documents/ODV/galaxy/data &&
+        mkdir -p Documents/ODV/galaxy/views &&
+        chmod 777 Documents/ODV/ -R &&
+
+        #if $auto_launch.launch == 'no':
+            #if $method.type == 'own_data' :
+                #for $i, $infile in enumerate($method.infiles):
+                    #if $infile.ext == "netcdf":
+                        cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}_${i}.nc' &&
+                    #else:
+                        cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}' &&
+                    #end if
+                #end for  
+            #end if
+            #if $method.type == 'zip' :
+                #import re
+                
+                #set zip_file_path = $method.folder
+                #set source_folder_name = re.sub('[^\s\w\-]', '_', str($zip_file_path)) 
+            
+                unzip "$zip_file_path" -d './Documents/ODV/galaxy/data/$source_folder_name' &&
+            #end if
+            #if $views.view == 'yes':
+                #for $i, $load_view in enumerate($views.input_view):
+                    cp '$load_view' './Documents/ODV/galaxy/views/${infile.element_identifier}.xview' &&
+                #end for
+            #end if
+            /init ;
+
+        #else:
+            export  ODV_ARG1=-x &&
+            cp '$auto_launch.load_data' './Documents/ODV/galaxy/data/${auto_launch.load_data.element_identifier}' &&
+            echo "open_data_file \$(ls \$PWD/Documents/ODV/galaxy/data/*)" > \$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
+            export  ODV_ARG2=\$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
+
+            #if $views.view == 'yes':
+                #for $i, $infile in enumerate($views.input_view):
+                    cp '$infile' './Documents/ODV/galaxy/views/${infile.element_identifier}.xview' &&
+                #end for
+                echo "load_view \$(ls \$PWD/Documents/ODV/galaxy/views/*)" >> \$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
+            #end if
+            /init ODV_ARG1 ODV_ARG2;
+        #end if
+
+
+
+        mv ./Documents/ODV/galaxy/outputs/ ./output &&        
+        rm ./Documents -rf &&
+        cd ./output &&
+        sleep 2 &&
+        for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
+
+    ]]>
+    </command>
+    <inputs>
+        <conditional name="auto_launch">
+            <param name="launch" type="select" label="Do you want your data to be automatically load when ODV is launched ?">
+                <option value="no">No, I want to manage the launch myself</option>
+                <option value="yes">Yes, I want my data to be loaded directly</option>
+            </param>
+            <when value="no">
+                <conditional name="method">
+                    <param name="type" type="select" label="Select if you are using a ODV collection in a zip folder or if you have your own raw data">
+                        <option value="zip">The data you are using are a ODV collection in a zip folder</option>
+                        <option value="own_data">The data you are using are Netcdf or tabular text files</option>
+                    </param>
+                    <when value="own_data">
+                        <param name="infiles" type="data" format="netcdf,tabular,txt" multiple="true" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
+                    </when>
+                    <when value="zip">
+                        <param name="folder" type="data" format="zip" multiple="true" label="ODV collection in a zip folder." help="Must contain the specific folder structure with file.odv and folder.Data"/>
+                    </when>
+                </conditional>
+            </when>
+            <when value="yes">
+                <param name="load_data" type="data" format="netcdf,tabular,txt" label="Netcdf or tabular text file. For text file, odv format is recommanded."/>
+            </when>
+        </conditional>
+        <conditional name="views">
+            <param name="view" type="select" label="Do you have a view ?">
+                <option value="no">No, I don't have any view</option>
+                <option value="yes">Yes, I have my own view</option>
+            </param>
+            <when value="no">
+            </when>
+            <when value="yes">
+                <param name="input_view" type="data" format="xml" multiple="true" label="Data view for ODV"/>
+            </when>
+        </conditional>
+    </inputs>
+    <outputs>
+        <collection name="outputs_netcdf" type="list" label="ODV netcdf outputs">
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.nc" directory="./output" format="netcdf"/>
+        </collection>
+        <collection name="outputs_all" type="list" label="ODV all outputs">
+            <discover_datasets pattern="__designation_and_ext__" directory="./output"/>
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        `ODV <https://odv.awi.de/>`_ plots geo-referenced and other arrays from netCDF, HDF, GRIB, and other datasets. For now, Galaxy is supporting only netCDF and text files as odv text file as input.
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{,
+            title = {Ocean Data View},
+            author = {Schlitzer Reiner},
+            year = {2023},
+            note = {https://odv.awi.de}
+        </citation>
+    </citations>
+</tool>
