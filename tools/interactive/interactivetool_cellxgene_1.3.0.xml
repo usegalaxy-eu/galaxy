@@ -7,6 +7,13 @@
             <port>80</port>
         </entry_point>
     </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+    </environment_variables>
     <stdio>
         <regex match="WARNING" source="both" level="warning" description="cellxgene warnings"/>
     </stdio>
