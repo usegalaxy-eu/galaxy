@@ -1,6 +1,6 @@
-<tool id="interactive_tool_cellxgene" tool_type="interactive" name="Interactive CELLxGENE Environment" version="1.3.0-1">
+<tool id="interactive_tool_cellxgene" tool_type="interactive" name="Interactive CELLxGENE Environment" version="1.3.0-2">
     <requirements>
-        <container type="docker">quay.io/bgruening/cellxgene:1.3.0-1</container>
+        <container type="docker">quay.io/bgruening/cellxgene:1.3.0-2</container>
     </requirements>
     <entry_points>
         <entry_point name="CELLxGENE Single Cell Visualisation on $infile.display_name" requires_domain="True">
