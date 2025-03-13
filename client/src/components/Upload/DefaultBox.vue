@@ -452,9 +452,14 @@ defineExpose({
                 <FontAwesomeIcon icon="fa-laptop" />
                 <span v-localize>Choose local file</span>
             </BButton>
-            <BButton v-if="hasRemoteFiles" id="btn-remote-files" :disabled="!enableSources" @click="eventRemoteFiles">
-                <FontAwesomeIcon icon="fa-folder-open" />
-                <span v-localize>Choose remote files</span>
+            <BButton
+                v-if="hasRemoteFiles"
+                id="btn-remote-files"
+                :size="size"
+                :disabled="!enableSources"
+                @click="eventRemoteFiles">
+                <FontAwesomeIcon :icon="faFolderOpen" />
+                <span v-localize>Choose from repository</span>
             </BButton>
             <BButton id="btn-new" title="Paste/Fetch data" :disabled="!enableSources" @click="eventCreate">
                 <FontAwesomeIcon icon="fa-edit" />
