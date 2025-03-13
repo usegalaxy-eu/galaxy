@@ -36,11 +36,15 @@
                                 title="This may skip executing jobs that you have already run.">
                                 Attempt to re-use jobs with identical parameters?
                             </b-form-checkbox>
-                            <b-form-checkbox
+                            <BFormCheckbox
                                 v-if="isConfigLoaded && config.object_store_allows_id_selection"
                                 v-model="splitObjectStore">
-                                Send outputs and intermediate to different storage locations?
-                            </b-form-checkbox>
+                                Send outputs and intermediate to different Galaxy storage?
+                            </BFormCheckbox>
+                            <!-- Options to default one way or the other, disable if admins want, etc.. -->
+                            <BFormCheckbox class="workflow-expand-form-link" @change="emit('showAdvanced')">
+                                Expand to full workflow form.
+                            </BFormCheckbox>
                             <WorkflowStorageConfiguration
                                 v-if="isConfigLoaded && config.object_store_allows_id_selection"
                                 :split-object-store="splitObjectStore"
