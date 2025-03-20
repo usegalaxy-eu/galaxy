@@ -23,24 +23,18 @@
     cp '$config.config_json' /app/wwwroot/config.json &&
 #elif $config.config_select == 'fairease':
     cp '$__tool_directory__/fairease_config.json' /app/wwwroot/config.json &&
-#else:
-    ## No config, will be the container default config
 #end if
 
 #if $catalog.cotalog_select == 'own':
     cp '$catalog.catalog_json' /app/wwwroot/init/simple.json &&
 #elif $catalog.cotalog_select == 'fairease':
     cp '$__tool_directory__/fairease_simple.json' /app/wwwroot/init/simple.json &&
-#else
-    ## No catalog, will be the container default catalog
 #end if
 
 #if $serverconfig.serverconfig_select == 'own':
     cp '$serverconfig.serverconfig_json' /app/serverconfig.json &&
 #elif $serverconfig.serverconfig_select == 'fairease':
     cp '$__tool_directory__/fairease_serverconfig.json' /app/serverconfig.json &&
-#else
-    ## No serverconfig, will be the container default serverconfig
 #end if
 
 cd /app/ &&
