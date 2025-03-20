@@ -1,6 +1,6 @@
 {
   /* Names of init files (in wwwroot/init), without the .json extension, to load by default */
-  "initializationUrls": ["fairease-main"],
+  "initializationUrls": ["simple"],
   "parameters": {
     "googleUrlShortenerKey": null,
     "googleAnalyticsKey": null,
@@ -43,11 +43,6 @@
     // This is used in various text messages. You should also set <title> in index.html
     "appName": "FAIREASE Hackathon - Terria Map",
     // See comments in lib/Views/global.scss for further information about customising colors, logos, fonts etc.
-    "brandBarElements": [
-      "",
-      "<a target=\"_blank\" href=\"https://www.fairease.eu/\"><img src=\"fairease.eu/img/fairease_logo.svg\" height=\"52\" title=\"Version: {{version}}\" /></a>",
-      ""
-    ],
     // Shown when things go wrong.
     "supportEmail": "help@example.com",
     // You probably shouldn't change this.
