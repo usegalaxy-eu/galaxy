@@ -1,0 +1,105 @@
+<tool id="interactive_tool_terriamap" tool_type="interactive" name="Terriamap" version="@VERSION@">
+    <description/>
+    <macros>
+        <token name="@VERSION@">0.3.0</token>
+    </macros>
+    <requirements>
+        <container type="docker">ghcr.io/terriajs/terriamap:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Terria Map" requires_domain="True">
+            <port>3001</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+
+## FAIR-EASE data are from
+## https://github.com/fair-ease/terria-config/blob/main/serverconfig.json
+## https://github.com/fair-ease/terria-config/blob/main/wwwroot/init/fairease-main.json
+## https://github.com/fair-ease/terria-config/blob/main/wwwroot/config.json
+
+#if  $config.config_select == 'own':
+    cp '$config.config_json' /app/wwwroot/config.json &&
+#elif $config.config_select == 'fairease':
+    cp '$__tool_directory__/fairease_config.json' /app/wwwroot/config.json &&
+#else:
+    ## No config, will be the container default config
+#end if
+
+#if $catalog.cotalog_select == 'own':
+    cp '$catalog.catalog_json' /app/wwwroot/init/simple.json &&
+#elif $catalog.cotalog_select == 'fairease':
+    cp '$__tool_directory__/fairease_simple.json' /app/wwwroot/init/simple.json &&
+#else
+    ## No catalog, will be the container default catalog
+#end if
+
+#if $serverconfig.serverconfig_select == 'own':
+    cp '$serverconfig.serverconfig_json' /app/serverconfig.json &&
+#elif $serverconfig.serverconfig_select == 'fairease':
+    cp '$__tool_directory__/fairease_serverconfig.json' /app/serverconfig.json &&
+#else
+    ## No serverconfig, will be the container default serverconfig
+#end if
+
+cd /app/ &&
+node ./node_modules/terriajs-server/lib/app.js --config-file serverconfig.json
+
+    ]]>
+    </command>
+    <inputs>
+        <conditional name="config">
+            <param name="config_select" type="select" label="Choose a Terriamap config file">
+                <option value="default" selected="true">default empty configuration</option>
+                <option value="fairease">FAIR-EASE configuration</option>
+                <option value="own">Provide your own configuration file</option>
+            </param>
+            <when value="fairease"/>
+            <when value="default"/>
+            <when value="own">
+                <param name="config_json" type="data" format="json" label="Terriamap config file in JSON."/>
+            </when>
+        </conditional>
+
+        <conditional name="catalog">
+            <param name="cotalog_select" type="select" label="Choose a Terriamap catalog file">
+                <option value="default" selected="true">default empty configuration</option>
+                <option value="fairease">FAIR-EASE configuration</option>
+                <option value="own">Provide your own configuration file</option>
+            </param>
+            <when value="fairease"/>
+            <when value="default"/>
+            <when value="own">
+                <param name="catalog_json" type="data" format="json" label="List of Cataloges"/>
+            </when>
+        </conditional>
+
+        <conditional name="serverconfig">
+            <param name="serverconfig_select" type="select" label="Choose a Terriamap serverconfig file" help="It will only work if you use 3001 as port">
+                <option value="default" selected="true">default empty configuration</option>
+                <option value="fairease">FAIR-EASE configuration</option>
+                <option value="own">Provide your own configuration file</option>
+            </param>
+            <when value="fairease"/>
+            <when value="default"/>
+            <when value="own">
+                <param name="serverconfig_json" type="data" format="json" label="Server config file in"/>
+            </when>
+        </conditional>
+
+    </inputs>
+    <outputs>
+        <data name="outfile" format="txt" />
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        Terria makes it easy to build advanced maps and digital twins, so you can see the bigger picture.
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+        </citation>
+    </citations>
+</tool>
