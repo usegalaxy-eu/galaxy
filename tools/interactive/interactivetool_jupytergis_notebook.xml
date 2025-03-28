@@ -1,6 +1,6 @@
 <tool id="interactive_tool_jupytergis_notebook" tool_type="interactive" name="Interactive JupyterGIS Notebook" version="0.1" profile="23.01">
     <requirements>
-        <container type="docker">quay.io/annefou/docker-jupytergis-notebook:0.1.7.5</container>
+        <container type="docker">quay.io/annefou/docker-jupytergis-notebook:0.4.2</container>
     </requirements>
     <entry_points>
        <!-- needs to be requires_domain="True" because the GIX extension creates URL like:
@@ -14,7 +14,6 @@
         <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
         <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
         <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
-        <environment_variable name="API_KEY" inject="api_key"/>
         <environment_variable name="EP_PATH" inject="entry_point_path_for_label">jupytergis</environment_variable>
     </environment_variables>
     <configfiles>
