@@ -1,0 +1,29 @@
+- id: b2drop_by_eudat
+  version: 0
+  name: B2DROP by EUDAT
+  description: |
+    B2DROP is a Nextcloud to sync and share your research data provided by EUDAT.
+  variables:
+    username:
+      label: Username / Account Name
+      type: string
+      help: |
+        The username or account name to use to connect to B2DROP. This is not your email address but the name show in the URL of your profile page.
+        Depending on your authentification method, it can also be your B2Access Identifier (e.g. c3d452hz-4spd-5gre-hg67-fc86je3936854)
+    writable:
+      label: Writable?
+      type: boolean
+      default: false
+      help: Allow Galaxy to write data to B2DROP.
+  secrets:
+    password:
+      label: Password
+      help: |
+        The password to use to connect to B2DROP.
+  configuration:
+    type: webdav
+    url: 'https://b2drop.eudat.eu'
+    root: '/remote.php/dav/files/{{ variables.username }}'
+    login: '{{ variables.username }}'
+    writable: '{{ variables.writable }}'
+    password: '{{ secrets.password }}'
