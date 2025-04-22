@@ -39,6 +39,7 @@
     <help><![CDATA[
         QGIS is a professional GIS application that is built on top of and proud to be itself Free and Open Source Software (FOSS). 
         Create, edit, visualise, analyse and publish geospatial information. For more user information https://docs.qgis.org/3.34/en/docs/user_manual/
+        To open your input in QGIS, open a new file. You are automatically directed to a folder called `galaxy`. Double click on the folder called `data`. In this folder, go to the bottom of the file-picker window. For `Files of type:` select `All files` in the dropdown menu. Then should be able now to see all your files, independent of the file-extension. Now you can select the file and open it. 
     ]]>
     </help>
     <citations>
