@@ -1,6 +1,6 @@
 <tool id="interactive_tool_jupyter_notebook" tool_type="interactive" name="Interactive JupyterLab Notebook" version="1.0.2" profile="23.0">
     <requirements>
-        <container type="docker">quay.io/bgruening/docker-jupyter-notebook:25.04</container>
+        <container type="docker">quay.io/galaxy/docker-jupyter-notebook:25.04</container>
     </requirements>
     <required_files>
         <include path="default_notebook.ipynb"/>
