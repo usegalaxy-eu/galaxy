@@ -1,7 +1,7 @@
 <tool id="interactive_tool_phyloseq" tool_type="interactive" name="Phyloseq" version="1.0.0" profile="23.1">
     <description>Explore microbiome profiles</description>
     <requirements>
-        <container type="docker">quay.io/paulzierep/shinyphyloseq:0.1</container>
+        <container type="docker">quay.io/paulzierep/shinyphyloseq:0.2</container>
     </requirements>
     <entry_points>
         <entry_point name="Phyloseq" requires_domain="True">
@@ -9,6 +9,16 @@
             <port>3838</port>
         </entry_point>
     </entry_points>
+    <!-- get environment variables needed for the put / get function -->
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="DEBUG">TRUE</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key"/>
+    </environment_variables>
+
     <command><![CDATA[
     mkdir -p ./shiny_input ./shiny_output &&
 
@@ -22,8 +32,8 @@
     ]]>
     </command>
     <inputs>
-        <param name="input" type="data" format="phyloseq" label="Phyloseq R object"
-            help="A phyloseq object stored as RDS file. If only a RData object is available the phyloseq object needs to be extracted first."/>
+        <param name="input" type="data" format="phyloseq" label="Phyloseq R object" optional="true"
+        help="A phyloseq object stored as RDS file. If only a RData object is available the phyloseq object needs to be extracted first."/>
     </inputs>
     <outputs>
         <collection name="output_collection" type="list" label="RData collection">
