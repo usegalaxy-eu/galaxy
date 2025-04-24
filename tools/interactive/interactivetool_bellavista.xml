@@ -4,7 +4,7 @@
         <token name="@VERSION@">0.0.2</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/bgruening/bellavista:0.0.2:0</container>
+        <container type="docker">quay.io/bgruening/bellavista:0.0.2-0</container>
     </requirements>
     <entry_points>
         <entry_point name="BellaVista" requires_domain="True">
@@ -12,10 +12,74 @@
         </entry_point>
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
-
+        cat $bellavista_config_file
+        bellavista $bellavista_config_file
     ]]></command>
-    <inputs>
+    <configfiles>
+        <configfile name="bellavista_config_file"><![CDATA[
+            {
+                "system": "$technology",
+                "data_folder": "/.",
+                "create_bellavista_inputs": true,
 
+                "visualization_parameters": {
+                    "plot_image": true,
+                    "plot_transcripts": true,
+                    "plot_cell_seg": true
+                    "genes_visible_on_startup": false,
+                    #if $plot_all_genes.all_genes == "Yes"
+                    "plot_allgenes": true,
+                    #else
+                    "plot_allgenes": false,
+                    #set $gene_list = ['"' + str(x.strip()) + '"' for x in str($plot_all_genes.selected_genes).split(',')]
+                    #set $genes = ','.join($gene_list)
+                    "selected_genes": $genes,
+                    #end if
+                    "rotate_angle": $rotate_angle,
+                    "transcript_point_size": $transcript_point_size,
+                },
+
+                "input_files": {
+                    "transcript_filename": "$transcript_filename",
+                    "images": "$images",
+                    "z_plane": $z_plane,
+                    #if $cell_segmentation:
+                    "cell_segmentation": "$cell_segmentation",
+                    #end if
+                    #if $nuclear_segmentation:
+                    "nuclear_segmentation": "$nuclear_segmentation",
+                    #end if
+                    #if $um_to_px_transform:
+                    "um_to_px_transform": "$um_to_px_transform",
+                    #end if
+                }
+            }
+
+        ]]></configfile>
+    </configfiles>
+    <inputs>
+        <param name="technology" type="select" label="Spatial transcriptomic technology">
+            <option value="Xenium">Xenium</option>
+            <option value="MERSCOPE">MERSCOPE</option>
+        </param>
+            <param name="transcript_filename" type="data" format="csv,parquet" optional="false" label="Transcript filename"/>
+            <param name="images" type="data" format="tiff,ome.tiff" multiple="true" optional="false" label="Images"/>
+            <param name="z_plane" type="integer" min="0" value="0" label="z-plane of image to be visualize"/>
+            <param name="cell_segmentation" type="data" format="parquet,zarr" optional="true" label="Cell segmentations"/>
+            <param name="nuclear_segmentation" type="data" format="parquet,zarr" optional="true" label="Nuclear segmentations"/>
+            <param name="um_to_px_transform" type="data" format="csv" optional="true" label="micron to pixel transformations"/>
+        <conditional name="plot_all_genes">
+            <param name="all_genes" type="select" label="Plot all genes?">
+                <option value="Yes" selected="true">Yes</option>
+                <option value="No">No</option>
+            </param>
+            <when value="Yes"/>
+            <when value="No">
+                <param name="selected_genes" type="data" format="tabular" label="Gene list" optional="false" help="One gene per line"/>
+            </when>
+        </conditional>
+        <param name="transcript_point_size" type="integer" min="0" value="1" label="Size of the points representing individual transcripts"/>
+        <param name="rotate_angle" type="integer" min="-180" max="180" value="0" label="Image rotation angle in degrees"/>
     </inputs>
     
     <outputs>
