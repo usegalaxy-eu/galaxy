@@ -14,7 +14,7 @@
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
         mkdir "input/" &&
-        ln -s '$transcript_filename' "input/${transcriptelement_identifier_filename.}.${transcript_filename.ext}" &&
+        ln -s '$transcript_filename' "input/${transcriptelement_identifier_filename}.${transcript_filename.ext}" &&
         ln -s '$images' "input/${images.element_identifier}.${images.ext}" &&
         ln -s '$bellavista_config_file' "input/config.json" &&
         #if $cell_segmentation:
