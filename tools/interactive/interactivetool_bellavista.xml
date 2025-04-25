@@ -1,11 +1,11 @@
-<tool id="interactive_tool_bellavista" tool_type="interactive" name="BellaVista Interactive" version="@VERSION@+galaxy0" profile="23.1">
+<tool id="interactive_tool_bellavista" tool_type="interactive" name="BellaVista Interactive" version="@VERSION@+galaxy1" profile="23.1">
     <description>Visualization for Imaging-Based Spatial Transcriptomics</description>
     <icon src="bellavista.png"/>
     <macros>
         <token name="@VERSION@">0.0.2</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/bgruening/bellavista:0.0.2-0</container>
+        <container type="docker">quay.io/bgruening/bellavista:0.0.2-2</container>
     </requirements>
     <entry_points>
         <entry_point name="BellaVista" requires_domain="True">
