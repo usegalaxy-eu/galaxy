@@ -180,5 +180,13 @@
     </tests>
     <help><![CDATA[
     
-    ]]></help>
+    ]]>
+    </help>
+    <citations>
+        <citation type="doi">10.1016/j.bpj.2024.11.3199</citation>
+        <citation type="bibtex">@Manual{github,
+            title = {Open-source Visualization for Imaging-Based Spatial Transcriptomics},
+            url = {https://github.com/pkosurilab/BellaVista}}
+        </citation>
+    </citations>
 </tool>
