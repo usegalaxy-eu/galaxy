@@ -89,7 +89,13 @@
             </param>
             <when value="Yes"/>
             <when value="No">
-                <param name="selected_genes" type="data" format="tabular" label="Gene list" optional="false" help="One gene per line"/>
+                <param name="selected_genes" type="text" optional="false" value="" label="Comma separated list of custom genes">
+                    <sanitizer>
+                        <valid initial="string.printable">
+                            <remove value="&apos;"/>
+                        </valid>
+                   </sanitizer>
+                </param>
             </when>
         </conditional>
         <param name="transcript_point_size" type="integer" min="0" value="1" label="Size of the points representing individual transcripts"/>
