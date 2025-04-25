@@ -179,7 +179,13 @@
     <tests>
     </tests>
     <help><![CDATA[
-    
+BellaVista is an open-source visualization tool for imaging-based spatial transcriptomics data. It allows users to visualize and explore spatial transcriptomics data in a user-friendly interface. The tool supports MERSCOPE and Xenium imaging-based spatial transcriptomics technologies.
+
+Users can customize the visualization by selecting specific genes, adjusting image rotation angles, and controlling the size of transcript points. BellaVista also provides options for plotting cell and nuclear segmentation, enhancing the exploration of spatial transcriptomics data.
+
+.. image:: https://raw.githubusercontent.com/pkosurilab/BellaVista/c8129bb8954c92962a87606595c09b35cc414295/images/bellavista_figure.png
+    :height: 500
+    :width: 700
     ]]>
     </help>
     <citations>
