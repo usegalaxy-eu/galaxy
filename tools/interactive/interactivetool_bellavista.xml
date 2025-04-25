@@ -14,17 +14,17 @@
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
         mkdir "input/" &&
-        ln -s '$transcript_filename' "input/" &&
-        ln -s '$images' "input/" &&
+        ln -s '$transcript_filename' "input/${transcriptelement_identifier_filename.}.${transcript_filename.ext}" &&
+        ln -s '$images' "input/${images.element_identifier}.${images.ext}" &&
         ln -s '$bellavista_config_file' "input/config.json" &&
         #if $cell_segmentation:
-        ln -s '$cell_segmentation' "input/" &&
+        ln -s '$cell_segmentation' "input/${cell_segmentation.element_identifier}.${cell_segmentation.ext}" &&
         #end if
         #if $nuclear_segmentation:
-        ln -s '$nuclear_segmentation' "input/" &&
+        ln -s '$nuclear_segmentation' "input/${nuclear_segmentation.element_identifier}.${nuclear_segmentation.ext}" &&
         #end if
         #if $um_to_px_transform:
-        ln -s '$um_to_px_transform' "input/" &&
+        ln -s '$um_to_px_transform' "input/micron_to_mosaic_pixel_transform.csv" &&
         #end if
         cat "input/config.json" &&
         /init
@@ -54,18 +54,18 @@
                 },
 
                 "input_files": {
-                    "images": "$images",
+                    "images": "${images.element_identifier}.${images.ext}",
                     "z_plane": $z_plane,
                     #if $cell_segmentation:
-                    "cell_segmentation": "$cell_segmentation",
+                    "cell_segmentation": "${cell_segmentation.element_identifier}.${cell_segmentation.ext}",
                     #end if
                     #if $nuclear_segmentation:
-                    "nuclear_segmentation": "$nuclear_segmentation",
+                    "nuclear_segmentation": "${nuclear_segmentation.element_identifier}.${nuclear_segmentation.ext}",
                     #end if
                     #if $um_to_px_transform:
-                    "um_to_px_transform": "$um_to_px_transform",
+                    "um_to_px_transform": "micron_to_mosaic_pixel_transform.csv",
                     #end if
-                    "transcript_filename": "$transcript_filename"
+                    "transcript_filename": "${transcriptelement_identifier_filename.}.${transcript_filename.ext}"
                 }
             }
 
