@@ -13,8 +13,21 @@
         </entry_point>
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
-        cat $bellavista_config_file &&
-        bash -c "bellavista $bellavista_config_file"
+        mkdir "input/" &&
+        mv $transcript_filename "input/" &&
+        mv $images "input/" &&
+        mv $bellavista_config_file "input/config.json" &&
+        #if $cell_segmentation:
+        mv $cell_segmentation "input/" &&
+        #end if
+        #if $nuclear_segmentation:
+        mv $nuclear_segmentation "input/" &&
+        #end if
+        #if $um_to_px_transform:
+        mv $um_to_px_transform "input/" &&
+        #end if
+        cat "input/config.json" &&
+        /init
     ]]></command>
     <configfiles>
         <configfile name="bellavista_config_file"><![CDATA[
