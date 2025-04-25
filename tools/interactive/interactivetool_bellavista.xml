@@ -1,4 +1,4 @@
-<tool id="interactive_tool_bellavista" tool_type="interactive" name="BellaVista Interactive" version="@VERSION@+galaxy1" profile="23.1">
+<tool id="interactive_tool_bellavista" tool_type="interactive" name="BellaVista Interactive" version="@VERSION@" profile="23.1">
     <description>Visualization for Imaging-Based Spatial Transcriptomics</description>
     <icon src="bellavista.png"/>
     <creator>
