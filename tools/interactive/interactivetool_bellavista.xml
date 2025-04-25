@@ -1,6 +1,12 @@
 <tool id="interactive_tool_bellavista" tool_type="interactive" name="BellaVista Interactive" version="@VERSION@+galaxy1" profile="23.1">
     <description>Visualization for Imaging-Based Spatial Transcriptomics</description>
     <icon src="bellavista.png"/>
+    <creator>
+        <organization name="European Galaxy Team" url="https://galaxyproject.org/eu/" />
+        <person givenName="Amirhossein" familyName="Naghsh Nilchi" email="nilchia@informatik.uni-freiburg.de" />
+        <person givenName="Pavan" familyName="Videm" email="videmp@informatik.uni-freiburg.de" />
+        <person givenName="Björn" familyName="Grüning" email="gruening@informatik.uni-freiburg.de" />
+    </creator>
     <macros>
         <token name="@VERSION@">0.0.2</token>
     </macros>
