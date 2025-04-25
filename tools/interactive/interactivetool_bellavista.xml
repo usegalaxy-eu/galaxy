@@ -5,7 +5,7 @@
         <token name="@VERSION@">0.0.2</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/bgruening/bellavista:0.0.2-2</container>
+        <container type="docker">quay.io/bgruening/bellavista:0.0.2-3</container>
     </requirements>
     <entry_points>
         <entry_point name="BellaVista" requires_domain="True">
@@ -13,7 +13,9 @@
         </entry_point>
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
-        mkdir input &&
+        export BELLAVISTA_DIR=`pwd`/input/ &&
+        mkdir 'input' 'input/BellaVista_output' &&
+        chmod -R 777 'input/' &&
         ln -s '$transcript_filename' './input/${transcript_filename.element_identifier}.${transcript_filename.ext}' &&
         ln -s '$images' 'input/${images.element_identifier}.${images.ext}' &&
         ln -s '$bellavista_config_file' './input/config.json' &&
