@@ -14,17 +14,17 @@
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
         mkdir "input/" &&
-        mv $transcript_filename "input/" &&
-        mv $images "input/" &&
-        mv $bellavista_config_file "input/config.json" &&
+        ln -s '$transcript_filename' "input/" &&
+        ln -s '$images' "input/" &&
+        ln -s '$bellavista_config_file' "input/config.json" &&
         #if $cell_segmentation:
-        mv $cell_segmentation "input/" &&
+        ln -s '$cell_segmentation' "input/" &&
         #end if
         #if $nuclear_segmentation:
-        mv $nuclear_segmentation "input/" &&
+        ln -s '$nuclear_segmentation' "input/" &&
         #end if
         #if $um_to_px_transform:
-        mv $um_to_px_transform "input/" &&
+        ln -s '$um_to_px_transform' "input/" &&
         #end if
         cat "input/config.json" &&
         /init
