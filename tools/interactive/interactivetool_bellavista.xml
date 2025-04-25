@@ -65,7 +65,7 @@
                     #if $um_to_px_transform:
                     "um_to_px_transform": "micron_to_mosaic_pixel_transform.csv",
                     #end if
-                    "transcript_filename": "${transcriptelement_identifier_filename.}.${transcript_filename.ext}"
+                    "transcript_filename": "${transcript_filename.element_identifier}.${transcript_filename.ext}"
                 }
             }
 
