@@ -23,7 +23,9 @@
         mkdir 'input' 'input/BellaVista_output' &&
         chmod -R 777 'input/' &&
         ln -s '$transcript_filename' './input/${transcript_filename.element_identifier}.${transcript_filename.ext}' &&
-        ln -s '$images' 'input/${images.element_identifier}.${images.ext}' &&
+        #for $image in $images:
+            ln -s '$image' 'input/${image.element_identifier}.${image.ext}' &&
+        #end for
         ln -s '$bellavista_config_file' './input/config.json' &&
         #if $cell_segmentation:
             ln -s '$cell_segmentation' './input/${cell_segmentation.element_identifier}.${cell_segmentation.ext}' &&
@@ -62,7 +64,12 @@
                 },
 
                 "input_files": {
-                    "images": "${images.element_identifier}.${images.ext}",
+                    #set $last_index = len($images) - 1
+                    "images": [
+                    #for $i in range(len($images)):
+                        "$images[$i].element_identifier.$images[$i].ext"#if $i != $last_index#,#end if
+                    #end for
+                    ],
                     "z_plane": $z_plane,
                     #if $cell_segmentation:
                     "cell_segmentation": "${cell_segmentation.element_identifier}.${cell_segmentation.ext}",
@@ -85,7 +92,7 @@
             <option value="MERSCOPE">MERSCOPE</option>
         </param>
             <param name="transcript_filename" type="data" format="csv,parquet" optional="false" label="Transcript filename"/>
-            <param name="images" type="data" format="tiff,ome.tiff" multiple="false" optional="false" label="Images"/>
+            <param name="images" type="data" format="tiff,ome.tiff" multiple="true" optional="false" label="Images"/>
             <param name="z_plane" type="integer" min="0" value="0" label="z-plane of image to be visualize"/>
             <param name="cell_segmentation" type="data" format="parquet,zarr" optional="true" label="Cell segmentations"/>
             <param name="nuclear_segmentation" type="data" format="parquet,zarr" optional="true" label="Nuclear segmentations"/>
