@@ -14,9 +14,9 @@
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
         mkdir input &&
-        ln -s '$transcript_filename' './input/${transcriptelement_identifier_filename}.${transcript_filename.ext}' &&
+        ln -s '$transcript_filename' './input/${transcript_filename.element_identifier}.${transcript_filename.ext}' &&
         ln -s '$images' 'input/${images.element_identifier}.${images.ext}' &&
-        ln -s '$bellavista_config_file' ./input/config.json &&
+        ln -s '$bellavista_config_file' './input/config.json' &&
         #if $cell_segmentation:
             ln -s '$cell_segmentation' './input/${cell_segmentation.element_identifier}.${cell_segmentation.ext}' &&
         #end if
@@ -77,7 +77,7 @@
             <option value="MERSCOPE">MERSCOPE</option>
         </param>
             <param name="transcript_filename" type="data" format="csv,parquet" optional="false" label="Transcript filename"/>
-            <param name="images" type="data" format="tiff,ome.tiff" multiple="true" optional="false" label="Images"/>
+            <param name="images" type="data" format="tiff,ome.tiff" multiple="false" optional="false" label="Images"/>
             <param name="z_plane" type="integer" min="0" value="0" label="z-plane of image to be visualize"/>
             <param name="cell_segmentation" type="data" format="parquet,zarr" optional="true" label="Cell segmentations"/>
             <param name="nuclear_segmentation" type="data" format="parquet,zarr" optional="true" label="Nuclear segmentations"/>
