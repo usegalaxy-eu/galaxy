@@ -1,10 +1,10 @@
 <tool id="interactive_tool_cellprofiler" tool_type="interactive" name="Run CellProfiler" version="@VERSION@+galaxy0" profile="23.1">
 	<description>interactive tool</description>
     <macros>
-        <token name="@VERSION@">4.2.6</token>
+        <token name="@VERSION@">4.2.8</token>
     </macros>
     <requirements>
-	    <container type="docker">quay.io/sunyi000/cellprofiler-galaxy:v4.2.6</container>
+	    <container type="docker">quay.io/sunyi000/cellprofiler-galaxy:v4.2.8</container>
     </requirements>
     <entry_points>
         <entry_point name="Cellprofiler" requires_domain="True">
