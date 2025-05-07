@@ -19,6 +19,13 @@
             ln -s "$img" "./home/input_images/${img.element_identifier}" &&
          #end for
 
+         #if $classes:
+             mkdir -p ./home/input_classes &&
+             #for $i,$cls in enumerate($classes):
+                 ln -s "$cls" "./home/input_classes/${cls.element_identifier}" &&
+             #end for
+         #end if
+
          #if $annotations:
              mkdir -p ./home/input_annotations &&
              #for $i,$ann in enumerate($annotations):
