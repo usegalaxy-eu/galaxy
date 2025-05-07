@@ -34,7 +34,7 @@
                                </sanitizer>
                             </param>
                         </when>
-                    </conditional>            
+                    </conditional>
                 </when>
             </conditional>
             <conditional name="plot_cell_segmentation">
@@ -73,29 +73,36 @@
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
         export BELLAVISTA_DIR=`pwd`/input/ &&
-        mkdir 'input' 'input/BellaVista_output' &&
-        chmod -R 777 'input/' &&
-        #if $technology_conditional.plot_genes.plot_transcripts == "true":
-            ln -s '$technology_conditional.plot_genes.transcript_filename' './input/${technology_conditional.plot_genes.transcript_filename.element_identifier}.${technology_conditional.plot_genes.transcript_filename.ext}' &&
-        #end if
-        #for $image in $technology_conditional.images:
-            ln -s '$image' 'input/${image.element_identifier}.${image.ext}' &&
-        #end for
-        ln -s '$bellavista_config_file' './input/config.json' &&
-        #if $technology_conditional.plot_cell_segmentation.plot_cell_seg == "true":
-            ln -s '$technology_conditional.plot_cell_segmentation.cell_segmentation' './input/${technology_conditional.plot_cell_segmentation.cell_segmentation.element_identifier}.${technology_conditional.plot_cell_segmentation.cell_segmentation.ext}' &&
-        #end if
-        #if $technology_conditional.plot_nuclear_segmentation.plot_nuclear_seg == "true":
-            ln -s '$technology_conditional.plot_nuclear_segmentation.nuclear_segmentation' './input/${technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.element_identifier}.${technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.ext}' &&
-        #end if
-        #if $technology_conditional.technology == "MERSCOPE":
-            ln -s '$technology_conditional.um_to_px_transform' ./input/micron_to_mosaic_pixel_transform.csv &&
+        #if $bellavista_conditional.tar_input == "Yes":
+            tar -xzf '$bellavista_conditional.bellavista_tar' &&
+            chmod -R 777 'input/' &&
+            cp './input/config_orig.json' './input/config.json' &&
+        #else if $bellavista_conditional.tar_input == "No":
+            mkdir 'input' 'input/BellaVista_output' &&
+            chmod -R 777 'input/' &&
+            #if $bellavista_conditional.technology_conditional.plot_genes.plot_transcripts == "true":
+                ln -s '$bellavista_conditional.technology_conditional.plot_genes.transcript_filename' './input/${bellavista_conditional.technology_conditional.plot_genes.transcript_filename.element_identifier}.${technology_conditional.plot_genes.transcript_filename.ext}' &&
+            #end if
+            #for $image in $bellavista_conditional.technology_conditional.images:
+                ln -s '$image' 'input/${image.element_identifier}.${image.ext}' &&
+            #end for
+            ln -s '$bellavista_config_file' './input/config.json' &&
+            #if $bellavista_conditional.technology_conditional.plot_cell_segmentation.plot_cell_seg == "true":
+                ln -s '$bellavista_conditional.technology_conditional.plot_cell_segmentation.cell_segmentation' './input/${bellavista_conditional.technology_conditional.plot_cell_segmentation.cell_segmentation.element_identifier}.${technology_conditional.plot_cell_segmentation.cell_segmentation.ext}' &&
+            #end if
+            #if $bellavista_conditional.technology_conditional.plot_nuclear_segmentation.plot_nuclear_seg == "true":
+                ln -s '$bellavista_conditional.technology_conditional.plot_nuclear_segmentation.nuclear_segmentation' './input/${bellavista_conditional.technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.element_identifier}.${technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.ext}' &&
+            #end if
+            #if $bellavista_conditional.technology_conditional.technology == "MERSCOPE":
+                ln -s '$bellavista_conditional.technology_conditional.um_to_px_transform' './input/micron_to_mosaic_pixel_transform.csv' &&
+            #end if
         #end if
         cat ./input/config.json &&
         /init
     ]]></command>
     <configfiles>
         <configfile name="bellavista_config_file"><![CDATA[
+            #if $bellavista_conditional.tar_input == "No":
             {
                 "system": "$technology",
                 "data_folder": "./",
@@ -103,27 +110,27 @@
 
                 "visualization_parameters": {
                     "plot_image": true,
-                    #if $technology_conditional.plot_genes.plot_transcripts == "true":
+                    #if $bellavista_conditional.technology_conditional.plot_genes.plot_transcripts == "true":
                     "plot_transcripts": true,
                     #else
                     "plot_transcripts": false,
                     #end if
-                    #if $technology_conditional.plot_cell_segmentation.plot_cell_seg == "true":
+                    #if $bellavista_conditional.technology_conditional.plot_cell_segmentation.plot_cell_seg == "true":
                     "plot_cell_seg": true,
                     #else
                     "plot_cell_seg": false,
                     #end if
-                    #if $technology_conditional.plot_nuclear_segmentation.plot_nuclear_seg == "true":
+                    #if $bellavista_conditional.technology_conditional.plot_nuclear_segmentation.plot_nuclear_seg == "true":
                     "plot_nuclear_seg": true,
                     #else
                     "plot_nuclear_seg": false,
                     #end if
                     "genes_visible_on_startup": false,
-                    #if $technology_conditional.plot_genes.plot_all_genes.all_genes == "Yes":
+                    #if $bellavista_conditional.technology_conditional.plot_genes.plot_all_genes.all_genes == "Yes":
                     "plot_allgenes": true,
                     #else
                     "plot_allgenes": false,
-                    #set $gene_list = ['"' + str(x.strip()) + '"' for x in str($technology_conditional.plot_genes.plot_all_genes.selected_genes).split(',')]
+                    #set $gene_list = ['"' + str(x.strip()) + '"' for x in str($bellavista_conditional.technology_conditional.plot_genes.plot_all_genes.selected_genes).split(',')]
                     #set $genes = ','.join($gene_list)
                     "selected_genes": $genes,
                     #end if
@@ -132,43 +139,54 @@
                 },
 
                 "input_files": {
-                    #set $last_index = len($technology_conditional.images) - 1
+                    #set $last_index = len($bellavista_conditional.technology_conditional.images) - 1
                     "images": [
                     #for $i in range(len($images)):
                         "$images[$i].element_identifier.$images[$i].ext"#if $i != $last_index#,#end if
                     #end for
                     ],
-                    #if $technology_conditional.plot_cell_segmentation.plot_cell_seg == "true":
-                    "cell_segmentation": "${technology_conditional.plot_cell_segmentation.cell_segmentation.element_identifier}.${technology_conditional.plot_cell_segmentation.cell_segmentation.ext}",
+                    #if $bellavista_conditional.technology_conditional.plot_cell_segmentation.plot_cell_seg == "true":
+                    "cell_segmentation": "${bellavista_conditional.technology_conditional.plot_cell_segmentation.cell_segmentation.element_identifier}.${bellavista_conditional.technology_conditional.plot_cell_segmentation.cell_segmentation.ext}",
                     #end if
-                    #if $technology_conditional.plot_nuclear_segmentation.plot_nuclear_seg == "true":
-                    "nuclear_segmentation": "${technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.element_identifier}.${technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.ext}",
+                    #if $bellavista_conditional.technology_conditional.plot_nuclear_segmentation.plot_nuclear_seg == "true":
+                    "nuclear_segmentation": "${bellavista_conditional.technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.element_identifier}.${bellavista_conditional.technology_conditional.plot_nuclear_segmentation.nuclear_segmentation.ext}",
                     #end if
-                    #if $technology_conditional.technology == "MERSCOPE":
+                    #if $bellavista_conditional.technology_conditional.technology == "MERSCOPE":
                     "um_to_px_transform": "micron_to_mosaic_pixel_transform.csv",
                     #end if
-                    #if $technology_conditional.plot_genes.plot_transcripts == "true":
-                    "transcript_filename": "${technology_conditional.plot_genes.transcript_filename.element_identifier}.${technology_conditional.plot_genes.transcript_filename.ext}",
+                    #if $bellavista_conditional.technology_conditional.plot_genes.plot_transcripts == "true":
+                    "transcript_filename": "${bellavista_conditional.technology_conditional.plot_genes.transcript_filename.element_identifier}.${bellavista_conditional.technology_conditional.plot_genes.transcript_filename.ext}",
                     #end if
-                    "z_plane": $technology_conditional.z_plane
+                    "z_plane": $bellavista_conditional.technology_conditional.z_plane
                 }
             }
-
+            #end if
         ]]></configfile>
     </configfiles>
     <inputs>
-        <conditional name="technology_conditional">
-            <param name="technology" type="select" label="Spatial transcriptomic technology">
-                <option value="Xenium">Xenium</option>
-                <option value="MERSCOPE" selected="true">MERSCOPE</option>
+        <conditional name="bellavista_conditional">
+            <param name="tar_input" type="select" label="Data prepared with bellavista_prepare tool?" help="For large datasets, it is recommended to use the bellavista_prepare tool to prepare the data.">
+                <option value="Yes" selected="true">Yes</option>
+                <option value="No">No</option>
             </param>
-            <when value="Xenium">
-                <expand macro="common_param"/> 
+            <when value="Yes">
+                <param name="bellavista_tar" type="data" format="tar.gz" label="bellavista_prepare tar output"/>
             </when>
-            <when value="MERSCOPE">
-                <expand macro="common_param">
-                    <param name="um_to_px_transform" type="data" format="csv" optional="false" label="micron to pixel transformations"/>
-                </expand>
+            <when value="No">
+                <conditional name="technology_conditional">
+                    <param name="technology" type="select" label="Spatial transcriptomic technology">
+                        <option value="Xenium">Xenium</option>
+                        <option value="MERSCOPE" selected="true">MERSCOPE</option>
+                    </param>
+                    <when value="Xenium">
+                        <expand macro="common_param"/>
+                    </when>
+                    <when value="MERSCOPE">
+                        <expand macro="common_param">
+                            <param name="um_to_px_transform" type="data" format="csv" optional="false" label="micron to pixel transformations"/>
+                        </expand>
+                    </when>
+                </conditional>
             </when>
         </conditional>
     </inputs>
@@ -182,9 +200,16 @@ BellaVista is an open-source visualization tool for imaging-based spatial transc
 
 Users can customize the visualization by selecting specific genes, adjusting image rotation angles, and controlling the size of transcript points. BellaVista also provides options for plotting cell and nuclear segmentation, enhancing the exploration of spatial transcriptomics data.
 
+.. class:: infomark
+
+**Note:** For large datasets, it is highly recommended to use the bellavista_prepare_ tool to prepare the data for visualization. This tool optimizes the data format and structure, ensuring efficient loading and rendering in BellaVista.
+
+
 .. image:: https://raw.githubusercontent.com/pkosurilab/BellaVista/c8129bb8954c92962a87606595c09b35cc414295/images/bellavista_figure.png
     :height: 500
     :width: 700
+
+.. _bellavista_prepare: https://usegalaxy.eu/?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fiuc%2Fbellavista_prepare%2Fbellavista_prepare%2F0.0.2%2Bgalaxy2&version=latest
     ]]>
     </help>
     <citations>
