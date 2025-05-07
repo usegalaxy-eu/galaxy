@@ -1,5 +1,6 @@
 <tool id="interactive_tool_anylabeling" tool_type="interactive" name="AnyLabeling Interactive" version="@VERSION@" profile="24.2">
-    <description>Effortless data labeling with AI support from YOLO and Segment Anything! AnyLabeling = LabelImg + Labelme + Improved UI + Auto-labeling</description>
+    <description>Effortless data labeling with AI support from YOLO and Segment Anything!</description>
+    <icon src="anylabeling.png"/>
     <requirements>
 	    <container type="docker">quay.io/sunyi000/docker-yololabel:v0.4.16</container>
     </requirements>
@@ -16,27 +17,27 @@
 	 chown -R 1000:1000 ./home &&
 
          #for $i,$img in enumerate($input_images):
-            ln -s "$img" "./home/input_images/${img.element_identifier}" &&
+            ln -s '$img' './home/input_images/${img.element_identifier}' &&
          #end for
 
          #if $classes:
              mkdir -p ./home/input_classes &&
              #for $i,$cls in enumerate($classes):
-                 ln -s "$cls" "./home/input_classes/${cls.element_identifier}" &&
+                 ln -s '$cls' './home/input_classes/${cls.element_identifier}' &&
              #end for
          #end if
 
          #if $annotations:
              mkdir -p ./home/input_annotations &&
              #for $i,$ann in enumerate($annotations):
-                 ln -s "$ann" "./home/input_annotations/${ann.element_identifier}" &&
+                 ln -s '$ann' './home/input_annotations/${ann.element_identifier}' &&
              #end for
          #end if
 
          #if $models:
              mkdir -p ./home/input_models &&
              #for $i,$mo in enumerate($models):
-                 ln -s "$mo" "./home/input_models/${mo.element_identifier}" &&
+                 ln -s '$mo' './home/input_models/${mo.element_identifier}' &&
              #end for
          #end if 
 
@@ -49,7 +50,7 @@
         <param name="input_images" type="data" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" multiple="true"  label="Input images"/>
         <param name="annotations" type="data" format="txt,json" optional="true" multiple="true" label="Pre-existing annotations"/>
         <param name="classes" type="data" format="txt" optional="true" multiple="true" label="Classes file (one class per line)"/>
-        <param name="models" type="data" format="auto" optional="true" multiple="true" label="Auto-labeling model file"/>
+        <param name="models" type="data" format="auto" optional="true" multiple="true" label="Auto-labeling model files"/>
     </inputs>
     <outputs>
         <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
@@ -60,6 +61,15 @@
     <tests>
     </tests>
     <help><![CDATA[
+	**What it is**
+	AnyLabeling = LabelImg + Labelme + Improved UI + Auto-labeling
+
+	**Features**:
+          - Image annotation for polygon, rectangle, circle, line and point.
+          - Auto-labeling YOLOv8, Segment Anything (SAM, SAM2).
+          - Text detection, recognition and KIE (Key Information Extraction) labeling.
+          - Multiple languages availables: English, Vietnamese, Chinese.
+
     ]]>
     </help>
     <citations>
