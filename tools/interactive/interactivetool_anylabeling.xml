@@ -48,8 +48,8 @@
     <inputs>
         <param name="input_images" type="data" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" multiple="true"  label="Input images"/>
         <param name="annotations" type="data" format="txt,json" optional="true" multiple="true" label="Pre-existing annotations"/>
-        <param name="classes" type="data" format="txt" optional="true" label="Classes file (one class per line)"/>
-        <param name="models" type="data" format="auto" optional="true" label="Auto-labeling model file"/>
+        <param name="classes" type="data" format="txt" optional="true" multiple="true" label="Classes file (one class per line)"/>
+        <param name="models" type="data" format="auto" optional="true" multiple="true" label="Auto-labeling model file"/>
     </inputs>
     <outputs>
         <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
