@@ -30,11 +30,50 @@ do
 done
 ]]>
         </configfile>
+        <configfile name="upload_script">
+
+source "/openrefine/bash-refine/bash-refine.sh" || exit 1
+cd /openrefine/bash-refine/ || exit 1
+init
+
+p="Galaxy file"
+projects["Galaxy file"]="/import/input.data"
+
+checkpoint "Import"; echo
+## project id will be stored in \${projects[tsv file example]}
+echo "import file \${projects[\$p]} ..."
+
+if curl -fs --write-out "%{redirect_url}\n" \
+  --form project-file="@\${projects[\$p]}" \
+  --form project-name="\${p}" \
+  --form format="text/line-based/*sv" \
+  --form options='{
+                    "encoding": "UTF-8",
+#if $infile.ext == 'csv':
+                    "separator": ","
+#else
+                    "separator": "\t"
+#end if
+                  }' \
+  "\${endpoint}/command/core/create-project-from-upload\$(refine_csrf)" \
+  > "\${workdir}/\${p}.id"
+then
+  log "imported \${projects[\$p]} as \${p}"
+else
+  error "import of \${projects[\$p]} failed!"
+fi
+refine_store "\${p}" "\${workdir}/\${p}.id" || error "import of \${p} failed!"
+echo
+
+checkpoint "Finish"; echo
+##refine_stop; echo
+checkpoint_stats; echo
+        </configfile>        
     </configfiles>
     <command detect_errors="aggressive"><![CDATA[
 
 #if $infile:
-    cp '$infile' /import/input.tabular &&
+    cp '$infile' /import/input.data &&
 #end if
 
 cat '$start_openrefine' &&
@@ -44,7 +83,7 @@ bash '$start_openrefine' &&
 cd /openrefine &&
 
 #if $infile:
-    bash bash-refine/myworkflow.sh &&
+    bash '$upload_script' &&
 #end if
 
 tail -f /dev/null
@@ -52,7 +91,7 @@ tail -f /dev/null
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="tabular,tsv" optional="true" label="Input file in tabular format"/>
+        <param name="infile" type="data" format="tabular,tsv,csv" optional="true" label="Input file in tabular format"/>
     </inputs>
     <outputs>
         <data name="outfile" format="tabular" />
@@ -82,4 +121,3 @@ Example input file (TAB separated)::
 ]]>
     </help>
 </tool>
-
