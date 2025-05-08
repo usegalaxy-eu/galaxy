@@ -2,7 +2,7 @@
     <description>Effortless data labeling with AI support from YOLO and Segment Anything!</description>
     <icon src="anylabeling.png"/>
     <requirements>
-	    <container type="docker">quay.io/sunyi000/docker-yololabel:v0.4.16</container>
+        <container type="docker">quay.io/bgruening/anylabeling:0.4.30</container>
     </requirements>
     <entry_points>
         <entry_point name="AnyLabeling" requires_domain="True">
