@@ -1,0 +1,84 @@
+<tool id="interactive_tool_anylabeling" tool_type="interactive" name="AnyLabeling Interactive" version="@VERSION@" profile="24.2">
+    <description>Effortless data labeling with AI support from YOLO and Segment Anything!</description>
+    <icon src="anylabeling.png"/>
+    <requirements>
+        <container type="docker">quay.io/bgruening/anylabeling:0.4.30</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="AnyLabeling" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+         export HOME=\$PWD &&
+         
+         mkdir -p ./home/output ./home/input_images &&
+	 chown -R 1000:1000 ./home &&
+
+         #for $i,$img in enumerate($input_images):
+            ln -s '$img' './home/input_images/${img.element_identifier}' &&
+         #end for
+
+         #if $class_file:
+             mkdir -p ./home/input_classes &&
+             ln -s '$class_file' './home/input_classes/${class_file.element_identifier}' &&
+         #end if
+
+         #if $annotations:
+             mkdir -p ./home/input_annotations &&
+             #for $i,$ann in enumerate($annotations):
+                 ln -s '$ann' './home/input_annotations/${ann.element_identifier}' &&
+             #end for
+         #end if
+
+         #if $models:
+             #import glob,os
+             mkdir -p ./home/input_models &&
+	     tar -C ./home/input_models -xvf $models &&
+             #for $f in sorted(glob.glob("./home/input_models/*")):
+                 ln -s "$f" "./home/input_models/${os.path.basename($f)}" &&
+             #end for    
+         #end if 
+
+        /init 
+         
+
+    ]]>
+    </command>
+    <inputs>
+        <param name="input_images" type="data" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" multiple="true"  label="Input images"/>
+        <param name="annotations" type="data" format="txt,json" optional="true" multiple="true" label="Pre-existing annotations"/>
+        <param name="class_file" type="data" format="txt,json" optional="true" multiple="false" label="Classes file (one class per line)"/>
+        <param name="models" type="data" format="tar" optional="true" label="A tarball containing custom model files and yaml files"/>
+    </inputs>
+    <outputs>
+        <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
+	<collection name="al_output" type="list" label="AnyLabeling output">
+		<discover_datasets pattern="__name_and_ext__" directory="./home/output" />
+	</collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+	**What it is**:
+           AnyLabeling = LabelImg + Labelme + Improved UI + Auto-labeling
+
+	**Features**:
+          - Image annotation for polygon, rectangle, circle, line and point.
+          - Auto-labeling YOLOv8, Segment Anything (SAM, SAM2).
+          - Text detection, recognition and KIE (Key Information Extraction) labeling.
+	  - Multiple languages availables: English, Vietnamese, Chinese.
+
+	**Custom Models**:
+	  - Loading custom models will enable you to use your own models for auto labeling. This is useful if you have a custom model that you have trained on your own data and want to use it for auto labeling.The supported model formats for YOLOv5, YOLOv8 and SegmentAnything is ONNX.
+          - Sample models could be download from https://github.com/vietanhdev/anylabeling-assets/releases/tag/v0.4.0
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">@Manual{github,
+            title = {AnyLabeling},
+            url = {https://github.com/vietanhdev/anylabeling}}
+        </citation>
+    </citations>
+</tool>
