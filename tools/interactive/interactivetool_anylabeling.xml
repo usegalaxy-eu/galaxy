@@ -20,11 +20,9 @@
             ln -s '$img' './home/input_images/${img.element_identifier}' &&
          #end for
 
-         #if $classes:
+         #if $class_file:
              mkdir -p ./home/input_classes &&
-             #for $i,$cls in enumerate($classes):
-                 ln -s '$cls' './home/input_classes/${cls.element_identifier}' &&
-             #end for
+             ln -s '$class_file' './home/input_classes/${class_file.element_identifier}' &&
          #end if
 
          #if $annotations:
@@ -51,7 +49,7 @@
     <inputs>
         <param name="input_images" type="data" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" multiple="true"  label="Input images"/>
         <param name="annotations" type="data" format="txt,json" optional="true" multiple="true" label="Pre-existing annotations"/>
-        <param name="classes" type="data" format="txt" optional="true" multiple="true" label="Classes file (one class per line)"/>
+        <param name="class_file" type="data" format="txt,json" optional="true" multiple="false" label="Classes file (one class per line)"/>
         <param name="models" type="data" format="tar" optional="true" label="A tarball containing custom model files and yaml files"/>
     </inputs>
     <outputs>
@@ -63,15 +61,18 @@
     <tests>
     </tests>
     <help><![CDATA[
-	**What it is**
-	AnyLabeling = LabelImg + Labelme + Improved UI + Auto-labeling
+	**What it is**:
+           AnyLabeling = LabelImg + Labelme + Improved UI + Auto-labeling
 
 	**Features**:
           - Image annotation for polygon, rectangle, circle, line and point.
           - Auto-labeling YOLOv8, Segment Anything (SAM, SAM2).
           - Text detection, recognition and KIE (Key Information Extraction) labeling.
-          - Multiple languages availables: English, Vietnamese, Chinese.
+	  - Multiple languages availables: English, Vietnamese, Chinese.
 
+	**Custom Models**:
+	  - Loading custom models will enable you to use your own models for auto labeling. This is useful if you have a custom model that you have trained on your own data and want to use it for auto labeling.The supported model formats for YOLOv5, YOLOv8 and SegmentAnything is ONNX.
+          - Sample models could be download from https://github.com/vietanhdev/anylabeling-assets/releases/tag/v0.4.0
     ]]>
     </help>
     <citations>
