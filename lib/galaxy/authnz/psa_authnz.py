@@ -53,7 +53,7 @@ BACKENDS_NAME = {
     "google": "google-openidconnect",
     "globus": "globus",
     "elixir": "elixir",
-    "nfdi": "helmholtz",
+    "nfdi": "infraproxy",
     "okta": "okta-openidconnect",
     "azure": "azuread-v2-tenant-oauth2",
     "egi_checkin": "egi-checkin",
