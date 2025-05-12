@@ -42,7 +42,7 @@ BACKENDS = {
     "google": "social_core.backends.google_openidconnect.GoogleOpenIdConnect",
     "globus": "social_core.backends.globus.GlobusOpenIdConnect",
     "elixir": "social_core.backends.elixir.ElixirOpenIdConnect",
-    "nfdi": "social_core.backends.nfdi.NFDIOpenIdConnect",
+    "nfdi": "social_core.backends.nfdi.InfraproxyOpenIdConnect",
     "okta": "social_core.backends.okta_openidconnect.OktaOpenIdConnect",
     "azure": "social_core.backends.azuread_tenant.AzureADV2TenantOAuth2",
     "egi_checkin": "social_core.backends.egi_checkin.EGICheckinOpenIdConnect",
