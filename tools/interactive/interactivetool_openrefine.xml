@@ -18,6 +18,7 @@
     </environment_variables>
     <configfiles>
         <configfile name="start_openrefine"><![CDATA[
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 &&
 exec /openrefine/refine -i 0.0.0.0 -m \${GALAXY_MEMORY_MB}m &
 
 ##Check if openrefine is up to work
