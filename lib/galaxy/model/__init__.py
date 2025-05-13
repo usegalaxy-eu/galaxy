@@ -1248,7 +1248,7 @@ ON CONFLICT
         }
 
     def is_active(self):
-        return self.active
+        return True
 
     def is_authenticated(self):
         # TODO: is required for python social auth (PSA); however, a user authentication is relative to the backend.
