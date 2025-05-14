@@ -42,22 +42,28 @@ BACKENDS = {
     "google": "social_core.backends.google_openidconnect.GoogleOpenIdConnect",
     "globus": "social_core.backends.globus.GlobusOpenIdConnect",
     "elixir": "social_core.backends.elixir.ElixirOpenIdConnect",
+    "lifescience": "social_core.backends.lifescience.LifeScienceOpenIdConnect",
+    "einfracz": "social_core.backends.einfracz.EInfraCZOpenIdConnect",
     "nfdi": "social_core.backends.nfdi.InfraproxyOpenIdConnect",
     "okta": "social_core.backends.okta_openidconnect.OktaOpenIdConnect",
     "azure": "social_core.backends.azuread_tenant.AzureADV2TenantOAuth2",
     "egi_checkin": "social_core.backends.egi_checkin.EGICheckinOpenIdConnect",
     "oidc": "social_core.backends.open_id_connect.OpenIdConnectAuth",
+    "tapis": "galaxy.authnz.tapis.TapisOAuth2",
 }
 
 BACKENDS_NAME = {
     "google": "google-openidconnect",
     "globus": "globus",
     "elixir": "elixir",
+    "lifescience": "life_science",
+    "einfracz": "e-infra_cz",
     "nfdi": "infraproxy",
     "okta": "okta-openidconnect",
     "azure": "azuread-v2-tenant-oauth2",
     "egi_checkin": "egi-checkin",
     "oidc": "oidc",
+    "tapis": "tapis",
 }
 
 AUTH_PIPELINE = (
