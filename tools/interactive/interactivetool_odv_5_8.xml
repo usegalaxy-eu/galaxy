@@ -20,6 +20,10 @@
         mkdir -p Documents/ODV/galaxy/data &&
         mkdir -p Documents/ODV/galaxy/views &&
         chmod 777 Documents/ODV/ -R &&
+        
+        touch Documents/ODV/galaxy/extract_history.cmd &&
+	    echo "export_data  \$PWD/Documents/ODV/galaxy/outputs/history_from_odv_collection_test.txt,[:],0,[],0,0,1,1,0,0" > \$PWD/Documents/ODV/galaxy/extract_history.cmd &&
+	    echo "quit" >> \$PWD/Documents/ODV/galaxy/extract_history.cmd &&
 
         #if $auto_launch.launch == 'no':
             #if $method.type == 'own_data' :
