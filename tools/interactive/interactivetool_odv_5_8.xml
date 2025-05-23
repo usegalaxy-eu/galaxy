@@ -20,10 +20,6 @@
         mkdir -p Documents/ODV/galaxy/data &&
         mkdir -p Documents/ODV/galaxy/views &&
         chmod 777 Documents/ODV/ -R &&
-        
-        touch Documents/ODV/galaxy/extract_history.cmd &&
-	    echo "export_data  \$PWD/Documents/ODV/galaxy/outputs/history_from_odv_collection.txt,[:],0,[],0,0,1,1,0,0" > \$PWD/Documents/ODV/galaxy/extract_history.cmd &&
-	    echo "quit" >> \$PWD/Documents/ODV/galaxy/extract_history.cmd &&
 
         #if $auto_launch.launch == 'no':
             #if $method.type == 'own_data' :
@@ -64,15 +60,25 @@
             #end if
             /init ODV_ARG1 ODV_ARG2;
         #end if
+        
+        #if $history.extract_hist == 'yes':
+            export  ODV_ARG1=-x
+            cp '$history.input_collection' './Documents/ODV/galaxy/data/${history.input_collection.element_identifier}' &&
+            touch Documents/ODV/galaxy/extract_history.cmd &&
+            echo "open_collection \$PWD/Documents/ODV/galaxy/data/*.odv" >  \$PWD/Documents/ODV/galaxy/extract_history.cmd &&
+	    echo "export_data  \$PWD/Documents/ODV/galaxy/outputs/history_from_odv_collection.txt,[:],0,[],0,0,1,1,0,0" >> \$PWD/Documents/ODV/galaxy/extract_history.cmd &&
+	    echo "quit" >> \$PWD/Documents/ODV/galaxy/extract_history.cmd &&
+	    export  ODV_ARG2=\$PWD/Documents/ODV/galaxy/extract_history.cmd &&
+	    /init ODV_ARG1 ODV_ARG2;
+	#end if
 
-
-
-        mv ./Documents/ODV/galaxy/outputs/ ./output &&        
+        mv ./Documents/ODV/galaxy/data/* ./Documents/ODV/galaxy/outputs/ &&
+        mv ./Documents/ODV/galaxy/outputs/ ./output && 
         rm ./Documents -rf &&
         cd ./output &&
         sleep 2 &&
         for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
-
+        
     ]]>
     </command>
     <inputs>
@@ -108,6 +114,17 @@
             </when>
             <when value="yes">
                 <param name="input_view" type="data" format="xml" multiple="true" label="Data view for ODV"/>
+            </when>
+        </conditional>
+        <conditional name="history">
+            <param name="extract_hist" type="select" label="Do you want to extract your history?" help="This will autmatically launch and exit ODV. You will not be able to interact with it">
+                <option value="no">No, I don't want to</option>
+                <option value="yes">Yes, I want to extract my history</option>
+            </param>
+            <when value="no">
+            </when>
+            <when value="yes">
+                <param name="input_collection" type="data" format="txt" multiple="true" label="Input the .odv file." help="This needs to be an odv file with the changes made in a previous odv launch."/>
             </when>
         </conditional>
     </inputs>
