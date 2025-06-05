@@ -1,7 +1,7 @@
 <tool id="interactive_tool_odv" tool_type="interactive" name="ODV" version="@VERSION@">
     <description>interactive plotting tool for geo-referenced data</description>
     <macros>
-    <token name="@VERSION@">5.8.0</token>
+    <token name="@VERSION@">5.8_1</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/bgruening/odv-headless:v@VERSION@</container>
@@ -21,54 +21,57 @@
         mkdir -p Documents/ODV/galaxy/views &&
         chmod 777 Documents/ODV/ -R &&
 
-        #if $auto_launch.launch == 'no':
-            #if $method.type == 'own_data' :
-                #for $i, $infile in enumerate($method.infiles):
-                    #if $infile.ext == "netcdf":
-                        cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}_${i}.nc' &&
-                    #else:
-                        cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}' &&
-                    #end if
-                #end for  
-            #end if
-            #if $method.type == 'zip' :
-                #import re
-                
-                #set zip_file_path = $method.folder
-                #set source_folder_name = re.sub('[^\s\w\-]', '_', str($zip_file_path)) 
-            
-                unzip "$zip_file_path" -d './Documents/ODV/galaxy/data/$source_folder_name' &&
-            #end if
-            #if $views.view == 'yes':
-                #for $i, $load_view in enumerate($views.input_view):
-                    cp '$load_view' './Documents/ODV/galaxy/views/${infile.element_identifier}.xview' &&
-                #end for
-            #end if
-            /init ;
 
-        #else:
-            export  ODV_ARG1=-x &&
-            cp '$auto_launch.load_data' './Documents/ODV/galaxy/data/${auto_launch.load_data.element_identifier}' &&
-            echo "open_data_file \$(ls \$PWD/Documents/ODV/galaxy/data/*)" > \$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
-            export  ODV_ARG2=\$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
+	#if $auto_launch.launch == 'no':
+	    #if $method.type == 'own_data' :
+	        #for $i, $infile in enumerate($method.infiles):
+	            #if $infile.ext == "netcdf":
+	                cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}_${i}.nc' &&
+	            #else:
+	                cp '$infile' './Documents/ODV/galaxy/data/${infile.element_identifier}' &&
+	            #end if
+	        #end for  
+	    #end if
+	    #if $method.type == 'zip' :
+	        #import re
+	        
+	        #set zip_file_path = $method.folder
+	    
+	        unzip "$zip_file_path" -d './Documents/ODV/galaxy/data/' &&
+	    #end if
+	    #if $views.view == 'yes':
+	        #for $i, $load_view in enumerate($views.input_view):
+	            cp '$load_view' './Documents/ODV/galaxy/views/${load_view.element_identifier}.xview' &&
+	        #end for
+	    #end if
+	    /init ;
 
-            #if $views.view == 'yes':
-                #for $i, $infile in enumerate($views.input_view):
-                    cp '$infile' './Documents/ODV/galaxy/views/${infile.element_identifier}.xview' &&
-                #end for
-                echo "load_view \$(ls \$PWD/Documents/ODV/galaxy/views/*)" >> \$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
-            #end if
-            /init ODV_ARG1 ODV_ARG2;
-        #end if
+	#else:
+	    export  ODV_ARG1=-x &&
+	    cp '$auto_launch.load_data' './Documents/ODV/galaxy/data/${auto_launch.load_data.element_identifier}' &&
+	    echo "open_data_file \$(ls \$PWD/Documents/ODV/galaxy/data/*)" > \$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
+	    export  ODV_ARG2=\$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
 
+	    #if $views.view == 'yes':
+	        #for $i, $infile in enumerate($views.input_view):
+	            cp '$infile' './Documents/ODV/galaxy/views/${infile.element_identifier}.xview' &&
+	        #end for
+	        echo "load_view \$(ls \$PWD/Documents/ODV/galaxy/views/*)" >> \$PWD/Documents/ODV/galaxy/qualification_oxygen.cmd &&
+	    #end if
+	    /init ODV_ARG1 ODV_ARG2;
+	#end if
+	
+	cd ./Documents/ODV/galaxy/data/ &&	
+	zip -r data_odv_collection.zip * &&
 
-
-        mv ./Documents/ODV/galaxy/outputs/ ./output &&        
+        cd ../../../.. &&
+	mv ./Documents/ODV/galaxy/data/* ./Documents/ODV/galaxy/outputs/ &&
+        mv ./Documents/ODV/galaxy/outputs/ ./output && 
         rm ./Documents -rf &&
         cd ./output &&
         sleep 2 &&
         for file in *; do mv "\$file" "\$file.\${file\#\#*.}"; done
-
+        
     ]]>
     </command>
     <inputs>
