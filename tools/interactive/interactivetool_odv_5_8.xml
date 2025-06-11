@@ -117,6 +117,9 @@
         <collection name="outputs_all" type="list" label="ODV all outputs">
             <discover_datasets pattern="__designation_and_ext__" directory="./output"/>
         </collection>
+        <collection name="outputs_txt" type="list" label="ODV history extracted">
+            <discover_datasets pattern="history_from_(?P&lt;designation&gt;.+)" directory="./output" format="txt"/>
+        </collection>
     </outputs>
     <tests>
     </tests>
