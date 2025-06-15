@@ -1,4 +1,5 @@
 <tool id="interactive_tool_isee" tool_type="interactive" name="iSEE" version="1.0.0">
+    <icon src="isee.png" />
   <requirements>
     <container type="docker">biocontainers/isee-galaxy:v3.13_cv1.0.0</container>
   </requirements>
