@@ -1,4 +1,5 @@
 <tool id="interactive_tool_pcstudio" tool_type="interactive" name="PhysiCell Studio" version="@VERSION@" profile="22.05">
+    <icon src="pcstudio.png" />
     <description>Interactive tool to create, simulate, and visualize a multicellular model using PhysiCell</description>
     <macros>
         <token name="@VERSION@">0.3</token>
