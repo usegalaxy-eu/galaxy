@@ -1,4 +1,5 @@
 <tool id="interactive_tool_holoviz" tool_type="interactive" name="Holoviz" version="@VERSION@">
+    <icon src="holoviz.png" />
     <description>High-level tools to simplify visualization in Python</description>
     <macros>
     <token name="@VERSION@">0.0.1</token>
