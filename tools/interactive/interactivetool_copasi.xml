@@ -1,4 +1,5 @@
 <tool id="interactive_tool_copasi" tool_type="interactive" name="COPASI" version="@VERSION@" profile="22.05">
+    <icon src="copasi.png" />
     <description>Biochemical System Simulator</description>
     <macros>
         <token name="@VERSION@">4.44.295-0</token>
