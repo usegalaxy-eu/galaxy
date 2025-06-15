@@ -1,4 +1,5 @@
 <tool id="interactive_tool_mgnify_notebook" tool_type="interactive" name="Interactive MGnify Notebook" version="1.2.2" profile="22.01">
+    <icon src="mgnify.png" />
     <requirements>
         <container type="docker">quay.io/microbiome-informatics/emg-notebooks.dev:v1.2.2</container>
     </requirements>
