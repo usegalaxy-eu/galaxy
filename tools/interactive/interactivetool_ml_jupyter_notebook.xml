@@ -1,4 +1,5 @@
 <tool id="interactive_tool_ml_jupyter_notebook" tool_type="interactive" name="GPU-enabled Interactive Jupyter Notebook for Machine Learning" version="@VERSION@" profile="22.01">
+    <icon src="jupyter_logo.png" />
     <macros>
         <token name="@VERSION@">0.4</token>
     </macros>

@@ -1,4 +1,5 @@
 <tool id="interactive_tool_rstudio" tool_type="interactive" name="RStudio" version="24.1" profile="22.01">
+    <icon src="rstudio.png" />
     <requirements>
         <container type="docker">quay.io/galaxy/docker-rstudio-notebook:24.1</container>
     </requirements>
