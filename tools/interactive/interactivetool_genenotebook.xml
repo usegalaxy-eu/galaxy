@@ -1,4 +1,5 @@
 <tool id="interactive_tool_genenotebook" tool_type="interactive" name="GeneNoteBook" version="0.4.3" profile="22.01">
+    <icon src="genenotebook.png" />
     <description>viewer</description>
     <requirements>
         <container type="docker">quay.io/biocontainers/genoboo:0.4.3--h9f5acd7_0</container>
