@@ -1,4 +1,5 @@
 <tool id="interactive_tool_rstudio_askor" tool_type="interactive" name="RStudio AskoR" version="0.1">
+    <icon src="rstudio.png" />
     <requirements>
         <container type="docker">quay.io/genouest/docker-galaxy-rstudio-askor:0.1</container>
     </requirements>
