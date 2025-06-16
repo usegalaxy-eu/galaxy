@@ -1,5 +1,6 @@
 <tool id="interactive_tool_ideal" tool_type="interactive" name="IDEAL" version="1.0.0" profile="23.1">
     <description>Interactive Differential Expression AnaLysis in RNA-seq data</description>
+    <icon src="ideal.png"/>
     <requirements>
         <container type="docker">quay.io/federicomarini/ideal:v0.2</container>
     </requirements>

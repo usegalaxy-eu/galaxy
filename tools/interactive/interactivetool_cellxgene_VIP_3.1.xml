@@ -1,4 +1,5 @@
 <tool id="interactive_tool_cellxgene_vip" tool_type="interactive" name="Interactive CELLxGENE VIP Environment" version="3.1.2">
+    <icon src="cellxgene.png" />
     <requirements>
         <container type="docker">quay.io/bgruening/cellxgene-vip:3.1.2</container>
     </requirements>
@@ -16,13 +17,13 @@
 
         #if ($var_name and $make_unique) or $layer:
         python '${anndata_unique_var_gene_symbols}' '${infile}' '${fancy_name}' '${var_name}' '${make_unique}' '${layer}'
-        #else  
+        #else
         cp '${infile}' '${fancy_name}'
         #end if
         &&
         mkdir annotation_files
         &&
-        cellxgene launch --host 0.0.0.0 --port 80 
+        cellxgene launch --host 0.0.0.0 --port 80
             --user-generated-data-dir annotation_files
         #if $var_name and not $make_unique:
             --var-names $var_name
@@ -48,7 +49,7 @@ layer = sys.argv[5]
 if gene_symbol_field and make_unique:
     if gene_symbol_field not in adata.var.keys():
         sys.exit(f"Field {gene_symbol_field} set as var_name does not exist in the var object. AnnData object will be used as it was given")
-    
+
     adata.var = rn(adata.var, gene_symbol_field, suffix = "_d")
     adata.var["extra_gene_id"] = adata.var.index
     adata.var = adata.var.set_index(f"{gene_symbol_field}_u")
@@ -77,7 +78,7 @@ adata.write_h5ad(output)
     <tests>
     </tests>
     <help><![CDATA[
-CELLxGENE VIP - "Cell by gene" plugin to visualize scRNA-seq, spatial transcriptomics, and multiome data. 
+CELLxGENE VIP - "Cell by gene" plugin to visualize scRNA-seq, spatial transcriptomics, and multiome data.
 =============================================================================
 Purpose
 -------
@@ -89,11 +90,11 @@ CELLxGENE-VIP is a frontend interactive visualization plugin of CELLxGENE framew
 
 Selecting the Var name
 ----------------------
-It can happen that the main index for the var element of AnnData is not the 
+It can happen that the main index for the var element of AnnData is not the
 gene symbol field, in which case search by genes will probably be by identifier.
-You can choose a different field and CELLxGENE will use this. If in addition you choose "Make unique", 
+You can choose a different field and CELLxGENE will use this. If in addition you choose "Make unique",
 the AnnData is modified (in a new copy) so that that field is made unique and
-it is indexed by it. Making it unique entails though loading the object into memory, 
+it is indexed by it. Making it unique entails though loading the object into memory,
 modifying and writing it back, which can delay the execution of CELLxGENE.
 
 Then CELLxGENE will allow searches by genes in that field.
