@@ -1,5 +1,6 @@
 <tool id="interactive_tool_source" tool_type="interactive" name="Interactive Source Notebooks" version="@VERSION@" profile="22.05">
     <description>Sea Observations Utility for Reprocessing, Calibration and Evaluation</description>
+    <icon src="source.png"/>
     <macros>
         <token name="@VERSION@">0.0.2</token>
     </macros>
@@ -124,7 +125,7 @@ SOURCE is written in Python, an interpreted programming language highly adopted 
 SOURCE is relocatable in the sense that it can be adapted to any basin worldwide, provided that the input data follow a specific standard format.
    ]]></help>
     <citations>
-        <citation type="doi">https://doi.org/10.3389/fmars.2021.750387</citation> 
+        <citation type="doi">10.3389/fmars.2021.750387</citation>
     </citations>
 </tool>
 

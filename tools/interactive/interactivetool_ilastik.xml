@@ -1,5 +1,6 @@
 <tool id="interactive_tool_ilastik" tool_type="interactive" name="Ilastik" version="@VERSION@" profile="23.0">
     <description>interactive learning and segmentation toolkit</description>
+    <icon src="ilastik.png"/>
     <macros>
         <token name="@VERSION@">1.4.0</token>
     </macros>
@@ -81,19 +82,19 @@
         </conditional>
         <param name="infiles" type="data" format="tiff" multiple="true" label="Input files in TIFF format"/>
     </inputs>
-    
+
     <outputs>
         <data name="ilastik_project" format="h5" label="Ilastik project file" from_work_dir="output/MyProject.ilp"/>
     </outputs>
-    
+
     <tests>
     </tests>
-    
+
     <help><![CDATA[
         Leverage machine learning algorithms to easily segment, classify, track and count your cells or other experimental data. Most operations are interactive, even on large datasets: you just draw the labels and immediately see the result. No machine learning expertise required.
 
         This tool has been designed uniquely to make/modify a project.
-        
+
         - It requires that input images have unique identifiers.
         - When you have trained your project, save it and quit the application. The project called 'MyProject.ilp' will be imported into your history.
         - If you want to modify a project, make sure you use at least the same images (with the same identifiers) as the first time (but you can add more).
