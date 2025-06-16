@@ -1,5 +1,6 @@
 <tool id="interactive_tool_terriamap" tool_type="interactive" name="Terriamap" version="@VERSION@">
-    <description/>
+    <description>Geospatial visualisation</description>
+    <icon src="terria.png"/>
     <macros>
         <token name="@VERSION@">0.3.0</token>
     </macros>
