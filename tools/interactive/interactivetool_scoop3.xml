@@ -1,5 +1,6 @@
 <tool id="interactive_tool_scoop3_argo" tool_type="interactive" name="Scoop3-Argo" version="@VERSION@">
     <description>Interactive visual quality control of Argo netCDF files</description>
+    <icon src="scoop.png"/>
     <macros>
         <token name="@VERSION@">1.40</token>
     </macros>
