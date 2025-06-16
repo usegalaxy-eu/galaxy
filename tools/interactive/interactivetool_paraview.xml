@@ -1,5 +1,5 @@
 <tool id="interactive_tool_paraview" tool_type="interactive" name="Paraview" version="0.1">
-    <icon src="https://raw.githubusercontent.com/Kitware/ParaView/d0f56f7b852706bea67dd9dad508ee8c6b2a6168/Utilities/Doxygen/images/paraview-logo-small.png"/>
+    <icon src="paraview-logo-small.png"/>
     <requirements>
         <!-- kitware/paraviewweb:pvw-v5.6.0-osmesa -->
         <container type="docker">bmcv/galaxy-paraviewweb:latest</container>
