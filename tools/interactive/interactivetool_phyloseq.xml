@@ -1,5 +1,6 @@
 <tool id="interactive_tool_phyloseq" tool_type="interactive" name="Phyloseq" version="1.0.0" profile="23.1">
     <description>Explore microbiome profiles</description>
+    <icon src="phyloseq.png"/>
     <requirements>
         <container type="docker">quay.io/paulzierep/shinyphyloseq:0.2</container>
     </requirements>
@@ -56,7 +57,7 @@ tree, and/or taxonomic assignment of the OTUs.
 
 Full documentation: https://joey711.github.io/phyloseq/
 
-**Shiny App**       
+**Shiny App**
 
 This IT uses https://github.com/joey711/shiny-phyloseq as the basis app but added some features that allow loading phyloseq objects dynamically from the Galaxy Input.
 The shiny app allows to interactively visualize and filer amplicon data:
@@ -71,8 +72,8 @@ The shiny app allows to interactively visualize and filer amplicon data:
 * Scatter pots
 * Bar charts
 
-Unfortunately, the following features of the app are currently defunct: provenance. 
-        
+Unfortunately, the following features of the app are currently defunct: provenance.
+
 ]]></help>
     <citations>
         <citation type="doi">10.1371/journal.pone.0061217</citation>
