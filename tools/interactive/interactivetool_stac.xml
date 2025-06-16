@@ -1,5 +1,6 @@
 <tool id="interactive_tool_stac" tool_type="interactive" name="STAC catalog" version="@VERSION@">
     <description>for searching, aggregating and downloading data</description>
+    <icon src="stac.png"/>
     <macros>
     <token name="@VERSION@">2.11.0</token>
     </macros>
