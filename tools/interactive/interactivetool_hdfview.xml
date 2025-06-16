@@ -1,5 +1,6 @@
 <tool id="interactive_tool_hdfview" name="Interactive Hdfview tool" tool_type="interactive" version="@TOOL_VERSION@">
     <description>Desktop application to display netcdf, hdf4 or hdf5 files</description>
+    <icon src="hdf.png"/>
     <macros>
         <token name="@VERSION@">3.3.0</token>
     </macros>
