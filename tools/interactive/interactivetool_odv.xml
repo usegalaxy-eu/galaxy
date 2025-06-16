@@ -1,5 +1,6 @@
 <tool id="interactive_tool_odv" tool_type="interactive" name="ODV" version="@VERSION@">
     <description>interactive plotting tool for geo-referenced data</description>
+    <icon src="odv.png"/>
     <macros>
     <token name="@VERSION@">v5.7.2</token>
     </macros>
