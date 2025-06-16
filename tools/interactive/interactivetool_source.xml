@@ -125,7 +125,7 @@ SOURCE is written in Python, an interpreted programming language highly adopted 
 SOURCE is relocatable in the sense that it can be adapted to any basin worldwide, provided that the input data follow a specific standard format.
    ]]></help>
     <citations>
-        <citation type="doi">https://doi.org/10.3389/fmars.2021.750387</citation>
+        <citation type="doi">10.3389/fmars.2021.750387</citation>
     </citations>
 </tool>
 
