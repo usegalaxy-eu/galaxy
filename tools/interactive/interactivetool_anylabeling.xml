@@ -17,18 +17,18 @@
 	 chown -R 1000:1000 ./home &&
 
          #for $i,$img in enumerate($input_images):
-            ln -s '$img' './home/input_images/${img.element_identifier}' &&
+	    ln -s '$img' './home/input_images/${img.element_identifier}.${img.ext}' &&
          #end for
 
          #if $class_file:
              mkdir -p ./home/input_classes &&
-             ln -s '$class_file' './home/input_classes/${class_file.element_identifier}' &&
+             ln -s '$class_file' './home/input_classes/${class_file.element_identifier}.${class_file.ext}' &&
          #end if
 
          #if $annotations:
              mkdir -p ./home/input_annotations &&
              #for $i,$ann in enumerate($annotations):
-                 ln -s '$ann' './home/input_annotations/${ann.element_identifier}' &&
+		    ln -s '$ann' './home/input_annotations/${ann.element_identifier}.${ann.ext}' &&
              #end for
          #end if
 
