@@ -1,5 +1,6 @@
 <tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@" profile="22.01">
     <description>interactive geographic information system (GIS)</description>
+    <icon src="qgis.png"/>
     <macros>
         <token name="@VERSION@">3.34</token>
     </macros>

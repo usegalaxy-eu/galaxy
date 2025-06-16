@@ -1,5 +1,6 @@
 <tool id="interactive_tool_divand" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="@VERSION@" profile="22.05">
     <description>Data-Interpolating Variational Analysis in n dimensions</description>
+    <icon src="divand.png"/>
     <macros>
         <token name="@VERSION@">0.0.6</token>
     </macros>

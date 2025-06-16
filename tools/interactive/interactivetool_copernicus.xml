@@ -1,5 +1,6 @@
 <tool id="interactive_tool_copernicus_notebook" tool_type="interactive" name="Copernicus Data Space Ecosystem" version="@VERSION@">
     <description>sample notebooks to access and discover data</description>
+    <icon src="cdse.png"/>
     <macros>
     <token name="@VERSION@">0.0.1</token>
     </macros>
