@@ -1,5 +1,6 @@
 <tool id="interactive_tool_cellprofiler" tool_type="interactive" name="Run CellProfiler" version="@VERSION@+galaxy0" profile="23.1">
 	<description>interactive tool</description>
+    <icon src="cellprofiler.png"/>
     <macros>
         <token name="@VERSION@">4.2.8</token>
     </macros>
@@ -15,13 +16,13 @@
     <![CDATA[
 	      export MPLCONFIGDIR=\$TEMP &&
         export HOME=\$PWD &&
-		    
+
         mkdir -p ./home ./home/output ./home/input &&
         chown -R 1000:1000 ./home &&
         #for $i,$filename in enumerate($infiles):
 	          ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
         #end for
-              
+
         #if str($input_type.existing) == "existing":
 	          cp '${input_type.pipeline_file}' \$HOME/home/output/'$input_type.pipeline_file.element_identifier'.cppipe &&
 	          echo "cellprofiler -r --pipeline \$HOME/home/output/'$input_type.pipeline_file.element_identifier'.cppipe -i \$HOME/home/input -o \$HOME/home/output " > \$HOME/home/cellprofiler_galaxy &&
@@ -29,7 +30,7 @@
 	          cp \$HOME/home/cellprofiler_galaxy '/bin' &&
         #end if
 
-	/init 
+	/init
     ]]>
     </command>
     <inputs>
@@ -47,16 +48,16 @@
             </when>
         </conditional>
     </inputs>
-    
+
     <outputs>
 	      <collection name="cp_output" type="list" label="CellProfiler output">
 	          <discover_datasets pattern="__name_and_ext__" directory="home/output" />
 	      </collection>
     </outputs>
-    
+
     <tests>
     </tests>
-    
+
     <help><![CDATA[
 ]]>
     </help>
