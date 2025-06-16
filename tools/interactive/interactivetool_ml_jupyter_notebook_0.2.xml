@@ -1,4 +1,5 @@
 <tool id="interactive_tool_ml_jupyter_notebook" tool_type="interactive" name="GPU-enabled Interactive Jupyter Notebook for Machine Learning" version="@VERSION@" profile="22.01">
+    <icon src="jupyterAI_logo.png" />
     <macros>
         <token name="@VERSION@">0.2</token>
     </macros>
@@ -78,7 +79,7 @@ except FileNotFoundError:
         ]]>
     </configfile>
     </configfiles>
-    
+
     <command><![CDATA[
         python staging_script.py &&
         export GALAXY_WORKING_DIR=`pwd` &&
