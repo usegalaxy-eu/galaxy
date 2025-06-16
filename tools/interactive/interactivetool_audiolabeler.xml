@@ -1,5 +1,6 @@
 <tool id="interactive_tool_audiolabeler" tool_type="interactive" name="NEAL" version="0.1">
     <description>Nature+Energy Audio Labeller audio data annotation tool</description>
+    <icon src="neal.png" />
     <requirements>
         <container type="docker">ylebras/neal-docker:latest</container>
     </requirements>
@@ -27,7 +28,7 @@
     </command>
     <inputs>
         <param name="input" type="data" multiple="true" format="wav" label="Input sound data file(s) in wav format"/>
-        
+
         <conditional name="mode">
             <param name="mode_select" type="select" label="Do you already have a labels file?" help="This need to conform to formatting as described in help section">
                 <option value="labeling">Start with a fresh labels file</option>
