@@ -1,5 +1,5 @@
 <tool id="interactive_tool_ml_jupyter_notebook" tool_type="interactive" name="GPU-enabled Interactive Jupyter Notebook for Machine Learning" version="@VERSION@" profile="22.01">
-    <icon src="jupyter_logo.png" />
+    <icon src="jupyterAI_logo.png" />
     <macros>
         <token name="@VERSION@">0.4</token>
     </macros>
@@ -79,7 +79,7 @@ except FileNotFoundError:
         ]]>
     </configfile>
     </configfiles>
-    
+
     <command><![CDATA[
         ## Check if the node has GPU. Activate CPU or GPU version of tensorflow
         if nvidia-smi 2> /dev/null; then

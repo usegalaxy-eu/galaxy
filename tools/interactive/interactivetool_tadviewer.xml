@@ -1,5 +1,6 @@
 <tool id="interactive_tool_tadviewer" name="tadviewer" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="20.01" license="MIT" tool_type="interactive">
     <description>interactive table viewer with SQL enginer for filtering</description>
+    <icon src="tad.png"/>
     <creator>
         <person
             givenName="Helge"
