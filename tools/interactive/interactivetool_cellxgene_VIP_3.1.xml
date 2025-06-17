@@ -1,5 +1,5 @@
 <tool id="interactive_tool_cellxgene_vip" tool_type="interactive" name="Interactive CELLxGENE VIP Environment" version="3.1.2">
-    <icon src="cellxgene.png" />
+    <icon src="cellxgene_vip.png" />
     <requirements>
         <container type="docker">quay.io/bgruening/cellxgene-vip:3.1.2</container>
     </requirements>
