@@ -1,5 +1,6 @@
 <tool id="interactive_tool_pampa" tool_type="interactive" name="pampa" version="0.0.1" profile="22.01">
     <description>Performance Indicators of Marine Protected Areas for the management of coastal ecosystems, resources and their uses</description>
+    <icon src="pampa.png" />
     <requirements>
         <container type="docker">ylebras/pampa:test</container>
     </requirements>
