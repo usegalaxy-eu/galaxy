@@ -1,5 +1,6 @@
 <tool id="interactive_tool_metashrimps" tool_type="interactive" name="metashrimps" version="0.0.2" profile="22.01">
     <description>Metadata Shiny for Retroactive Information Management and Production of data paper Sketches</description>
+    <icon src="metashrimps.png" />
     <requirements>
         <container type="docker">ylebras/ms_metashrimps:v2</container>
     </requirements>
