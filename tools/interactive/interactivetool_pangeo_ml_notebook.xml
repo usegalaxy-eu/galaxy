@@ -1,5 +1,5 @@
 <tool id="interactive_tool_pangeo_ml_notebook" tool_type="interactive" name="Interactive Pangeo Machine Learning Notebook" version="23.0" profile="23.0">
-    <icon src="pangeo.png"/>
+    <icon src="pangeo_ml.png"/>
     <requirements>
         <container type="docker">quay.io/nordicesmhub/docker-pangeo-ml-notebook:2023.02.27</container>
     </requirements>
