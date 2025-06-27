@@ -123,8 +123,8 @@ shiny::runApp(app, host="0.0.0.0", port=8888, quiet=TRUE, launch.browser=FALSE)
     <param
       name="input"
       type="data"
-      format="rdata.se"
-      label="HDF5SummarizedExperiment: rdata.se (composite)"
+      format="rdata.sce"
+      label="HDF5SummarizedExperiment: rdata.sce (composite)"
       help="This datatype represents a HDF5SummarizedExperiment object as
         exported from R."
     />
