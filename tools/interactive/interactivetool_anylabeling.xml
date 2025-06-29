@@ -1,4 +1,4 @@
-<tool id="interactive_tool_anylabeling" tool_type="interactive" name="AnyLabeling Interactive" version="@VERSION@" profile="24.2">
+<tool id="interactive_tool_anylabeling" tool_type="interactive" name="AnyLabeling Interactive" version="0.4.30" profile="24.2">
     <description>Effortless data labeling with AI support from YOLO and Segment Anything!</description>
     <icon src="anylabeling.png"/>
     <requirements>
