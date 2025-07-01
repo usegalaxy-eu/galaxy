@@ -53,7 +53,7 @@
              #end for    
          #end if 
 
-        /init
+        && /init
     ]]>
     </command>
     <inputs>
