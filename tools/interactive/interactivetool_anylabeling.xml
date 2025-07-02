@@ -18,7 +18,7 @@
 
          #for $i,$img in enumerate($input_images):
             #if $img.element_identifier.endswith($img.ext)
-	        && ln -s '$img' './home/input_images/${img.element_identifier}
+	        && ln -s '$img' './home/input_images/${img.element_identifier}'
 	    #else:
 		&& ln -s '$img' './home/input_images/${img.element_identifier}.${img.ext}'
 	    #end if
