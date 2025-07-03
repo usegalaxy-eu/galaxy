@@ -2,7 +2,7 @@
 #    uv export --frozen --no-annotate --no-hashes --no-dev
 a2wsgi==1.10.8
 adal==1.2.7
-aiobotocore==2.21.1
+aiobotocore==2.15.2
 aiofiles==24.1.0
 aiohappyeyeballs==2.6.1
 aiohttp==3.11.18
@@ -29,8 +29,8 @@ billiard==4.2.1
 bioblend==1.5.0
 bleach==6.2.0
 boltons==25.0.0
-boto==2.49.0
-botocore==1.37.1
+boto==2.49.0  # this comment generates a merge conflict if this dependency is updated upstream
+botocore==1.35.36
 bx-python==0.13.0
 cachecontrol==0.14.2
 celery==5.5.2
