@@ -16,7 +16,7 @@
         <param required="true">dataset_id</param>
     </params>
     <requirements>
-        <requirement type="npm" version="0.0.1" package="@galaxyproject/tiffviewer"/>
+        <requirement type="npm" version="0.0.3" package="@galaxyproject/tiffviewer"/>
     </requirements>
     <entry_point entry_point_type="script" src="index.js" css="index.css" />
     <tests>
