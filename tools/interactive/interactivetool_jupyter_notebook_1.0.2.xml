@@ -49,7 +49,7 @@ for user_input in json.load(open(galaxy_inputs, "r")).get("user_inputs", []):
             os.makedirs(path, exist_ok=True)
             try:
                 os.symlink(input_value_dict['source_path'], os.path.join(path, filename))
-            except FileExistsError:
+            except (FileExistsError, TypeError):
                 pass
             for metadata_value_dict in input_value_dict['metadata_files']:
                 path, filename = os.path.split(metadata_value_dict['staging_path'])
@@ -58,7 +58,7 @@ for user_input in json.load(open(galaxy_inputs, "r")).get("user_inputs", []):
                 os.makedirs(path, exist_ok=True)
                 try:
                     os.symlink(metadata_value_dict['source_path'], os.path.join(path, filename))
-                except FileExistsError:
+                except (FileExistsError, TypeError):
                     pass
             input_values2.append(input_value_dict2)
         input_values = input_values2
