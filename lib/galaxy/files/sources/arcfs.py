@@ -1,19 +1,19 @@
 try:
-    from gitlab_arc_fs.gitlab_fs import GitlabFS
+    from gitlab_arc_fs.arc_fs import ARCfs
 except ImportError:
-    GitlabFS = None
+    ARCfs = None
 from ._pyfilesystem2 import PyFilesystem2FilesSource  # NOQA
 
 
-class GitlabFSFilesSource(PyFilesystem2FilesSource):
-    plugin_type = "gitlabfs"
-    required_module = GitlabFS
-    required_package = "gitlab_fs"
+class ARCfsFilesSource(PyFilesystem2FilesSource):
+    plugin_type = "arcfs"
+    required_module = ARCfs
+    required_package = "gitlab_arc_fs"
 
-    def _open_fs(self, user_context):
+    def _open_fs(self, user_context, opts = None):  # NOQA
         props = self._serialization_props(user_context)
-        handle = GitlabFS(**props)
+        handle = ARCfs(**props)
         return handle
 
 
-__all__ = (GitlabFSFilesSource,)
+__all__ = (ARCfsFilesSource,)
