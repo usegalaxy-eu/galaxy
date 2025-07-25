@@ -1,7 +1,7 @@
 <tool id="interactive_tool_jupytergis_notebook" tool_type="interactive" name="Interactive JupyterGIS Notebook" version="0.1" profile="23.01">
     <icon src="jupytergis.png"/>
     <requirements>
-        <container type="docker">quay.io/annefou/docker-jupytergis-notebook:0.4.2</container>
+        <container type="docker">quay.io/annefou/docker-jupytergis-notebook:0.6.2</container>
     </requirements>
     <entry_points>
        <!-- needs to be requires_domain="True" because the GIX extension creates URL like:
