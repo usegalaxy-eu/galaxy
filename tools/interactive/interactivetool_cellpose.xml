@@ -2,10 +2,10 @@
     <description>a generalist algorithm for cellular segmentation and restoration</description>
     <icon src="cellpose.png" />
     <macros>
-        <token name="@VERSION@">3.0.11</token>
+        <token name="@VERSION@">3.1.1.1</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/sunyi000/cellpose-galaxy:v3.0.11</container>
+        <container type="docker">quay.io/sunyi000/cellpose-galaxy:v3.1.1.1</container>
     </requirements>
     <entry_points>
         <entry_point name="CellPose" requires_domain="True">
