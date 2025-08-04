@@ -16,11 +16,15 @@
     <![CDATA[
         export HOME=\$PWD/home/ &&
 
-        mkdir -p ./home ./home/cp_working_dir &&
+        mkdir -p ./home/cp_working_dir/models &&
         chmod -R 777 ./home &&
         #for $i,$filename in enumerate($infiles):
         ln -s '$filename' './home/cp_working_dir/${filename.element_identifier}.${filename.ext}' &&
         #end for
+
+        if [ -n "\$(ls -A ./home/cp_working_dir/models)" ]; then
+	    tar -czf model_output.tar -C ./home/cp_working_dir models &&
+        fi
 
     /init
     ]]>
@@ -30,8 +34,9 @@
     </inputs>
 
     <outputs>
+        <data name="model_output" format="tar" label="Saved model" from_work_dir="model_output.tar" />
         <collection name="cp_output" type="list" label="CellPose output">
-            <discover_datasets pattern="__name_and_ext__" directory="./home/cp_working_dir" />
+            <discover_datasets pattern="__name_and_ext__" directory="./home/cp_working_dir"/>
         </collection>
     </outputs>
     <tests>
