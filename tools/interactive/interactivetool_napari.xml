@@ -14,13 +14,14 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-        export HOME=\$PWD &&
-        ## Create a directory where the app user has access
-        mkdir -p ./output ./input &&
-        chown 1000:1000 ./output ./input &&
-        #for $i, $filename in enumerate($infile):
-              ln -s '$filename' './input/${filename.element_identifier}.${filename.ext}' &&
-        #end for
+        export HOME=\$PWD/home &&
+        mkdir -p ./home/input ./home/output ./home/omero &&
+        chown -R 1000 ./home &&
+        #if $infile:
+            #for $filename in $infile:
+               ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
+            #end for
+        #end if
     /init
 
     ]]>
