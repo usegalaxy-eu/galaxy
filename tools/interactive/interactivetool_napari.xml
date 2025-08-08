@@ -5,7 +5,7 @@
         <token name="@VERSION@">0.6.3</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/sunyi000/napari-galaxy:v0.6.3</container>
+        <container type="docker">quay.io/sunyi000/napari-galaxy:v@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="Napari">
