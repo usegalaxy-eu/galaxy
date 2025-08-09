@@ -28,15 +28,9 @@
         /init &&
 
         if [ -n "\$(ls -A ./home/cp_working_dir/models)" ]; then
-        ## remove saved masks and convert the pytorch models
-        rm -rf ./home/cp_working_dir/models/*.npy &&
-        for file in ./home/cp_working_dir/models/*; do
-            if [ -f "\$file" ]; then
-                basename=\$(basename "\$file")
-                python3 '$__tool_directory__/pytorch_convert_safetensors.py' --convert pt_safe -i "\$file" -o "./home/cp_working_dir/models/safe/\${basename}.safetensors";
-                echo "Converted \$file to \${basename}.safetensors";
-            fi
-        done
+            ## remove saved masks and convert the pytorch models
+            rm -rf ./home/cp_working_dir/models/*.npy &&
+            python3 '$__tool_directory__/pytorch_convert_safetensors.py' --convert pt_safe --batch -i "./home/cp_working_dir/models/" -o "./home/cp_working_dir/models/safe";
         fi
     ]]>
     </command>
