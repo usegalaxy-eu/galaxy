@@ -2,10 +2,10 @@
     <description>a generalist algorithm for cellular segmentation and restoration</description>
     <icon src="cellpose.png" />
     <macros>
-        <token name="@VERSION@">3.1.1.1</token>
+        <token name="@VERSION@">3.1.1.2</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/sunyi000/cellpose-galaxy:v3.1.1.1</container>
+        <container type="docker">quay.io/sunyi000/cellpose-galaxy:v@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="CellPose">
@@ -18,11 +18,11 @@
     <command detect_errors="exit_code">
     <![CDATA[
         export HOME=\$PWD/home/ &&
-
+        export CELLPOSE_START_DIR=./home/cp_working_dir/ &&
         mkdir -p ./home/cp_working_dir/models/safe &&
         chmod -R 777 ./home &&
         #for $i,$filename in enumerate($infiles):
-        ln -s '$filename' './home/cp_working_dir/${filename.element_identifier}.${filename.ext}' &&
+            ln -s '$filename' './home/cp_working_dir/${filename.element_identifier}.${filename.ext}' &&
         #end for
 
         /init &&
