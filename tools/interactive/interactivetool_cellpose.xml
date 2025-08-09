@@ -18,7 +18,7 @@
     <command detect_errors="exit_code">
     <![CDATA[
         export HOME=\$PWD/home/ &&
-        export CELLPOSE_START_DIR=./home/cp_working_dir/ &&
+        export CELLPOSE_START_DIR=\$PWD/home/cp_working_dir/ &&
         mkdir -p ./home/cp_working_dir/models/safe &&
         chmod -R 777 ./home &&
         #for $i,$filename in enumerate($infiles):
