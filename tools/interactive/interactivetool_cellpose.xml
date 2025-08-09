@@ -32,9 +32,9 @@
         rm -rf ./home/cp_working_dir/models/*.npy &&
         for file in ./home/cp_working_dir/models/*; do
             if [ -f "$file" ]; then
-                basename=$(basename "$file")
-                python '$__tool_directory__/pytorch_convert_safetensors.py' --convert pt_safe -i "$file" -o "./home/cp_working_dir/models/safe/${basename}.safetensors";
-                echo "Converted $file to ${basename}.safetensors";
+                basename=\$(basename "\$file")
+                python '$__tool_directory__/pytorch_convert_safetensors.py' --convert pt_safe -i "\$file" -o "./home/cp_working_dir/models/safe/\${basename}.safetensors";
+                echo "Converted \$file to \${basename}.safetensors";
             fi
         done
         fi
