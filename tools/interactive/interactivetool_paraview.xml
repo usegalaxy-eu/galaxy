@@ -1,7 +1,7 @@
-<tool id="interactive_tool_paraview" tool_type="interactive" name="Paraview" version="v5.12+galaxy02" profile="24.2">
+<tool id="interactive_tool_paraview" tool_type="interactive" name="Paraview" version="v5.11+galaxy01" profile="24.2">
     <icon src="paraview.png"/>
     <requirements>
-        <container type="docker">quay.io/sunyi000/docker-paraview:v5.12</container>
+        <container type="docker">quay.io/bmcv/docker-paraview:v5.11</container>
     </requirements>
     <entry_points>
         <entry_point name="Paraview">
