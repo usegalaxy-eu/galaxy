@@ -2,7 +2,7 @@
     <description>Sea Observations Utility for Reprocessing, Calibration and Evaluation</description>
     <icon src="source.png"/>
     <macros>
-        <token name="@VERSION@">0.0.2</token>
+        <token name="@VERSION@">1.4.4</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/coastal-source-jupyter-lab:@VERSION@</container>
@@ -10,7 +10,7 @@
     <entry_points>
         <entry_point name="Source Interactive Tool" requires_domain="True">
             <port>8888</port>
-            <url>ipython/lab</url>
+            <url>lab</url>
         </entry_point>
     </entry_points>
     <environment_variables>
@@ -35,17 +35,17 @@
 
         ## change into the directory where the notebooks are located
         cd ./jupyter/ &&
-        export HOME=/home/jovyan/ &&
-        export PATH=/home/jovyan/.local/bin:\$PATH &&
+        ## export HOME=/home/jovyan/ &&
+        export PATH=\$HOME/.local/bin:\$PATH &&
 
         #if $mode.mode_select == 'scratch'
             ## copy all notebooks, workflows and data
             cp '$__tool_directory__/default_notebook.ipynb' ./ipython_galaxy_notebook.ipynb &&
             jupyter trust ./ipython_galaxy_notebook.ipynb &&
-            cp -r /home/\$NB_USER/notebooks/ ./ &&
+	    cp -r /root/notebooks ./ &&
 
             ## provide all rights to copied files
-            jupyter lab --allow-root --no-browser &&
+            jupyter lab --ip='*' --port=8888 --allow-root --no-browser --ServerApp.token='' --ServerApp.password='' &&
             cp ./*.ipynb '$jupyter_notebook' &&
             cd outputs/ &&
             sleep 2 &&
@@ -58,7 +58,7 @@
                 jupyter nbconvert --to notebook --execute --output ./ipython_galaxy_notebook.ipynb --allow-errors  ./*.ipynb &&
                 #set $noteboook_name = 'ipython_galaxy_notebook'
             #else
-                jupyter lab --allow-root --no-browser --NotebookApp.shutdown_button=True &&
+                jupyter lab --allow-root --no-browser --NotebookApp.shutdown_button=True --ServerApp.token='' --ServerApp.password='' &&
             #end if
             cp './${noteboook_name}.ipynb' '$jupyter_notebook' &&
             cd outputs/ &&
@@ -128,5 +128,3 @@ SOURCE is relocatable in the sense that it can be adapted to any basin worldwide
         <citation type="doi">10.3389/fmars.2021.750387</citation>
     </citations>
 </tool>
-
-
