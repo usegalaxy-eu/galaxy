@@ -2,7 +2,7 @@
     <description>Sea Observations Utility for Reprocessing, Calibration and Evaluation</description>
     <icon src="source.png"/>
     <macros>
-        <token name="@VERSION@">1.4.4</token>
+        <token name="@VERSION@">1.4.5</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/coastal-source-jupyter-lab:@VERSION@</container>
