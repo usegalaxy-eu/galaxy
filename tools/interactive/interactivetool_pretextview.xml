@@ -1,0 +1,47 @@
+<tool id="interactive_tool_pretextview" tool_type="interactive" name="PretextView" version="@VERSION@">
+    <description>Paired REad TEXTure Viewer Contact Map Viewer</description>
+    <icon src="pretextview.png"/>
+    <macros>
+    <token name="@VERSION@">1.0.3</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/pretextview:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="ODV" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        export HOME=\$PWD &&
+        export PTV_INPUT='$infile' &&
+        /init
+    ]]>
+    </command>
+    <inputs>
+        <param name="infile" type="data" format="pretext" label="Pretext Contact Map"/>
+    </inputs>
+    <outputs>
+        <data name="output" format="txt" label="${tool.name} on ${on_string}"/>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        `PretextView <https://github.com/sanger-tol/PretextView/>`_ is a desktop application for viewing pretext contact maps.
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+@misc{PretextView,
+  author       = {Sanger Institute Tree of Life Programme},
+  title        = {PretextView: A visualisation tool for genome assemblies},
+  year         = {2023},
+  publisher    = {GitHub},
+  journal      = {GitHub repository},
+  howpublished = {\url{https://github.com/sanger-tol/PretextView}},
+  note         = {Accessed: 2025-09-01}
+}
+        </citation>
+    </citations>
+</tool>
