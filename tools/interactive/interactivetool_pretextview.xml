@@ -8,7 +8,7 @@
         <container type="docker">quay.io/galaxy/pretextview:@VERSION@</container>
     </requirements>
     <entry_points>
-        <entry_point name="ODV" requires_domain="True">
+        <entry_point name="PretextView">
             <port>5800</port>
         </entry_point>
     </entry_points>
