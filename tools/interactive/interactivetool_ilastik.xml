@@ -1,5 +1,6 @@
 <tool id="interactive_tool_ilastik" tool_type="interactive" name="Ilastik" version="@VERSION@" profile="24.2">
     <description>interactive learning and segmentation toolkit</description>
+    <icon src="ilastik.png"/>
     <macros>
         <token name="@VERSION@">1.4.1.post1</token>
     </macros>
