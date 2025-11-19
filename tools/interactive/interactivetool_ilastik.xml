@@ -1,8 +1,8 @@
-<tool id="interactive_tool_ilastik" tool_type="interactive" name="Ilastik" version="@VERSION@" profile="23.0">
+<tool id="interactive_tool_ilastik" tool_type="interactive" name="Ilastik" version="@VERSION@" profile="24.2">
     <description>interactive learning and segmentation toolkit</description>
     <icon src="ilastik.png"/>
     <macros>
-        <token name="@VERSION@">1.4.0</token>
+        <token name="@VERSION@">1.4.1.post1</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/ilastik:@VERSION@</container>
@@ -27,8 +27,8 @@
         #end if
         export HOME=\$PWD &&
         ## Create a directory where the app user has access
-        mkdir -p ./output &&
-        chown 1000:1000 ./output/ &&
+        mkdir -p ./output ./zarr_output &&
+        chown 1000:1000 ./output/ ./zarr_output &&
         ## Make a copy of the existing project if exists
         #if str($input_type.existing) == "existing":
             cp '$input_type.project' ./output/MyProject.ilp &&
@@ -36,7 +36,11 @@
 
         ## Link input images to current working directory
         #for input in $infiles:
-            ln -s '$input' ./'$input.element_identifier'.tif &&
+            #if $input.element_identifier.endswith($input.ext):
+                ln -s '$input' ./'$input.element_identifier' &&
+            #else:
+                ln -s '$input' ./${input.element_identifier}.${input.ext} &&
+            #end if
         #end for
         ## Write the bash script to run:
         #if str($input_type.existing) == "new":
@@ -47,7 +51,11 @@
         ## Copy it to /bin/ so it will be used by the container:
         chmod +x ./ilastik_with_args &&
         cp ./ilastik_with_args '/bin/' &&
-        /init
+        /init  &&
+        
+        if [ -n "\$(ls -A ./zarr_output)" ]; then
+	    cp -r ./zarr_output/* $zarr_output.extra_files_path; 
+        fi
     ]]>
     </command>
     <inputs>
@@ -80,25 +88,21 @@
                 <param argument="--project" type="data" format="h5" label="Existing ilastik project" />
             </when>
         </conditional>
-        <param name="infiles" type="data" format="tiff" multiple="true" label="Input files in TIFF format"/>
-    </inputs>
-
+        <param name="infiles" type="data" format="tiff,h5" multiple="true" label="Input files in TIFF or h5 format"/>
+    </inputs>    
     <outputs>
         <data name="ilastik_project" format="h5" label="Ilastik project file" from_work_dir="output/MyProject.ilp"/>
+	<data name="zarr_output" format="ome_zarr" label="Output OME-Zarr" />
     </outputs>
-
     <tests>
     </tests>
-
     <help><![CDATA[
         Leverage machine learning algorithms to easily segment, classify, track and count your cells or other experimental data. Most operations are interactive, even on large datasets: you just draw the labels and immediately see the result. No machine learning expertise required.
 
         This tool has been designed uniquely to make/modify a project.
-
         - It requires that input images have unique identifiers.
         - When you have trained your project, save it and quit the application. The project called 'MyProject.ilp' will be imported into your history.
         - If you want to modify a project, make sure you use at least the same images (with the same identifiers) as the first time (but you can add more).
-
         Please, check the documentation at https://www.ilastik.org/documentation/.
 ]]>
     </help>
