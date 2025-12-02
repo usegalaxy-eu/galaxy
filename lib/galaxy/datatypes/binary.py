@@ -490,6 +490,12 @@ class CompressedZarrZipArchive(CompressedZipArchive):
                     dataset.metadata.zarr_format = format_version
 
     def sniff(self, filename: str) -> bool:
+        """
+        >>> from galaxy.datatypes.sniff import get_test_fname
+        >>> fname = get_test_fname('Images.zarr.zip')
+        >>> CompressedZarrZipArchive().sniff(fname)
+        True
+        """
         # Check if the zip file contains a zarr store.
         # In theory, the zarr store must be in the root of the zip file.
         # See: https://github.com/zarr-developers/zarr-python/issues/756#issuecomment-852134901
@@ -1550,6 +1556,8 @@ class Anndata(H5):
     True
     >>> Anndata().sniff(get_test_fname('adata_unk.h5ad'))
     True
+    >>> Anndata().sniff(get_test_fname('adata_noX.h5ad'))
+    True
     """
 
     file_ext = "h5ad"
@@ -1724,14 +1732,23 @@ class Anndata(H5):
 
             # Resolving the problematic shape parameter
             if "X" in dataset.metadata.layers_names:
-                # Shape we determine here due to the non-standard representation of 'X' dimensions
-                shape = anndata_file["X"].attrs.get("shape")
-                if shape is not None:
-                    dataset.metadata.shape = tuple(shape)
-                elif hasattr(anndata_file["X"], "shape"):
-                    dataset.metadata.shape = tuple(anndata_file["X"].shape)
 
-            if dataset.metadata.shape is None:
+                # Check if X is a null/empty matrix (common in fragment-only files of snapatac data for example)
+                if (
+                    anndata_file["X"].attrs.get("encoding-type") == "null"
+                    or anndata_file["X"].attrs.get("shape") is None
+                ):
+                    # if X matrix is null/empty, derive shape from obs and var sizes
+                    dataset.metadata.shape = (int(dataset.metadata.obs_size), int(dataset.metadata.var_size))
+                else:
+                    # if X matrix has actual data
+                    shape = anndata_file["X"].attrs.get("shape")
+                    if shape is not None:
+                        dataset.metadata.shape = tuple(shape)
+                    elif hasattr(anndata_file["X"], "shape") and anndata_file["X"].shape is not None:
+                        dataset.metadata.shape = tuple(anndata_file["X"].shape)
+
+            if dataset.metadata.shape is None or dataset.metadata.shape == (-1, -1):
                 dataset.metadata.shape = (int(dataset.metadata.obs_size), int(dataset.metadata.var_size))
 
     def set_peek(self, dataset: DatasetProtocol, **kwd) -> None:
@@ -4961,6 +4978,162 @@ class Hic(Binary):
         with open(dataset.get_file_name(), "rb") as handle:
             header_bytes = handle.read(8)
         dataset.metadata.version = struct.unpack("<i", header_bytes[4:8])[0]
+
+
+class SpatialData(CompressedZarrZipArchive):
+    """
+    Class for SpatialData file: https://spatialdata.scverse.org/
+
+    SpatialData: an open and universal framework for processing spatial omics data.
+    SpatialData aims at implementing a performant in-memory representation in Python
+    and an on-disk representation based on the Zarr and Parquet data formats
+    and following, when applicable, the OME-NGFF specification
+
+    The format stores multi-modal spatial omics datasets including:
+    - Images (2D/3D multi-scale)
+    - Labels (segmentation masks)
+    - Shapes (polygons, circles)
+    - Points (transcript locations, point clouds)
+    - Tables (annotations)
+    """
+
+    file_ext = "spatialdata.zip"
+
+    def _extract_spatialdata_info(self, filename: str) -> Dict[str, Any]:
+        """Extract information about SpatialData elements from the zarr archive."""
+        info: Dict[str, Any] = {
+            "images": set(),
+            "labels": set(),
+            "shapes": set(),
+            "points": set(),
+            "tables": set(),
+            "table_shapes": {},
+        }
+
+        try:
+            with zipfile.ZipFile(filename) as zf:
+                # Find root zarr directory and detect version
+                root_zarr = is_v3 = None
+                for file in zf.namelist():
+                    if file.endswith(".zarr/zarr.json"):
+                        root_zarr, is_v3 = file.rsplit("/", 1)[0], True
+                        break
+                    elif file.endswith(".zarr/.zattrs"):
+                        root_zarr, is_v3 = file.rsplit("/", 1)[0], False
+                        break
+                if not root_zarr:
+                    return info
+
+                # Extract elements: <root>.zarr/<type>/<name>/...
+                prefix = root_zarr + "/"
+                for file in zf.namelist():
+                    if file.startswith(prefix):
+                        parts = file[len(prefix) :].split("/")
+                        if len(parts) >= 2 and parts[1] and not parts[1].startswith(".") and parts[1] != "zarr.json":
+                            if parts[0] in info and parts[0] != "table_shapes":
+                                info[parts[0]].add(parts[1])
+
+                # Extract table shapes (AnnData dimensions)
+                def get_shape(path):
+                    if path in zf.namelist():
+                        with zf.open(path) as f:
+                            return json.load(f).get("shape", [None])[0]
+
+                for table in info["tables"]:
+                    try:
+                        base = f"{root_zarr}/tables/{table}"
+                        ext = "zarr.json" if is_v3 else ".zarray"
+                        n_obs = get_shape(f"{base}/obs/_index/{ext}")
+                        # V3: if no obs/_index, check obs metadata for index column
+                        if is_v3 and n_obs is None:
+                            obs_meta = f"{base}/obs/zarr.json"
+                            if obs_meta in zf.namelist():
+                                with zf.open(obs_meta) as f:
+                                    idx_col = json.load(f).get("attributes", {}).get("_index")
+                                    if idx_col:
+                                        n_obs = get_shape(f"{base}/obs/{idx_col}/zarr.json")
+                        n_vars = get_shape(f"{base}/var/_index/{ext}")
+                        if n_obs and n_vars:
+                            info["table_shapes"][table] = (n_obs, n_vars)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+        return info
+
+    def set_peek(self, dataset: DatasetProtocol, **kwd) -> None:
+        if not dataset.dataset.purged:
+            info = self._extract_spatialdata_info(dataset.get_file_name())
+            lines = ["SpatialData object"]
+            if dataset.metadata.zarr_format:
+                lines[0] += f" (Zarr Format v{dataset.metadata.zarr_format})"
+
+            # Filter non-empty element types
+            element_types = [
+                ("images", "Images"),
+                ("labels", "Labels"),
+                ("shapes", "Shapes"),
+                ("points", "Points"),
+                ("tables", "Tables"),
+            ]
+            non_empty = [(key, label) for key, label in element_types if info[key]]
+
+            for idx, (key, label) in enumerate(non_empty):
+                is_last = idx == len(non_empty) - 1
+                elements = sorted(info[key])
+                lines.append(f"{'└──' if is_last else '├──'} {label} ({len(elements)})")
+
+                prefix = "      " if is_last else "│     "
+                for i, name in enumerate(elements):
+                    display = f"'{name}'"
+                    if key == "tables" and name in info["table_shapes"]:
+                        display += f": AnnData {info['table_shapes'][name]}"
+                    lines.append(f"{prefix}{'└──' if i == len(elements) - 1 else '├──'} {display}")
+
+            dataset.peek = "\n".join(lines)
+            dataset.blurb = f"SpatialData file ({nice_size(dataset.get_size())})"
+        else:
+            dataset.peek = "file does not exist"
+            dataset.blurb = "file purged from disk"
+
+    def sniff(self, filename: str) -> bool:
+        """
+        Check if file is a SpatialData zarr archive (has spatialdata_attrs in root metadata).
+
+        >>> from galaxy.datatypes.sniff import get_test_fname
+        >>> fname = get_test_fname('subsampled_visium.spatialdata.zip')
+        >>> SpatialData().sniff(fname)
+        True
+        >>> fname = get_test_fname('subsampled_visium_v3.spatialdata.zip')
+        >>> SpatialData().sniff(fname)
+        True
+        >>> fname = get_test_fname('Images.zarr.zip')
+        >>> SpatialData().sniff(fname)
+        False
+        """
+        try:
+            with zipfile.ZipFile(filename) as zf:
+                if self._find_zarr_metadata_file(zf) is None:
+                    return False
+
+                # Check root metadata files (.zattrs or zarr.json) for spatialdata_attrs
+                for file in zf.namelist():
+                    if len(file.split("/")) <= 2 and file.endswith((".zattrs", "zarr.json")):
+                        try:
+                            with zf.open(file) as f:
+                                meta = json.load(f)
+                                # Standard format or v3 consolidated
+                                if "spatialdata_attrs" in meta.get("attributes", meta):
+                                    return True
+                                if "metadata" in meta:
+                                    for pm in meta["metadata"].values():
+                                        if isinstance(pm, dict) and "spatialdata_attrs" in pm.get("attributes", {}):
+                                            return True
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+        return False
 
 
 @build_sniff_from_prefix

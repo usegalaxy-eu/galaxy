@@ -148,7 +148,7 @@
     <datatype extension="las" type="galaxy.datatypes.binary:Binary" mimetype="application/vnd.las" subclass="true" display_in_upload="true" description="The LAS (LASer) format is a file format designed for the interchange and archiving of Lidar point cloud data." description_url="https://www.loc.gov/preservation/digital/formats/fdd/fdd000418.shtml">
         <infer_from suffix="las" />
     </datatype>
-    <datatype extension="laz" type="galaxy.datatypes.binary:Binary" mimetype="application/vnd.las" subclass="true" display_in_upload="true" description="LAZ is an open format for lossless compression of LAS." description_url="https://downloads.rapidlasso.de/doc/laszip.pdf">
+    <datatype extension="laz" type="galaxy.datatypes.binary:Binary" mimetype="application/vnd.laszip" subclass="true" display_in_upload="true" description="LAZ is an open format for lossless compression of LAS." description_url="https://downloads.rapidlasso.de/doc/laszip.pdf">
         <infer_from suffix="laz" />
     </datatype>
     <datatype extension="d3_hierarchy" type="galaxy.datatypes.text:Json" mimetype="application/json" subclass="true" display_in_upload="true"/>
@@ -351,6 +351,7 @@
     <datatype extension="ome_zarr.zip" type="galaxy.datatypes.binary:CompressedOMEZarrZipArchive" display_in_upload="true">
         <converter file="archive_to_directory.xml" target_datatype="ome_zarr" />
     </datatype>
+    <datatype extension="spatialdata.zip" type="galaxy.datatypes.binary:SpatialData" mimetype="application/octet-stream" display_in_upload="true" description="A data framework that comprises a FAIR storage format and a collection of python libraries for performant access, alignment, and processing of uni- and multi-modal spatial omics datasets" description_url="https://github.com/scverse/spatialdata"/>
     <datatype extension="tar" auto_compressed_types="gz,bz2" type="galaxy.datatypes.binary:CompressedArchive" subclass="true" display_in_upload="true">
       <converter file="archive_to_directory.xml" target_datatype="directory"/>
     </datatype>
@@ -1295,6 +1296,7 @@
     <sniffer type="galaxy.datatypes.qiime2:QIIME2Metadata"/>
     <sniffer type="galaxy.datatypes.qiime2:QIIME2Artifact"/>
     <sniffer type="galaxy.datatypes.qiime2:QIIME2Visualization"/>
+    <sniffer type="galaxy.datatypes.binary:SpatialData"/>
     <sniffer type="galaxy.datatypes.binary:CompressedOMEZarrZipArchive"/>
     <sniffer type="galaxy.datatypes.binary:CompressedZarrZipArchive"/>
     <sniffer type="galaxy.datatypes.binary:CompressedZipArchive"/>
