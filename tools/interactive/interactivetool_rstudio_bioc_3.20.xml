@@ -32,15 +32,18 @@
         fi &&
         if [ -n "\$GROUPID" ]; then
             echo "[`date`] - Setting user group to \$GROUPID." &&
-            groupmod -g "\$GROUPID" rstudio;
+            groupmod -g "\$GROUPID" rstudio || true;
         fi &&
 
         ## This is where GalaxyConnector places files copied from Galaxy
         mkdir -p /import &&
         chown rstudio:rstudio /import &&
-        ln -s "/import" /home/rstudio/galaxy_imports &&
-        mkdir -p ./rstudio_outputs && chown rstudio:rstudio ./rstudio_outputs && ln -s "\$PWD/rstudio_outputs" /home/rstudio/galaxy_outputs &&
-
+        ln -s /import /home/rstudio/galaxy_imports &&
+        
+        mkdir ./rstudio_outputs && 
+        chown rstudio:rstudio ./rstudio_outputs || true && 
+        ln -s "\$PWD/rstudio_outputs" /home/rstudio/galaxy_outputs &&
+        
         echo "[`date`] - Creating Rprofile" &&
         cp '$__tool_directory__/Rprofile.R' /home/rstudio/.Rprofile &&
 
@@ -66,6 +69,7 @@
 
         echo "[`date`] - Starting container processes, including RStudio..." &&
         /init
+
     ]]>
     </command>
     <outputs>
