@@ -12,7 +12,6 @@
     <![CDATA[
       export HOME=\$PWD &&
       mkdir ./input/ &&
-      chown -R 1000:1000 ./input &&
 
       #for $img in $infile:
           #if $img.element_identifier.endswith($img.ext)
