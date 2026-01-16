@@ -273,5 +273,12 @@ except FileNotFoundError:
         do the heavy lifting such as performing computation on GPUs and data reduction steps in Galaxy and the plotting and more `interactive` part on smaller datasets in Jupyter Lab.
 
         You can start with a new JupyterLab notebook from scratch and wait until the job starts running. Running job will provide you a link which can be opened in the same or another browser tab. This link opens JupyterLab notebook which can be used to prototype machine learning solutions.
+        
+        ### GPU access notice
+        If you start a JupyterLab instance that requires GPU resources without prior authorization, the job will fail and an error message will redirect you to:
+        http://usegalaxy.eu/gpu-request
+        You will need to submit a GPU access request at this page. Our team will review requests as soon as possible.
+
+        
     ]]></help>
 </tool>
