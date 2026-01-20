@@ -44,6 +44,8 @@ class CondorJobState(AsynchronousJobState):
         self.failed = False
         self.user_log = None
         self.user_log_size = 0
+        # Count consecutive unchanged log size checks to occasionally force a reread.
+        self.unchanged_log_checks = 0
 
 
 class CondorJobRunner(AsynchronousJobRunner):
@@ -187,12 +189,24 @@ class CondorJobRunner(AsynchronousJobRunner):
             job_id = cjs.job_id
             galaxy_id_tag = cjs.job_wrapper.get_id_tag()
             try:
-                if (
-                    cjs.job_wrapper.tool.tool_type != "interactive"
-                    and os.stat(cjs.user_log).st_size == cjs.user_log_size
-                ):
-                    new_watched.append(cjs)
-                    continue
+                stat_size = os.stat(cjs.user_log).st_size
+                if cjs.job_wrapper.tool.tool_type != "interactive" and stat_size == cjs.user_log_size:
+                    cjs.unchanged_log_checks += 1
+                    # check every 300 iterations, which will be around 5min
+                    if cjs.unchanged_log_checks >= 300:
+                        log.debug(
+                            "(%s/%s) forcing condor log reread after %d unchanged checks (size=%d)",
+                            galaxy_id_tag,
+                            job_id,
+                            cjs.unchanged_log_checks,
+                            stat_size,
+                        )
+                        cjs.unchanged_log_checks = 0
+                    else:
+                        new_watched.append(cjs)
+                        continue
+                else:
+                    cjs.unchanged_log_checks = 0
                 s1, s4, s7, s5, s9, log_size = summarize_condor_log(cjs.user_log, job_id)
                 job_running = s1 and not (s4 or s7)
                 job_complete = s5
