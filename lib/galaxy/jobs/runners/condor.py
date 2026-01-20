@@ -194,7 +194,7 @@ class CondorJobRunner(AsynchronousJobRunner):
                     cjs.unchanged_log_checks += 1
                     # check every 300 iterations, which will be around 5min
                     if cjs.unchanged_log_checks >= 300:
-                        log.debug(
+                        log.warning(
                             "(%s/%s) forcing condor log reread after %d unchanged checks (size=%d)",
                             galaxy_id_tag,
                             job_id,
