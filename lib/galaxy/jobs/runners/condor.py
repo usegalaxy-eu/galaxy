@@ -192,7 +192,8 @@ class CondorJobRunner(AsynchronousJobRunner):
                 stat_size = os.stat(cjs.user_log).st_size
                 if cjs.job_wrapper.tool.tool_type != "interactive" and stat_size == cjs.user_log_size:
                     cjs.unchanged_log_checks += 1
-                    if cjs.unchanged_log_checks >= 65:
+                    # check every 300 iterations, which will be around 5min
+                    if cjs.unchanged_log_checks >= 300:
                         log.debug(
                             "(%s/%s) forcing condor log reread after %d unchanged checks (size=%d)",
                             galaxy_id_tag,
