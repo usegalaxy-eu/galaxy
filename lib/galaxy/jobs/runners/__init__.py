@@ -873,6 +873,20 @@ class AsynchronousJobRunner(BaseJobRunner, Monitors):
                         # TODO: This is where any cleanup would occur
                         self.handle_stop()
                         return
+                    try:
+                        job_id_tag = async_job_state.job_wrapper.get_id_tag()
+                        external_id = getattr(async_job_state, "job_id", None)
+                    except Exception:
+                        job_id_tag = UNKNOWN
+                        external_id = None
+                    log.debug(
+                        "%s: moving job to watched list (job=%s external=%s watched_size_before=%d queue_size_after_pop=%d)",
+                        self.runner_name,
+                        job_id_tag,
+                        external_id,
+                        len(self.watched),
+                        self.monitor_queue.qsize(),
+                    )
                     self.watched.append(async_job_state)
             except Empty:
                 pass
