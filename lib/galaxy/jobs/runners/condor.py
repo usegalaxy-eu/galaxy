@@ -177,19 +177,7 @@ class CondorJobRunner(AsynchronousJobRunner):
         cjs.job_destination = job_destination
 
         # Add to our 'queue' of jobs to monitor
-        log.debug(
-            "(%s/%s) enqueueing condor job state to monitor queue (size before enqueue: %d)",
-            galaxy_id_tag,
-            external_job_id,
-            self.monitor_queue.qsize(),
-        )
         self.monitor_queue.put(cjs)
-        log.debug(
-            "(%s/%s) condor job state enqueued (size after enqueue: %d)",
-            galaxy_id_tag,
-            external_job_id,
-            self.monitor_queue.qsize(),
-        )
 
     def check_watched_items(self):
         """
