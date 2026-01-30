@@ -1,11 +1,11 @@
-<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="23.1">
+<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="24.1">
     <icon src="napari.png" />
     <description>interactive tool</description>
     <macros>
-        <token name="@VERSION@">0.6.3</token>
+        <token name="@VERSION@">0.6.6</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/sunyi000/napari-galaxy:v@VERSION@</container>
+        <container type="docker">quay.io/galaxy/napari:v@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="Napari">
