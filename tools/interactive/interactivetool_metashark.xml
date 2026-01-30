@@ -2,7 +2,7 @@
     <icon src="metashark.png" />
     <description>Metadata Shiny Automated Resource and Knowledge</description>
     <requirements>
-        <container type="docker">ylebras/metashark:1.7.5</container>
+        <container type="docker">ylebras/metashark:1.7.6</container>
     </requirements>
     <entry_points>
         <entry_point name="metashark visualisation" requires_domain="True">
