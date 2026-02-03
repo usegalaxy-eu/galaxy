@@ -466,6 +466,7 @@ class PulsarJobRunner(AsynchronousJobRunner):
                 guest_ports=job_wrapper.guest_ports,
                 tool_directory_required_files=tool_directory_required_files,
             )
+            print("FOR MIRA", client, client_job_description, remote_job_config)
             external_job_id = pulsar_submit_job(client, client_job_description, remote_job_config)
             log.info(f"Pulsar job submitted with job_id {external_job_id}")
             job = job_wrapper.get_job()
