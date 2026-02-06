@@ -21,6 +21,7 @@
         #if $annotation:
             cp '$annotation' /data/annotation.bed &&
         #end if
+        /startup.sh
     ]]></command>
     <inputs>
         <param name="coords_file" type="data" format="txt,tabular" label="Coords file" help="Output from DotPrep.py (*.coords file)"/>
