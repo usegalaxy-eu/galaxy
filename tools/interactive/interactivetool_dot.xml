@@ -15,7 +15,7 @@
         </entry_point>
     </entry_points>
     <command><![CDATA[
-export HOME=\$PWD/home/ &&
+        export HOME=\$PWD/home/ &&
         export DOT_START_DIR=\$PWD/home/cp_working_dir/ &&
         mkdir -p ./home/cp_working_dir/inputs/ &&
         chmod -R 777 ./home &&
