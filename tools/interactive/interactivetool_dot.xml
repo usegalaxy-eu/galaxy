@@ -16,13 +16,13 @@
     </entry_points>
     <command><![CDATA[
         export HOME=\$PWD/home/ &&
-        export DOT_START_DIR=\$PWD/home/cp_working_dir/ &&
-        mkdir -p ./home/cp_working_dir/inputs/ &&
+        export DOT_START_DIR=\$PWD/home/ &&
+        mkdir -p ./home/inputs/ &&
         chmod -R 777 ./home &&
-        cp '$coords_file' ./home/cp_working_dir/inputs/input.coords &&
-        cp '$coords_idx_file' ./home/cp_working_dir/inputs/input.coords.idx &&
+        cp '$coords_file' ./home/inputs/input.coords &&
+        cp '$coords_idx_file' ./home/inputs/input.coords.idx &&
         #if $annotation:
-            cp '$annotation' ./home/cp_working_dir/inputs/annotation.bed &&
+            cp '$annotation' ./home/inputs/annotation.bed &&
         #end if
         /startup.sh
     ]]></command>
