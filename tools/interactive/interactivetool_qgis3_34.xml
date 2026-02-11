@@ -17,7 +17,7 @@
         export HOME=\$PWD &&
         mkdir -p ./data &&
         mkdir -p ./output &&
-        chown 1000:1000 ./output/ && ## change permission for the app user
+        chown 1000:1000 ./outputs || true && ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
         #if $infiles:
             #for $infile in $infiles:
                 yes | cp '$infile' './data/$infile.display_name' &&
