@@ -33,7 +33,7 @@
         /init
     ]]></command>
     <inputs>
-        <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps,spatialdata.zip" label="Images"/>
+        <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps,spatialdata.zip" label="Images and Spatial Data"/>
         <param name="plugin" type="select" label="Napari plugin">
             <option value="base">Base</option>
             <option value="spdata">napari-spatialdata</option>
@@ -57,6 +57,8 @@
             - overlay derived data such as points, polygons, segmentations, and more;
 
             - annotate and edit derived datasets, using standard data structures such as NumPy or Zarr arrays, allowing you to seamlessly weave exploration, computation, and annotation together in imaging data analysis.
+
+        **Note:** SpatialData should be provided as a zipped file with the spatialdata.zip format.
 ]]>
     </help>
 </tool>
