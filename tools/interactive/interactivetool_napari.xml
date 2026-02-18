@@ -1,8 +1,8 @@
 <tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="24.1">
-    <icon src="napari.png" />
+    <icon src="napari.png"/>
     <description>interactive tool</description>
     <macros>
-        <token name="@VERSION@">0.6.6</token>
+        <token name="@VERSION@">0.7.0</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/napari:v@VERSION@</container>
@@ -12,22 +12,32 @@
             <port>5800</port>
         </entry_point>
     </entry_points>
-    <command detect_errors="exit_code">
-    <![CDATA[
+    <command detect_errors="exit_code"><![CDATA[
         export HOME=\$PWD/home &&
         mkdir -p ./home/input ./home/output ./home/omero &&
         chown -R 1000 ./home &&
         #if $infile:
             #for $filename in $infile:
-               ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
+                #if $filename.ext == 'spatialdata.zip':
+                   unzip -q '$filename' -d ./home/input/ &&
+                #else
+                   ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
+                #end if
             #end for
         #end if
-    /init
-
-    ]]>
-    </command>
+        echo "Installed napari version:" &&
+        #if str($plugin) == 'spdata':
+            echo "Installing napari-spatialdata and squidpy..." &&
+            /opt/conda/bin/conda run -n napari pip install napari-spatialdata squidpy &&
+        #end if
+        /init
+    ]]></command>
     <inputs>
-        <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" label="Images" />
+        <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps,spatialdata.zip" label="Images"/>
+        <param name="plugin" type="select" label="Napari plugin">
+            <option value="base">Base</option>
+            <option value="spdata">napari-spatialdata</option>
+        </param>
     </inputs>
     <outputs>
         <collection name="np_output" type="list" label="Napari Output">
@@ -35,10 +45,10 @@
         </collection>
         <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt"/>
     </outputs>
-    
+
     <tests>
     </tests>
-    
+
     <help><![CDATA[
         Napari is a Python library for n-dimensional image visualisation, annotation, and analysis. With napari you can:
 
