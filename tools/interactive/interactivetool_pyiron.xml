@@ -1,4 +1,5 @@
 <tool id="interactive_tool_pyiron" tool_type="interactive" name="PyIron Interactive Jupyter Notebook" version="0.2.1" profile="21.09">
+    <icon src="pyiron.png"/>
     <requirements>
         <container type="docker">quay.io/bgruening/docker-jupyter-notebook:pyiron</container>
     </requirements>
