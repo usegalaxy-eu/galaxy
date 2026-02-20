@@ -1,0 +1,81 @@
+<tool id="interactive_tool_dot" tool_type="interactive" name="Dot" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="@PROFILE@">
+    <description>Interactive dot plot viewer for comparative genomics</description>
+    <icon src="dot.png"/>
+    <macros>
+        <token name="@TOOL_VERSION@">1.0.0</token>
+        <token name="@VERSION_SUFFIX@">1</token>
+        <token name="@PROFILE@">25.1</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/dotplot:v@TOOL_VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Dot Plot Viewer" requires_domain="True">
+            <port>8080</port>
+        </entry_point>
+    </entry_points>
+    <command><![CDATA[
+        export HOME=\$PWD/home/ &&
+        export DOT_START_DIR=\$PWD/home/ &&
+        mkdir -p ./home/inputs/ &&
+        chmod -R 777 ./home &&
+        cp '$coords_file' ./home/inputs/input.coords &&
+        cp '$coords_idx_file' ./home/inputs/input.coords.idx &&
+        #if $annotation:
+            cp '$annotation' ./home/inputs/annotation.bed &&
+        #end if
+        /startup.sh
+    ]]></command>
+    <inputs>
+        <param name="coords_file" type="data" format="txt,tabular" label="Coords file" help="Output from DotPrep.py (*.coords file)"/>
+        <param name="coords_idx_file" type="data" format="txt,tabular" label="Coords index file" help="Index file from DotPrep.py (*.coords.idx file)"/>
+        <param name="annotation" type="data" format="bed" optional="true" label="Reference genome annotation" help="BED file with annotations"/>
+    </inputs>
+    <outputs>
+        <data name="Interactive Dot Viewer on data ${on_string}" format="txt"/>
+    </outputs>
+    <help><![CDATA[
+**What it does**
+
+Dot is an interactive dot plot viewer for visualizing genome-genome alignments.
+
+Instead of generating static dot plot images on the command line, Dot lets you interact with 
+alignments by zooming in and investigating regions in detail. This is particularly useful for:
+
+- Comparing genome assemblies
+- Analyzing structural variations
+- Identifying inversions, duplications, and translocations
+- Visualizing synteny between genomes
+
+**Input Requirements**
+
+The tool accepts:
+
+**Pre-processed coords files** (*.coords and *.coords.idx): Output from running DotPrep tool on nucmer alignments
+
+**Optional Annotations** : You can provide BED annotation files for either or both genomes to show additional context (e.g., genes, repeats, other features).
+
+**Interactive Features**
+
+Once the viewer loads:
+
+- Zoom in by dragging a rectangle around a region of interest
+- Zoom back out by double-clicking
+- View alignment details by hovering over dots
+- Toggle between different visualization modes
+- Load annotation tracks for genomic context
+
+    ]]></help>
+    <citations>
+        <citation type="bibtex">
+            @misc{nattestad2017dot,
+            author = {Nattestad, Maria},
+            title = {Dot: An interactive dot plot viewer for comparative genomics},
+            year = {2017},
+            publisher = {GitHub},
+            journal = {GitHub repository},
+            url = {https://github.com/MariaNattestad/dot}
+        }
+        </citation>
+    </citations>
+</tool>
