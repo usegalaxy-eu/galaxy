@@ -1,0 +1,341 @@
+{
+  "homeCamera": {
+    "north": -17.634,
+    "east": 187.927,
+    "south": -22.958,
+    "west": 182.269
+  },
+  "workbench": ["wo"],
+  "corsDomains": [
+    "data.marine.ie",
+    "atlas.marine.ie",
+    "erddap.marine.ie",
+    "services-eu1.arcgis.com",
+    "tinyurl.com"
+  ],
+  "catalog": [
+    {
+      "type": "group",
+      "isOpen": true,
+      "name": "Sentinel 5P",
+      "members": [
+        {
+          "type": "group",
+          "name": "Daily Sulphur Dioxide - Near Real Time",
+          "isOpen": true,
+          "members": [
+            {
+              "type": "wms",
+              "name": "Daily Sulphur Dioxide - Near Real Time 2022-01-14",
+              "url": "https://thredds.icare.univ-lille.fr/thredds/wms/S5P_SO2_NRTI_D3/2022/S5P_SO2_NRTI_D3_2022-01-14_3600x1800_V1-01.nc?service=WMS&version=1.3.0&request=GetCapabilities",
+              "layers": "sulfurdioxide_total_vertical_column",
+              "colorScaleMinimum": 0.0005,
+              "colorScaleMaximum": 0.01
+            },
+            {
+              "type": "wms",
+              "name": "Daily Sulphur Dioxide - Near Real Time 2022-01-15",
+              "url": "https://thredds.icare.univ-lille.fr/thredds/wms/S5P_SO2_NRTI_D3/2022/S5P_SO2_NRTI_D3_2022-01-15_3600x1800_V1-01.nc?service=WMS&version=1.3.0&request=GetCapabilities",
+              "layers": "sulfurdioxide_total_vertical_column",
+              "colorScaleMinimum": 0.0005,
+              "colorScaleMaximum": 0.01
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "isOpen": true,
+      "name": "CMEMS Chlorophyl - Examind",
+      "members": [
+        {
+          "type": "group",
+          "name": "Chlorphyl",
+          "isOpen": true,
+          "members": [
+            {
+              "type": "wms",
+              "name": "mass_concentration_of_chlorophyll_a_in_sea_water",
+              "url": "https://examind.eoscfe.mesocentre.uca.fr/examind/WS/wms/CMEMS_WMS?service=WMS&version=1.3.0&request=GetCapabilities",
+              "layers": "CHL_L3"
+            },
+            {
+              "type": "wms",
+              "name": "CHL_uncertainty_L4_Daily",
+              "url": "https://examind.eoscfe.mesocentre.uca.fr/examind/WS/wms/CMEMS_WMS?service=WMS&version=1.3.0&request=GetCapabilities",
+              "layers": "CHL_uncertainly_L4_Daily"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "wms-group",
+      "name": "CMEMS WMS - Examind",
+      "url": "https://examind.eoscfe.mesocentre.uca.fr/examind/WS/wms/CMEMS_WMS",
+      "id": "cmemswmsexamind"
+    },
+    {
+      "name": "CSV",
+      "type": "group",
+      "members": [
+        {
+          "type": "csv",
+          "name": "CSV Test",
+          "id": "zrPtHVJcPi",
+          "url": "test/incidents_notime.csv"
+        },
+        {
+          "type": "csv",
+          "name": "USGS Earthquake data - Dec'2021 - Jan'2022 - (CSV)",
+          "url": "fairease.eu/data/usgs_earthQuake_2021-12_2022-30.csv",
+          "activeStyle": "mag",
+          "id": "usgshunga20212022"
+        },
+        {
+          "name": "ABC Photo Stories (2009-2014)",
+          "description": "Australia Broadcasting Company stories from 2009-2014 with accompanying photos.\n\nThis dataset demonstrates the ability to show users a custom feature info panel when they click on a feature on the map.",
+          "type": "csv",
+          "id": "cJiWroyAzU",
+          "url": "test/localphotostories20092014.csv",
+          "featureInfoTemplate": {
+            "template": "<div class='abc'><small>{{Date}}</small>{{#Primary image}}<figure><img src='{{Primary image}}'/><figcaption>{{Primary image caption}}</figcaption></figure>{{/Primary image}}<p><a target='_blank' href={{URL}}>Read More</a></div>"
+          }
+        },
+        {
+          "type": "csv",
+          "name": "Pacific Earthquakes (CSV)",
+          "url": "test/earthquakes.csv",
+          "activeStyle": "Magnitude",
+          "id": "u3nGNh"
+        }
+      ]
+    },
+    {
+      "type": "api-table",
+      "name": "City of Melbourne Pedestrian Counter",
+      "description": "The City of Melbourne Pedestrian Counting System data has been obtained from the City of Melbourne Open data platform: www.data.melbourne.vic.gov.au to demonstrate the directional movement of pedestrians across the city.\n\nThe counters generate a per minute reading on each of the pedestrian traffic sensors which are then displayed as near-live data.\n\nTo find out more about the City of Melbourne's Pedestrian Counting System or to seek access to their data, please click:\n\nhttp://www.pedestrian.melbourne.vic.gov.au/?_ga=2.244642053.1432520662.1632694466-1456630549.1631675392#date=27-09-2021&time=1",
+      "defaultStyle": {
+        "time": {
+          "spreadFinishTime": true,
+          "timeColumn": "sensing_datetime"
+        }
+      },
+      "initialTimeSource": "stop",
+      "columns": [
+        {
+          "name": "total_of_directions"
+        },
+        {
+          "name": "direction_2"
+        },
+        {
+          "name": "direction_1"
+        },
+        {
+          "name": "sensing_datetime"
+        },
+        {
+          "name": "latitude"
+        },
+        {
+          "name": "longitude"
+        }
+      ],
+      "idKey": "location_id",
+      "refreshInterval": 60,
+      "removeDuplicateRows": true,
+      "apis": [
+        {
+          "url": "https://melbournetestbed.opendatasoft.com/api/explore/v2.1/catalog/datasets/pedestrian-counting-system-past-hour-counts-per-minute/records?select=location_id%2Csensing_datetime%2Cdirection_1%2Cdirection_2%2Ctotal_of_directions&order_by=sensing_datetime%20DESC&limit=100",
+          "responseDataPath": "results",
+          "kind": "PER_ROW"
+        },
+        {
+          "url": "https://melbournetestbed.opendatasoft.com/api/explore/v2.1/catalog/datasets/pedestrian-counting-system-sensor-locations/exports/json?lang=en&timezone=Australia%2FSydney",
+          "kind": "PER_ID"
+        }
+      ]
+    },
+    {
+      "type": "geojson",
+      "url": "https://tinyurl.com/2keu2az3",
+      "name": "Argo BGC -ifremer ERDDAP geojson - TinyURL",
+      "id": "ifremerargobgctinyul"
+    },
+    {
+      "type": "geojson",
+      "url": "https://tinyurl.com/yn5v2dc2",
+      "name": "ERDDAP MI Waverider geojson example",
+      "id": "waverider"
+    },
+    {
+      "type": "csv",
+      "name": "CMEMS_BGC_data_csv_chart",
+      "url": "fairease.eu/data/CMEMS_BGC.csv",
+      "defaultStyle": {
+        "id": "test_style",
+        "time": {
+          "timeColumn": "datetime",
+          "idColumns": ["platform_code", "LONGITUDE", "LATITUDE"]
+        },
+        "chart": {
+          "xAxisColumn": "PSAL",
+          "lines": [
+            {
+              "yAxisColumn": "PRES"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "csv",
+      "name": "USGS Earthquake data - Dec'2021 - Jan'2022 - (CSV)",
+      "url": "test/usgs_earthQuake_2021-12_2022-30.csv",
+      "activeStyle": "mag",
+      "id": "usgshunga20212022"
+    },
+    {
+      "type": "csv",
+      "name": "USGS Earthquake data - Dec'2021 - Jan'2022 - Styled(CSV)",
+      "url": "test/usgs_earthQuake_2021-12_2022-30.csv",
+      "activeStyle": "mag",
+      "id": "usgshunga20212022styled",
+      "styles": [
+        {
+          "id": "mag",
+          "color": {
+            "colorPalette": "Reds"
+          },
+          "label": {
+            "enabled": false,
+            "mapType": "constant",
+            "column": "mag",
+            "null": {
+              "labelColumn": "mag"
+            }
+          },
+          "hidden": false,
+          "chart": {
+            "xAxisColumn": "time",
+            "lines": [
+              {
+                "yAxisColumn": "mag"
+              }
+            ]
+          }
+        },
+        {
+          "id": "depth",
+          "color": {
+            "colorPalette": "Blues"
+          },
+          "label": {
+            "enabled": false,
+            "mapType": "constant",
+            "column": "depth",
+            "null": {
+              "labelColumn": "depth"
+            }
+          },
+          "hidden": false,
+          "chart": {
+            "xAxisColumn": "time",
+            "lines": [
+              {
+                "yAxisColumn": "depth"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "isOpen": true,
+      "name": "3D Visualisations",
+      "description": "Cesium ION 3D assets",
+      "members": [
+        {
+          "type": "3d-tiles",
+          "ionAssetId": 96188,
+          "name": "Cesium OSM Buildings",
+          "id": "some-unique-id"
+        },
+        {
+          "type": "cesium-terrain",
+          "ionAssetId": 2426648,
+          "name": "Cesium World Bathymetry"
+        },
+        {
+          "type": "3d-tiles",
+          "ionAssetId": 2275207,
+          "name": "Google Photorealistic 3D Tiles"
+        },
+        {
+          "type": "geojson",
+          "url": "fairease.eu/data/ifremer.geojson",
+          "name": "geojson example",
+          "id": "ifremergeojsonexample"
+        }
+      ]
+    }
+  ],
+  "viewerMode": "2d",
+  "baseMaps": {
+    "enabledBaseMaps": [
+      "basemap-openstreetmap",
+      "basemap-positron",
+      "basemap-darkmatter",
+      "basemap-voyager"
+    ],
+    "defaultBaseMapId": "basemap-openstreetmap",
+    "previewBaseMapId": "basemap-natural-earth-II",
+    "items": [
+      {
+        "item": {
+          "id": "basemap-positron",
+          "name": "Positron (Light)",
+          "type": "open-street-map",
+          "url": "https://basemaps.cartocdn.com/light_all/",
+          "attribution": "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>, © <a href='https://carto.com/about-carto/'>CARTO</a>",
+          "subdomains": ["a", "b", "c", "d"],
+          "opacity": 1
+        },
+        "image": "images/basemaps/positron.png"
+      },
+      {
+        "item": {
+          "id": "basemap-darkmatter",
+          "name": "Dark Matter",
+          "type": "open-street-map",
+          "url": "https://basemaps.cartocdn.com/dark_all/",
+          "attribution": "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>, © <a href='https://carto.com/about-carto/'>CARTO</a>",
+          "subdomains": ["a", "b", "c", "d"],
+          "opacity": 1
+        },
+        "image": "images/basemaps/dark-matter.png"
+      },
+      {
+        "item": {
+          "id": "basemap-voyager",
+          "type": "open-street-map",
+          "name": "Voyager",
+          "url": "https://global.ssl.fastly.net/rastertiles/voyager/",
+          "attribution": "© OpenStreetMap contributors ODbL, © CartoDB CC-BY 3.0",
+          "opacity": 1,
+          "subdomains": [
+            "cartodb-basemaps-a",
+            "cartodb-basemaps-b",
+            "cartodb-basemaps-c",
+            "cartodb-basemaps-d"
+          ]
+        },
+        "image": "https://raw.githubusercontent.com/TerriaJS/saas-catalogs-public/main/misc/basemaps/icons/voyager-aus.png"
+      }
+    ]
+  }
+}
+

@@ -1,0 +1,62 @@
+<tool id="interactive_tool_pcstudio" tool_type="interactive" name="PhysiCell Studio" version="@VERSION@" profile="22.05">
+    <icon src="pcstudio.png" />
+    <description>Interactive tool to create, simulate, and visualize a multicellular model using PhysiCell</description>
+    <macros>
+        <token name="@VERSION@">0.3</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/physicell/pcstudio:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="PhysiCell Studio" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+    </environment_variables>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        mkdir -p ./output &&
+        chown 1000:1000 ./output && ## the app user of the container
+        /init &&
+        cp /opt/pcstudio/output/final.svg '$final_svg' || true &&
+        cp /opt/pcstudio/output/final.xml '$final_xml' || true &&
+        cp /opt/pcstudio/output/PhysiCell_settings.xml '$physicell_settings' || true &&
+        cp /opt/pcstudio/output/detailed_rules.html '$detailed_rules' || true &&
+        zip -r all_results.zip /opt/pcstudio/output/
+    ]]>
+    </command>
+    <inputs>
+        <param name="config_file"  type="data" format="xml" label="xml config file" optional="true"/>
+    </inputs>
+    <outputs>
+        <data name="final_svg" format="svg" label="${tool.name} on ${on_string}: final.svg"/>
+        <data name="final_xml" format="xml" label="${tool.name} on ${on_string}: final.xml"/>
+        <data name="physicell_settings" format="xml" label="${tool.name} on ${on_string}: PhysiCell_settings.xml"/>
+        <data name="detailed_rules" format="html" label="${tool.name} on ${on_string}: detailed_rules.html"/>
+        <data name="all_results" format="zip" label="${tool.name} on ${on_string}: all results archive" from_work_dir="./all_results.zip"/>
+        <!--collection name="outputs" type="list" label="PhysiCell outputs">
+            <discover_datasets pattern="__name_and_ext__" directory="outputs" />
+        </collection-->
+    </outputs>
+    <tests>
+        <test>
+        </test>
+    </tests>
+    <help><![CDATA[
+
+A graphical tool to create, execute, and visualize a multicellular model using PhysiCell.
+
+]]>
+    </help>
+    <citations>
+        <citation type="doi">10.1371/journal.pcbi.1005991</citation>
+        <citation type="doi">10.46471/gigabyte.128</citation>
+        <citation type="doi">10.1101/2023.09.17.557982</citation>
+    </citations>
+</tool>
