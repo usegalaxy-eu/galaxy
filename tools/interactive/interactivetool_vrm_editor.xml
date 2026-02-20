@@ -1,5 +1,6 @@
 <tool id="interactive_tool_vrm_editor" tool_type="interactive" name="VRM Editor" version="@VERSION@" profile="22.01">
     <description>interative tool for creating Variable Resolution Mesh for NorESM/CESM</description>
+    <icon src="vrm.png"/>
     <macros>
     <token name="@VERSION@">0.2.1</token>
     </macros>
