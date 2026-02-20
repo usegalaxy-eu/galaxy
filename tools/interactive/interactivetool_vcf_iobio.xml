@@ -1,4 +1,5 @@
 <tool id="interactive_tool_vcf_iobio" tool_type="interactive" name="VCF (iobio) Visualisation" version="0.1">
+    <icon src="iobio.png" />
     <requirements>
         <container type="docker">qiaoy/iobio-bundle.vcf-iobio:dev-ondemand</container>
     </requirements>
