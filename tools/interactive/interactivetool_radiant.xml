@@ -1,5 +1,6 @@
 <tool id="interactive_tool_radiant" tool_type="interactive" name="radiant" version="0.1">
     <description>Data analytics using Radiant R Shiny app</description>
+    <icon src="radiant.png"/>
     <requirements>
         <container type="docker">ylebras/radiant-docker</container>
     </requirements>
@@ -17,7 +18,7 @@
         <environment_variable name="API_KEY" inject="api_key" />
     </environment_variables>
     <command><![CDATA[
-        
+
         mkdir -p /srv/shiny-server/data/ &&
         cp '$infile' /srv/shiny-server/data/inputdata.txt &&
 
