@@ -1,0 +1,64 @@
+<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="24.1">
+    <icon src="napari.png"/>
+    <description>interactive tool</description>
+    <macros>
+        <token name="@VERSION@">0.7.0</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/napari:v@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Napari">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code"><![CDATA[
+        export HOME=\$PWD/home &&
+        mkdir -p ./home/input ./home/output ./home/omero &&
+        chown -R 1000 ./home &&
+        #if $infile:
+            #for $filename in $infile:
+                #if $filename.ext == 'spatialdata.zip':
+                   unzip -q '$filename' -d ./home/input/ &&
+                #else
+                   ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
+                #end if
+            #end for
+        #end if
+        echo "Installed napari version:" &&
+        #if str($plugin) == 'spdata':
+            echo "Installing napari-spatialdata and squidpy..." &&
+            /opt/conda/bin/conda run -n napari pip install napari-spatialdata squidpy &&
+        #end if
+        /init
+    ]]></command>
+    <inputs>
+        <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps,spatialdata.zip" label="Images and Spatial Data"/>
+        <param name="plugin" type="select" label="Napari plugin">
+            <option value="base">Base</option>
+            <option value="spdata">napari-spatialdata</option>
+        </param>
+    </inputs>
+    <outputs>
+        <collection name="np_output" type="list" label="Napari Output">
+            <discover_datasets pattern="__name_and_ext__" directory="./home/output"/>
+        </collection>
+        <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt"/>
+    </outputs>
+
+    <tests>
+    </tests>
+
+    <help><![CDATA[
+        Napari is a Python library for n-dimensional image visualisation, annotation, and analysis. With napari you can:
+
+            - view and explore 2D, 3D, and higher-dimensional arrays on a canvas;
+
+            - overlay derived data such as points, polygons, segmentations, and more;
+
+            - annotate and edit derived datasets, using standard data structures such as NumPy or Zarr arrays, allowing you to seamlessly weave exploration, computation, and annotation together in imaging data analysis.
+
+        **Note:** SpatialData should be provided as a zipped file with the spatialdata.zip format.
+]]>
+    </help>
+</tool>
