@@ -1,0 +1,55 @@
+<tool id="interactive_tool_cellpose" tool_type="interactive" name="CellPose Interactive" version="@VERSION@+galaxy0" profile="23.1">
+    <description>a generalist algorithm for cellular segmentation and restoration</description>
+    <icon src="cellpose.png" />
+    <macros>
+        <token name="@VERSION@">3.1.1.2</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/sunyi000/cellpose-galaxy:v@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="CellPose">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <required_files>
+        <include path="pytorch_convert_safetensors.py" />
+    </required_files>
+    <command detect_errors="exit_code">
+    <![CDATA[
+        export HOME=\$PWD/home/ &&
+        export CELLPOSE_START_DIR=\$PWD/home/cp_working_dir/ &&
+        mkdir -p ./home/cp_working_dir/models/safe &&
+        chmod -R 777 ./home &&
+        #for $i,$filename in enumerate($infiles):
+            ln -s '$filename' './home/cp_working_dir/${filename.element_identifier}.${filename.ext}' &&
+        #end for
+
+        /init &&
+
+        if [ -n "\$(ls -A ./home/cp_working_dir/models)" ]; then
+            ## remove saved masks and convert the pytorch models
+            rm -rf ./home/cp_working_dir/models/*.npy &&
+            python3 '$__tool_directory__/pytorch_convert_safetensors.py' --convert pt_safe --batch -i "./home/cp_working_dir/models/" -o "./home/cp_working_dir/models/safe";
+        fi
+    ]]>
+    </command>
+    <inputs>
+        <param name="infiles" type="data" multiple="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" label="Images" />
+        <param name="model" type="boolean" falsevalue="false" truevalue="true" checked="false" label="Output manual cellpose trained model?"/>
+    </inputs>
+    <outputs>
+    <collection name="model_output" type="list" label="Saved model(s)">
+        <discover_datasets pattern="__name_and_ext__" directory="./home/cp_working_dir/models/safe"/>
+        <filter>model</filter>
+    </collection>
+    <collection name="cp_output" type="list" label="CellPose output">
+        <discover_datasets pattern="__name_and_ext__" directory="./home/cp_working_dir"/>
+    </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+]]>
+    </help>
+</tool>
