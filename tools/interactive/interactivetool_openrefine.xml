@@ -1,28 +1,29 @@
-<tool id="interactive_tool_openrefine" tool_type="interactive" name="OpenRefine" version="0.2">
+<tool id="interactive_tool_openrefine" tool_type="interactive" name="OpenRefine" version="0.3">
     <icon src="openrefine.png" />
     <description>Working with messy data</description>
     <requirements>
-        <container type="docker">ylebras/openrefine-docker</container>
+        <container type="docker">ylebras/openrefine-docker:2024</container>
     </requirements>
     <entry_points>
-        <entry_point name="Openrefine visualisation" requires_domain="False" requires_path_in_url="False">
+        <entry_point name="Openrefine" requires_domain="False" requires_path_in_url="False">
             <port>3333</port>
         </entry_point>
     </entry_points>
     <environment_variables>
         <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
         <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
-        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">443</environment_variable>
         <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
         <environment_variable name="API_KEY" inject="api_key" />
     </environment_variables>
     <configfiles>
         <configfile name="start_openrefine"><![CDATA[
-exec /OpenRefine/refine -i 0.0.0.0 -m \$GALAXY_MEMORY_MB &
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 &&
+exec /openrefine/refine -i 0.0.0.0 -m \${GALAXY_MEMORY_MB}m &
 
 ##Check if openrefine is up to work
 STATUS=\$(curl --include 'http://127.0.0.1:3333' 2>&1)
-while [[ \${STATUS} =~ "refused" ]]
+while [[ ! \${STATUS} =~ "OpenRefine" ]]
 do
   echo "Waiting for openrefine: \$STATUS \n"
   STATUS=\$(curl --include 'http://127.0.0.1:3333' 2>&1)
@@ -30,21 +31,60 @@ do
 done
 ]]>
         </configfile>
+        <configfile name="upload_script">
+
+source "/openrefine/bash-refine/bash-refine.sh" || exit 1
+cd /openrefine/bash-refine/ || exit 1
+init
+
+p="Galaxy file"
+projects["Galaxy file"]="/import/input.data"
+
+checkpoint "Import"; echo
+## project id will be stored in \${projects[tsv file example]}
+echo "import file \${projects[\$p]} ..."
+
+if curl -fs --write-out "%{redirect_url}\n" \
+  --form project-file="@\${projects[\$p]}" \
+  --form project-name="\${p}" \
+  --form format="text/line-based/*sv" \
+  --form options='{
+                    "encoding": "UTF-8",
+#if $infile.ext == 'csv':
+                    "separator": ","
+#else
+                    "separator": "\t"
+#end if
+                  }' \
+  "\${endpoint}/command/core/create-project-from-upload\$(refine_csrf)" \
+  > "\${workdir}/\${p}.id"
+then
+  log "imported \${projects[\$p]} as \${p}"
+else
+  error "import of \${projects[\$p]} failed!"
+fi
+refine_store "\${p}" "\${workdir}/\${p}.id" || error "import of \${p} failed!"
+echo
+
+checkpoint "Finish"; echo
+##refine_stop; echo
+checkpoint_stats; echo
+        </configfile>        
     </configfiles>
     <command detect_errors="aggressive"><![CDATA[
 
 #if $infile:
-    cp '$infile' /import/input.tabular &&
+    cp '$infile' /import/input.data &&
 #end if
 
 cat '$start_openrefine' &&
 bash '$start_openrefine' &&
 
 ## Createnew project with the dataset
-cd /refine-python &&
+cd /openrefine &&
 
 #if $infile:
-    python openrefine_create_project_API.py '/import/input.tabular' &&
+    bash '$upload_script' &&
 #end if
 
 tail -f /dev/null
@@ -52,7 +92,7 @@ tail -f /dev/null
     ]]>
     </command>
     <inputs>
-        <param name="infile" type="data" format="tabular,tsv" optional="true" label="Input file in tabular format"/>
+        <param name="infile" type="data" format="tabular,tsv,csv" optional="true" label="Input file in tabular format"/>
     </inputs>
     <outputs>
         <data name="outfile" format="tabular" />
