@@ -22,7 +22,7 @@
     <command detect_errors="exit_code">
     <![CDATA[
         mkdir -p ./output &&
-        chown 1000:1000 ./output && ## the app user of the container
+        chown 1000:1000 ./output || true && ## the app user of the container
         /init &&
         cp /opt/pcstudio/output/final.svg '$final_svg' || true &&
         cp /opt/pcstudio/output/final.xml '$final_xml' || true &&
