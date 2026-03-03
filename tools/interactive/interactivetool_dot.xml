@@ -2,8 +2,8 @@
     <description>Interactive dot plot viewer for comparative genomics</description>
     <icon src="dot.png"/>
     <macros>
-        <token name="@TOOL_VERSION@">1.0.0</token>
-        <token name="@VERSION_SUFFIX@">1</token>
+        <token name="@TOOL_VERSION@">1.0.2</token>
+        <token name="@VERSION_SUFFIX@">0</token>
         <token name="@PROFILE@">25.1</token>
     </macros>
     <requirements>
@@ -15,16 +15,14 @@
         </entry_point>
     </entry_points>
     <command><![CDATA[
-        export HOME=\$PWD/home/ &&
-        export DOT_START_DIR=\$PWD/home/ &&
-        mkdir -p ./home/inputs/ &&
-        chmod -R 777 ./home &&
-        cp '$coords_file' ./home/inputs/input.coords &&
-        cp '$coords_idx_file' ./home/inputs/input.coords.idx &&
-        #if $annotation:
-            cp '$annotation' ./home/inputs/annotation.bed &&
-        #end if
-        /startup.sh
+    mkdir -p /opt/dot/inputs/ &&
+    chmod -R 777 /opt/dot/inputs &&
+    cp '$coords_file' /opt/dot/inputs/input.coords &&
+    cp '$coords_idx_file' /opt/dot/inputs/input.coords.idx &&
+    #if $annotation:
+        cp '$annotation' /opt/dot/inputs/annotation.bed &&
+    #end if
+    /startup.sh
     ]]></command>
     <inputs>
         <param name="coords_file" type="data" format="txt,tabular" label="Coords file" help="Output from DotPrep.py (*.coords file)"/>
