@@ -28,7 +28,7 @@
         export HOME=\$PWD &&
         ## Create a directory where the app user has access
         mkdir -p ./output ./zarr_output &&
-        chown 1000:1000 ./output/ ./zarr_output &&
+        chown 1000:1000 ./output/ ./zarr_output || true &&
         ## Make a copy of the existing project if exists
         #if str($input_type.existing) == "existing":
             cp '$input_type.project' ./output/MyProject.ilp &&
