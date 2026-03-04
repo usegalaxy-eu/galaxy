@@ -14,7 +14,7 @@
 	export HOME=\$PWD &&
 	 
 	mkdir -p ./home/output ./home/input_images &&
-	chown 1000:1000 ./outputs || true && ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
+	chown 1000:1000 ./home || true ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
 
 	#for $i,$img in enumerate($input_images):
 		#if $img.element_identifier.endswith($img.ext)
