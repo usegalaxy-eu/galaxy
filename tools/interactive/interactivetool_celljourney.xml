@@ -30,7 +30,7 @@
 **What it does**
 
 CellJourney is an interactive web-based visualization tool for single-cell RNA sequencing data.
-Once launched, it opens in a new browser tab where you can interactively explore:
+Once launched, you can interactively explore:
 
 - Cell trajectory inference and pseudotime visualization
 - RNA velocity stream plots
