@@ -1,7 +1,8 @@
 <tool id="interactive_tool_celljourney" name="Cell Journey" tool_type="interactive" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="@PROFILE@">
     <description>Interactive single-cell trajectory and RNA velocity visualization</description>
+    <icon src="celljourney.png"/>
     <macros>
-        <token name="@TOOL_VERSION@">1.0.0</token>
+        <token name="@TOOL_VERSION@">1.0.1</token>
         <token name="@VERSION_SUFFIX@">0</token>
         <token name="@PROFILE@">25.1</token>
     </macros>
@@ -15,11 +16,11 @@
         </entry_point>
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
-        cp '$input_h5ad' /tmp/input_data.h5ad &&
-        python /app/celljourney.py --file /tmp/input_data.h5ad
+        cp '$input_data' /tmp/input_data.${input_data.ext} &&
+        python /app/celljourney.py --file /tmp/input_data.${input_data.ext}
     ]]></command>
     <inputs>
-        <param name="input_h5ad" type="data" format="h5ad" label="Input AnnData file " help="Preprocessed AnnData (.h5ad) file from your history. All visualization parameters can be adjusted interactively inside the CellJourney application." />
+        <param name="input_data" type="data" format="h5ad,h5mu,csv" label="Input AnnData file" help="Preprocessed AnnData file from your history. All visualization parameters can be adjusted interactively inside the CellJourney application."/>
     </inputs>
     <outputs>
         <data name="Interactive CellJourney on data ${on_string}" format="txt"/>
@@ -44,7 +45,7 @@ All visualization parameters are configured **inside the application** - no need
 
 **Input**
 
-A preprocessed **AnnData (.h5ad)** file from your Galaxy history. Recommended contents:
+A preprocessed **AnnData (.h5ad, .h5mu, .csv)** file from your Galaxy history. Recommended contents:
 
 - ``adata.obsm['X_umap']`` - 2D embedding for visualization
 - ``adata.obs['leiden']`` - cluster labels (or any categorical annotation)
