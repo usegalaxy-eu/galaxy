@@ -2,7 +2,7 @@
     <icon src="napari.png"/>
     <description>interactive tool</description>
     <macros>
-        <token name="@VERSION@">0.7.0</token>
+        <token name="@VERSION@">0.7.1</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/napari:v@VERSION@</container>
