@@ -1,8 +1,8 @@
-<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="24.1">
+<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="25.1">
     <icon src="napari.png"/>
     <description>interactive tool</description>
     <macros>
-        <token name="@VERSION@">0.7.0</token>
+        <token name="@VERSION@">0.7.1</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/napari:v@VERSION@</container>
@@ -18,13 +18,18 @@
         chown -R 1000 ./home | true &&
         #if $infile:
             #for $filename in $infile:
-                ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
+                #if $filename.ext == 'spatialdata.zip':
+                    ## The UI expects the file to have .zarr extension
+                    unzip -q '$filename' -d './home/input/${filename.element_identifier}.zarr' &&
+                #else
+                   ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
+                #end if
             #end for
         #end if
         /init
     ]]></command>
     <inputs>
-        <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" label="Images"/>
+        <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps,spatialdata.zip" label="Images and Spatial Data"/>
     </inputs>
     <outputs>
         <collection name="np_output" type="list" label="Napari Output">
@@ -44,6 +49,8 @@
             - overlay derived data such as points, polygons, segmentations, and more;
 
             - annotate and edit derived datasets, using standard data structures such as NumPy or Zarr arrays, allowing you to seamlessly weave exploration, computation, and annotation together in imaging data analysis.
+
+        **Note:** SpatialData should be provided as a zipped file with the spatialdata.zip format.
 ]]>
     </help>
 </tool>
