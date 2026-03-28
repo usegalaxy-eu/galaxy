@@ -19,7 +19,8 @@
         #if $infile:
             #for $filename in $infile:
                 #if $filename.ext == 'spatialdata.zip':
-                   unzip -q '$filename' -d ./home/input/ &&
+                    ## The UI expects the file to have .zarr extension
+                    unzip -q '$filename' -d './home/input/${filename.element_identifier}.zarr' &&
                 #else
                    ln -s '$filename' './home/input/${filename.element_identifier}.${filename.ext}' &&
                 #end if
