@@ -1,4 +1,4 @@
-<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="24.1">
+<tool id="interactive_tool_napari" tool_type="interactive" name="Run Napari" version="@VERSION@+galaxy0" profile="25.1">
     <icon src="napari.png"/>
     <description>interactive tool</description>
     <macros>
@@ -25,19 +25,10 @@
                 #end if
             #end for
         #end if
-        echo "Installed napari version:" &&
-        #if str($plugin) == 'spdata':
-            echo "Installing napari-spatialdata and squidpy..." &&
-            /opt/conda/bin/conda run -n napari pip install napari-spatialdata squidpy &&
-        #end if
         /init
     ]]></command>
     <inputs>
         <param name="infile" type="data" multiple="true" optional="true" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps,spatialdata.zip" label="Images and Spatial Data"/>
-        <param name="plugin" type="select" label="Napari plugin">
-            <option value="base">Base</option>
-            <option value="spdata">napari-spatialdata</option>
-        </param>
     </inputs>
     <outputs>
         <collection name="np_output" type="list" label="Napari Output">
