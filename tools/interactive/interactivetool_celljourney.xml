@@ -1,0 +1,70 @@
+<tool id="interactive_tool_celljourney" name="Cell Journey" tool_type="interactive" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" profile="@PROFILE@">
+    <description>Interactive single-cell trajectory and RNA velocity visualization</description>
+    <icon src="celljourney.png"/>
+    <macros>
+        <token name="@TOOL_VERSION@">1.0.1</token>
+        <token name="@VERSION_SUFFIX@">0</token>
+        <token name="@PROFILE@">25.1</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/celljourney:v@TOOL_VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="CellJourney" requires_domain="True">
+            <port>8080</port>
+            <url>/</url>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code"><![CDATA[
+        cp '$input_data' /tmp/input_data.${input_data.ext} &&
+        python /app/celljourney.py --file /tmp/input_data.${input_data.ext}
+    ]]></command>
+    <inputs>
+        <param name="input_data" type="data" format="h5ad,h5mu,csv" label="Input AnnData file" help="Preprocessed AnnData file from your history. All visualization parameters can be adjusted interactively inside the CellJourney application."/>
+    </inputs>
+    <outputs>
+        <data name="Interactive CellJourney on data ${on_string}" format="txt"/>
+    </outputs>
+    <help><![CDATA[
+.. class:: infomark
+
+**What it does**
+
+CellJourney is an interactive web-based visualization tool for single-cell RNA sequencing data.
+Once launched, you can interactively explore:
+
+- Cell trajectory inference and pseudotime visualization
+- RNA velocity stream plots
+- Dimensionality-reduced embeddings (UMAP, t-SNE, PCA, etc.)
+- Gene expression coloring
+- Cluster and cell-type annotations
+
+All visualization parameters are configured **inside the application** - no need to set them here.
+
+-----
+
+**Input**
+
+A preprocessed **AnnData (.h5ad, .h5mu, .csv)** file from your Galaxy history. Recommended contents:
+
+- ``adata.obsm['X_umap']`` - 2D embedding for visualization
+- ``adata.obs['leiden']`` - cluster labels (or any categorical annotation)
+- ``adata.obsm['velocity_umap']`` - RNA velocity vectors (optional, from scVelo)
+- ``adata.obs['dpt_pseudotime']`` - pseudotime values (optional)
+
+    ]]></help>
+    <citations>
+        <citation type="bibtex">
+            @misc{celljourney2024,
+            author = {TabakaLab},
+            title  = {CellJourney: Interactive single-cell trajectory and RNA velocity visualization},
+            year   = {2024},
+            url    = {https://github.com/TabakaLab/CellJourney}
+}
+        </citation>
+    </citations>
+    <creator>
+        <person givenName="Saim" familyName="Momin" url="https://github.com/SaimMomin12"/>
+        <organization name="Galaxy Europe" url="https://galaxyproject.org/eu/"/>
+    </creator>
+</tool>
