@@ -17,6 +17,10 @@ import sys
 # insert *this* galaxy before all others on sys.path
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
 
-from galaxy.metadata.set_metadata import set_metadata
+
+def set_metadata():
+    from galaxy.metadata.set_metadata import set_metadata as _set_metadata
+
+    return _set_metadata()
 
 __all__ = ("set_metadata",)

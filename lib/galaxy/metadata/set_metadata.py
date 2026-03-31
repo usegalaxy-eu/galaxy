@@ -11,6 +11,8 @@ set to the path of the dataset on which metadata is being set
 constructed automatically).
 """
 
+from __future__ import annotations
+
 import glob
 import json
 import logging
@@ -19,69 +21,14 @@ import sys
 import traceback
 from functools import partial
 from pathlib import Path
-from typing import (
-    Optional,
-)
-
-try:
-    from pulsar.client.staging import COMMAND_VERSION_FILENAME
-except ImportError:
-    # Package unit tests
-    COMMAND_VERSION_FILENAME = "COMMAND_VERSION"
-
-import galaxy.datatypes.registry
-import galaxy.model.mapping
-from galaxy.datatypes import sniff
-from galaxy.datatypes.data import validate
-from galaxy.job_execution.compute_environment import dataset_path_to_extra_path
-from galaxy.job_execution.output_collect import (
-    collect_dynamic_outputs,
-    collect_extra_files,
-    collect_primary_datasets,
-    collect_shrinked_content_from_path,
-    default_exit_code_file,
-    read_exit_code_from,
-    SessionlessJobContext,
-)
-from galaxy.job_execution.setup import TOOL_PROVIDED_JOB_METADATA_KEYS
-from galaxy.model import (
-    Dataset,
-    DatasetInstance,
-    HistoryDatasetAssociation,
-    Job,
-    store,
-)
-from galaxy.model.custom_types import total_size
-from galaxy.model.metadata import MetadataTempFile
-from galaxy.model.store import SessionlessContext
-from galaxy.model.store.discover import MaxDiscoveredFilesExceededError
-from galaxy.objectstore import (
-    build_object_store_from_config,
-    ObjectStore,
-)
-from galaxy.tool_util.output_checker import (
-    AnyJobMessage,
-    check_output,
-    DETECTED_JOB_STATE,
-)
-from galaxy.tool_util.parser.stdio import (
-    StdioErrorLevel,
-    ToolStdioExitCode,
-    ToolStdioRegex,
-)
-from galaxy.tool_util.provided_metadata import parse_tool_provided_metadata
-from galaxy.util import (
-    safe_contains,
-    stringify_dictionary_keys,
-    unicodify,
-)
-from galaxy.util.expressions import ExpressionContext
+from typing import Optional
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
 
 
 MAX_STDIO_READ_BYTES = 100 * 10**6  # 100 MB
+COMMAND_VERSION_FILENAME = "COMMAND_VERSION"
 
 
 def reset_external_filename(dataset_instance: DatasetInstance):
@@ -100,6 +47,8 @@ def push_if_necessary(object_store: ObjectStore, dataset: DatasetInstance, exter
 
 
 def set_validated_state(dataset_instance):
+    from galaxy.datatypes.data import validate
+
     datatype_validation = validate(dataset_instance)
 
     dataset_instance.validated_state = datatype_validation.state
@@ -117,6 +66,9 @@ def set_meta_with_tool_provided(
     datatypes_registry,
     max_metadata_value_size,
 ):
+    from galaxy.datatypes import sniff
+    from galaxy.model.custom_types import total_size
+
     # This method is somewhat odd, in that we set the metadata attributes from tool,
     # then call set_meta, then set metadata attributes from tool again.
     # This is intentional due to interplay of overwrite kwd, the fact that some metadata
@@ -162,6 +114,9 @@ def get_metadata_params(tool_job_working_directory):
 
 
 def get_object_store(tool_job_working_directory, object_store=None):
+    from galaxy.model import Dataset
+    from galaxy.objectstore import build_object_store_from_config
+
     if not object_store:
         object_store_conf_path = os.path.join(tool_job_working_directory, "metadata", "object_store_conf.json")
         with open(object_store_conf_path) as f:
@@ -179,6 +134,27 @@ def set_metadata_portable(
     object_store: Optional[ObjectStore] = None,
     extended_metadata_collection: Optional[bool] = None,
 ):
+    import galaxy.model
+    from galaxy.job_execution.compute_environment import dataset_path_to_extra_path
+    from galaxy.job_execution.output_collect import (
+        SessionlessJobContext,
+        collect_dynamic_outputs,
+        collect_extra_files,
+        collect_primary_datasets,
+        collect_shrinked_content_from_path,
+        default_exit_code_file,
+        read_exit_code_from,
+    )
+    from galaxy.job_execution.setup import TOOL_PROVIDED_JOB_METADATA_KEYS
+    from galaxy.model import Job, store
+    from galaxy.model.metadata import MetadataTempFile
+    from galaxy.model.store import SessionlessContext
+    from galaxy.model.store.discover import MaxDiscoveredFilesExceededError
+    from galaxy.tool_util.output_checker import AnyJobMessage, DETECTED_JOB_STATE, check_output
+    from galaxy.tool_util.parser.stdio import StdioErrorLevel, ToolStdioExitCode, ToolStdioRegex
+    from galaxy.util import safe_contains, stringify_dictionary_keys, unicodify
+    from galaxy.util.expressions import ExpressionContext
+
     is_celery_task = tool_job_working_directory is not None
     tool_job_working_directory = Path(tool_job_working_directory or os.path.abspath(os.getcwd()))
     metadata_tmp_files_dir = os.path.join(tool_job_working_directory, "metadata")
@@ -541,6 +517,9 @@ def set_metadata_portable(
 
 
 def validate_and_load_datatypes_config(datatypes_config):
+    import galaxy.datatypes.registry
+    import galaxy.model
+
     galaxy_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
 
     if not os.path.exists(datatypes_config):
@@ -565,10 +544,14 @@ def validate_and_load_datatypes_config(datatypes_config):
 
 
 def load_job_metadata(job_metadata, provided_metadata_style):
+    from galaxy.tool_util.provided_metadata import parse_tool_provided_metadata
+
     return parse_tool_provided_metadata(job_metadata, provided_metadata_style=provided_metadata_style)
 
 
 def write_job_metadata(tool_job_working_directory, job_metadata, set_meta, tool_provided_metadata):
+    from galaxy.model import Dataset, HistoryDatasetAssociation
+
     for i, file_dict in enumerate(tool_provided_metadata.get_new_datasets_for_metadata_collection(), start=1):
         filename = file_dict["filename"]
         new_dataset_filename = os.path.join(tool_job_working_directory, "working", filename)
