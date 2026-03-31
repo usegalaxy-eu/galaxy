@@ -23,12 +23,6 @@ from typing import (
     Optional,
 )
 
-try:
-    from pulsar.client.staging import COMMAND_VERSION_FILENAME
-except ImportError:
-    # Package unit tests
-    COMMAND_VERSION_FILENAME = "COMMAND_VERSION"
-
 import galaxy.datatypes.registry
 import galaxy.model.mapping
 from galaxy.datatypes import sniff
@@ -83,6 +77,7 @@ log = logging.getLogger(__name__)
 
 
 MAX_STDIO_READ_BYTES = 100 * 10**6  # 100 MB
+COMMAND_VERSION_FILENAME = "COMMAND_VERSION"
 
 
 def reset_external_filename(dataset_instance: DatasetInstance):
