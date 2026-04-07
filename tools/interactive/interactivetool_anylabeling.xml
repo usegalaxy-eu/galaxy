@@ -13,14 +13,14 @@
        <![CDATA[
 	export HOME=\$PWD &&
 	 
-	mkdir -p ./home/output ./home/input_images &&
+	mkdir -p ./home/output ./home/inputs &&
 	chmod -R 777 ./home ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
 
 	#for $i,$img in enumerate($input_images):
 		#if $img.element_identifier.endswith($img.ext)
-			&& ln -s '$img' './home/input_images/${img.element_identifier}'
+			&& ln -s '$img' './home/inputs/${img.element_identifier}'
         #else:
-        	&& ln -s '$img' './home/input_images/${img.element_identifier}.${img.ext}'
+        	&& ln -s '$img' './home/inputs/${img.element_identifier}.${img.ext}'
         #end if
 	#end for
 
@@ -34,12 +34,11 @@
     #end if
 
     #if $annotations:
-        && mkdir -p ./home/input_annotations
         #for $i,$ann in enumerate($annotations):
             #if $ann.element_identifier.endswith($ann.ext)
-                && ln -s '$ann' './home/input_annotations/${ann.element_identifier}'
+                && ln -s '$ann' './home/inputs/${ann.element_identifier}'
             #else:
-                && ln -s '$ann' './home/input_annotations/${ann.element_identifier}.${ann.ext}'
+                && ln -s '$ann' './home/inputs/${ann.element_identifier}.${ann.ext}'
             #end if
         #end for
     #end if
