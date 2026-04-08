@@ -286,6 +286,33 @@ class TestToolsApi(ApiTestCase, TestsTools):
             assert "hg18_value" in option_values
             assert "mm10_value" in option_values
 
+    @skip_without_tool("dbkey_filter_multi_input")
+    def test_build_request_dbkey_filter_hdca_multi_input(self):
+        # Regression test for https://github.com/galaxyproject/galaxy/issues/22399:
+        # an HDCA passed to a multiple="true" data input must not break a downstream
+        # data_meta filter. Previously this raised
+        # AttributeError: 'MetaData' object has no attribute 'element_is_set'
+        # because _get_ref_data returned the raw list containing the HDCA instead
+        # of unwrapping it to its HDAs.
+        with self.dataset_populator.test_history() as history_id:
+            hda1 = self.dataset_populator.new_dataset(history_id, content="a\nb\nc", dbkey="hg19", wait=True)
+            hda2 = self.dataset_populator.new_dataset(history_id, content="d\ne\nf", dbkey="hg19", wait=True)
+            element_identifiers = [
+                {"name": "sample1", "src": "hda", "id": hda1["id"]},
+                {"name": "sample2", "src": "hda", "id": hda2["id"]},
+            ]
+            hdca = self.dataset_collection_populator.create_list_in_history(
+                history_id,
+                element_identifiers=element_identifiers,
+                direct_upload=False,
+                wait=True,
+            ).json()
+            inputs = {"inputs": [{"src": "hdca", "id": hdca["id"]}]}
+            build = self.dataset_populator.build_tool_state("dbkey_filter_multi_input", history_id, inputs=inputs)
+            option_values = self._get_build_option_values(build, "index")
+            assert "hg19_value" in option_values
+            assert "hg18_value" not in option_values
+
     @skip_without_tool("dbkey_filter_collection_input")
     def test_run_dbkey_filter_nested_collection_dce(self):
         with self.dataset_populator.test_history() as history_id:
@@ -2397,6 +2424,21 @@ class TestToolsApi(ApiTestCase, TestsTools):
         hdca = self._get(f"histories/{history_id}/contents/dataset_collections/{implicit_collections[0]['id']}").json()
         assert hdca["elements"][0]["object"]["elements"][0]["object"]["elements"][0]["element_identifier"] == "forward"
 
+    @skip_without_tool("discover_long_name")
+    def test_long_output_name_fails_gracefully(self, history_id):
+        # Short name succeeds
+        response = self._run("discover_long_name", history_id, {"output_name": "normal_name"})
+        self._assert_status_code_is(response, 200)
+        self.dataset_populator.wait_for_job(response.json()["jobs"][0]["id"], assert_ok=True)
+        # Long name fails with clear error
+        response = self._run("discover_long_name", history_id, {"output_name": "a" * 240})
+        self._assert_status_code_is(response, 200)
+        job_id = response.json()["jobs"][0]["id"]
+        self.dataset_populator.wait_for_job(job_id, assert_ok=False)
+        job_details = self.dataset_populator.get_job_details(job_id, full=True).json()
+        assert job_details["state"] == "error"
+        assert "255 character" in job_details["job_messages"][0]["desc"]
+
     def _bed_list(self, history_id):
         bed1_contents = open(self.get_filename("1.bed")).read()
         bed2_contents = open(self.get_filename("2.bed")).read()
@@ -2467,6 +2509,22 @@ class TestToolsApi(ApiTestCase, TestsTools):
         collection = execute.assert_has_n_jobs(2).assert_creates_implicit_collection(0)
         collection.assert_has_dataset_element("forward").with_contents_stripped("forward")
         collection.assert_has_dataset_element("reverse").with_contents_stripped("reverse")
+
+    @skip_without_tool("identifier_in_conditional")
+    def test_hdca_rejected_for_single_data_param_in_conditional(self, history_id):
+        # Regression test for https://github.com/galaxyproject/galaxy/issues/22401 .
+        # Submitting a paired collection (no batch wrapper) to a non-multiple
+        # ``data`` parameter is invalid and must produce a 400 client error,
+        # not a 500 from a TypeError raised inside ``wrap_values``. Map-over is
+        # still supported via ``{"batch": True, "values": [...]}``, exercised
+        # by ``test_identifier_map_over_input_in_conditional``.
+        hdca_id = self._build_pair(history_id, ["123", "456"])
+        inputs = {
+            "outer_cond|multi_input": False,
+            "outer_cond|input1": {"src": "hdca", "id": hdca_id},
+        }
+        response = self._run("identifier_in_conditional", history_id, inputs)
+        self._assert_status_code_is(response, 400)
 
     @skip_without_tool("identifier_multiple_in_conditional")
     def test_identifier_multiple_reduce_in_conditional(self, history_id):

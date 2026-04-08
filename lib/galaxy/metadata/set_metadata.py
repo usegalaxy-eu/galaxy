@@ -43,6 +43,7 @@ from galaxy.model import (
     DatasetInstance,
     HistoryDatasetAssociation,
     Job,
+    JobOutputNameTooLongError,
     store,
 )
 from galaxy.model.custom_types import total_size
@@ -217,6 +218,7 @@ def set_metadata_portable(
 
     export_store = None
     final_job_state = Job.states.OK
+    discovery_failed = False
     job_messages: list[AnyJobMessage] = []
     if extended_metadata_collection:
         tool_dict = metadata_params["tool"]
@@ -341,7 +343,9 @@ def set_metadata_portable(
                 input_ext=input_ext,
             )
             collect_dynamic_outputs(job_context, output_collections)
-        except MaxDiscoveredFilesExceededError as e:
+        except (MaxDiscoveredFilesExceededError, JobOutputNameTooLongError) as e:
+            log.warning("Job failed during extended metadata output discovery: %s", e)
+            discovery_failed = True
             final_job_state = Job.states.ERROR
             job_messages.append(
                 {
@@ -364,7 +368,6 @@ def set_metadata_portable(
                             continue
                         command_line_lines.append(line)
                     job.command_line = "".join(command_line_lines).strip()
-                    export_store.export_job(job, include_job_data=False)
 
     unnamed_id_to_path = {}
     unnamed_is_deferred = {}
@@ -532,6 +535,16 @@ def set_metadata_portable(
     if export_store:
         export_store.push_metadata_files()
         export_store._finalize()
+        if discovery_failed and job:
+            # _finalize() builds the jobs attrs file from included_datasets /
+            # included_collections via `creating_job_associations`. For tools
+            # whose only discoverable outputs are dynamic collections, nothing
+            # reaches either of those before discovery fails, so _finalize()
+            # writes an empty jobs list - and the ERROR state (plus
+            # job_messages) we set on the job is not persisted. Export the job
+            # once here so perform_import on the host side picks it up from
+            # the jobs attrs file.
+            export_store.export_job(job, include_job_data=False)
     write_job_metadata(tool_job_working_directory, job_metadata, set_meta, tool_provided_metadata)
 
 
