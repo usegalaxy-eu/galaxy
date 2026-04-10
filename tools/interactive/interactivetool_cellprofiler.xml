@@ -14,7 +14,7 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-	      export MPLCONFIGDIR=\$TEMP &&
+        export MPLCONFIGDIR=\$TEMP &&
         export HOME=\$PWD &&
 
         mkdir -p ./home ./home/output ./home/input &&
@@ -26,7 +26,7 @@
         #if str($input_type.existing) == "existing":
 	          cp '${input_type.pipeline_file}' \$HOME/home/output/'$input_type.pipeline_file.element_identifier'.cppipe &&
 	          echo "cellprofiler -r --pipeline \$HOME/home/output/'$input_type.pipeline_file.element_identifier'.cppipe -i \$HOME/home/input -o \$HOME/home/output " > \$HOME/home/cellprofiler_galaxy &&
-	          chmod +x \$HOME/home/cellprofiler_galaxy &&
+	          chmod +x \$HOME/home/cellprofiler_galaxy || true &&
 	          cp \$HOME/home/cellprofiler_galaxy '/bin' &&
         #end if
 
