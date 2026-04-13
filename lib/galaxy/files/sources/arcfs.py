@@ -12,33 +12,37 @@ from galaxy.files.models import (  # type: ignore
     BaseFileSourceTemplateConfiguration,
     FilesSourceRuntimeContext,
 )
+
 from galaxy.util.config_templates import TemplateExpansion  # type: ignore
 
-from typing import Union
+from typing import Optional, Union
 
 
 class ARCfsTemplateConfiguration(BaseFileSourceTemplateConfiguration):
-    token: Union[str, TemplateExpansion] = ""
-    server_url: Union[str, TemplateExpansion] = ""
+    token: Optional[Union[str, TemplateExpansion]] = None
+    server_url: Union[str, TemplateExpansion]
 
 
 class ARCfsResolvedConfiguration(BaseFileSourceConfiguration):
-    token: str = ""
-    server_url: str = ""
-
+    token: Optional[str] = None
+    server_url: str
 
 class ARCfsFilesSource(PyFilesystem2FilesSource[ARCfsTemplateConfiguration, ARCfsResolvedConfiguration]):
     plugin_type = "arcfs"
     required_module = ARCfs
     required_package = "gitlab_arc_fs"
-
     template_config_class = ARCfsTemplateConfiguration
     resolved_config_class = ARCfsResolvedConfiguration
 
     def _open_fs(self, context: FilesSourceRuntimeContext[ARCfsResolvedConfiguration], **kwargs):
         cfg = context.config
-        token = (cfg.token or "").strip()
+
+        token = (cfg.token or "").strip() or None  # CHANGED: normalize blank token to None
+
         server_url = (cfg.server_url or "").strip().rstrip("/")
+        if not server_url:
+            raise ValueError("server_url must be configured for ARCfs")
+
         return ARCfs(token=token, server_url=server_url)
 
 
