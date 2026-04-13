@@ -15,7 +15,7 @@
     <command detect_errors="exit_code"><![CDATA[
         export HOME=\$PWD/home &&
         mkdir -p ./home/input ./home/output ./home/omero &&
-        chown -R 1000 ./home | true &&
+        chown -R 1000 ./home || true &&
         #if $infile:
             #for $filename in $infile:
                 #if $filename.ext == 'spatialdata.zip':
