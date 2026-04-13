@@ -35,7 +35,7 @@ class ARCfsFilesSource(PyFilesystem2FilesSource[ARCfsTemplateConfiguration, ARCf
     def _open_fs(self, context: FilesSourceRuntimeContext[ARCfsResolvedConfiguration], **kwargs):
         cfg = context.config
 
-        token = (cfg.token or "").strip() or None
+        token = (cfg.token or "").strip()
         
         server_url = (cfg.server_url or "").strip().rstrip("/")
         if not server_url:
