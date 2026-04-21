@@ -12,34 +12,31 @@
     <command detect_errors="exit_code">
        <![CDATA[
 	export HOME=\$PWD &&
-	 
-	mkdir -p ./home/output ./home/input_images &&
-	chmod -R 777 ./home ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
+
+	mkdir -p ./home/workspace
 
 	#for $i,$img in enumerate($input_images):
 		#if $img.element_identifier.endswith($img.ext)
-			&& ln -s '$img' './home/input_images/${img.element_identifier}'
+			&& cp '$img' './home/workspace/${img.element_identifier}'
         #else:
-        	&& ln -s '$img' './home/input_images/${img.element_identifier}.${img.ext}'
+        	&& cp '$img' './home/workspace/${img.element_identifier}.${img.ext}'
         #end if
 	#end for
 
     #if $class_file:
-        && mkdir -p ./home/input_classes
         #if $class_file.element_identifier.endswith($class_file.ext)
-            && ln -s '$class_file' './home/input_classes/${class_file.element_identifier}'
+            && cp '$class_file' './home/workspace/${class_file.element_identifier}'
         #else:
-            && ln -s '$class_file' './home/input_classes/${class_file.element_identifier}.${class_file.ext}'
+            && cp '$class_file' './home/workspace/${class_file.element_identifier}.${class_file.ext}'
         #end if
     #end if
 
     #if $annotations:
-        && mkdir -p ./home/input_annotations
         #for $i,$ann in enumerate($annotations):
             #if $ann.element_identifier.endswith($ann.ext)
-                && ln -s '$ann' './home/input_annotations/${ann.element_identifier}'
+                && cp '$ann' './home/workspace/${ann.element_identifier}'
             #else:
-                && ln -s '$ann' './home/input_annotations/${ann.element_identifier}.${ann.ext}'
+                && cp '$ann' './home/workspace/${ann.element_identifier}.${ann.ext}'
             #end if
         #end for
     #end if
@@ -53,6 +50,7 @@
         #end for    
     #end if 
 
+    && chmod -R 777 ./home ## after all copies so files are writable by the app user (fails silently on NFS with root-squash)
     && /init
     ]]>
     </command>
@@ -63,10 +61,9 @@
         <param name="models" type="data" format="tar" optional="true" label="A tarball containing custom model files and yaml files"/>
     </inputs>
     <outputs>
-        <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
-	<collection name="al_output" type="list" label="AnyLabeling output">
-	    <discover_datasets pattern="__name_and_ext__" directory="./home/output" />
-	</collection>
+        <collection name="al_output" type="list" label="AnyLabeling output (JSON)" format="json">
+            <discover_datasets pattern="(?P&lt;name&gt;.+)\.json" ext="json" directory="./home/workspace" />
+        </collection>
     </outputs>
     <tests>
     </tests>
