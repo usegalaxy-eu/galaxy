@@ -61,7 +61,7 @@
         <param name="models" type="data" format="tar" optional="true" label="A tarball containing custom model files and yaml files"/>
     </inputs>
     <outputs>
-        <collection name="al_output" type="list" label="AnyLabeling output (JSON)" format="json">
+        <collection name="annotations_json" type="list" label="AnyLabeling output (JSON)" format="json">
             <discover_datasets pattern="(?P&lt;name&gt;.+)\.json" ext="json" directory="./home/workspace" />
         </collection>
     </outputs>
