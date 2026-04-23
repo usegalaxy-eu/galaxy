@@ -75,6 +75,7 @@ from galaxy.tool_util.deps import (
 )
 from galaxy.tool_util.deps.requirements import CredentialsRequirement
 from galaxy.tool_util.fetcher import ToolLocationFetcher
+from galaxy.tool_util.identifiers import uri_safe_tool_id
 from galaxy.tool_util.loader import (
     imported_macro_paths,
     raw_tool_xml_tree,
@@ -191,7 +192,6 @@ from galaxy.tools.parameters.workflow_utils import workflow_building_modes
 from galaxy.tools.parameters.wrapped_json import json_wrap
 from galaxy.util import (
     in_directory,
-    listify,
     Params,
     parse_xml_string,
     rst_to_html,
@@ -204,7 +204,6 @@ from galaxy.util.bunch import Bunch
 from galaxy.util.compression_utils import get_fileobj_raw
 from galaxy.util.dictifiable import UsesDictVisibleKeys
 from galaxy.util.expressions import ExpressionContext
-from galaxy.util.form_builder import SelectField
 from galaxy.util.json import (
     safe_loads,
     swap_inf_nan,
@@ -690,33 +689,6 @@ class ToolBox(AbstractToolBox):
             tool.name = tool.id
         return tool
 
-    def get_tool_components(self, tool_id, tool_version=None, get_loaded_tools_by_lineage=False, set_selected=False):
-        """
-        Retrieve all loaded versions of a tool from the toolbox and return a select list enabling
-        selection of a different version, the list of the tool's loaded versions, and the specified tool.
-        """
-        tool_version_select_field = None
-        tools = []
-        tool = None
-        # Backwards compatibility for datasource tools that have default tool_id configured, but which
-        # are now using only GALAXY_URL.
-        tool_ids = listify(tool_id)
-        for tool_id in tool_ids:
-            if tool_id.endswith("/"):
-                # Some data sources send back redirects ending with `/`, this takes care of that case
-                tool_id = tool_id[:-1]
-            if get_loaded_tools_by_lineage:
-                tools = self.get_loaded_tools_by_lineage(tool_id)
-            else:
-                tools = self.get_tool(tool_id, tool_version=tool_version, get_all_versions=True)
-            if tools:
-                tool = self.get_tool(tool_id, tool_version=tool_version, get_all_versions=False)
-                assert tool
-                if len(tools) > 1:
-                    tool_version_select_field = self.__build_tool_version_select_field(tools, tool.id, set_selected)
-                break
-        return tool_version_select_field, tools, tool
-
     def _path_template_kwds(self):
         return {
             "model_tools_path": MODEL_TOOLS_PATH,
@@ -765,20 +737,6 @@ class ToolBox(AbstractToolBox):
         session = self.app.model.context
         stored = session.get_one(StoredWorkflow, id)
         return stored.latest_workflow
-
-    def __build_tool_version_select_field(self, tools, tool_id, set_selected):
-        """Build a SelectField whose options are the ids for the received list of tools."""
-        options: list[tuple[str, str]] = []
-        for tool in tools:
-            options.insert(0, (tool.version, tool.id))
-        select_field = SelectField(name="tool_id")
-        for option_tup in options:
-            selected = set_selected and option_tup[1] == tool_id
-            if selected:
-                select_field.add_option(f"version {option_tup[0]}", option_tup[1], selected=True)
-            else:
-                select_field.add_option(f"version {option_tup[0]}", option_tup[1])
-        return select_field
 
 
 class DefaultToolState:
@@ -1169,6 +1127,18 @@ class Tool(UsesDictVisibleKeys, ToolParameterBundle):
             return list(self.lineage.tool_versions)
         else:
             return []
+
+    @property
+    def hidden_tool_versions(self):
+        if not self.lineage or not self.id:
+            return []
+        versions_by_id = self.app.toolbox._tool_versions_by_id.get(self.id, {})
+        hidden_versions = []
+        for version in self.lineage.tool_versions:
+            tool = versions_by_id.get(version)
+            if tool and tool.hidden:
+                hidden_versions.append(version)
+        return hidden_versions
 
     @property
     def is_latest_version(self):
@@ -2971,6 +2941,8 @@ class Tool(UsesDictVisibleKeys, ToolParameterBundle):
         tool_dict["hidden"] = self.hidden
         tool_dict["is_workflow_compatible"] = self.is_workflow_compatible
         tool_dict["xrefs"] = self.xrefs
+        tool_dict["versions"] = self.tool_versions
+        tool_dict["hidden_versions"] = self.hidden_tool_versions
 
         if self.dynamic_tool:
             tool_dict["uuid"] = str(self.dynamic_tool.uuid)
@@ -3124,6 +3096,7 @@ class Tool(UsesDictVisibleKeys, ToolParameterBundle):
                 "message": tool_message,
                 "warnings": tool_warnings,
                 "versions": self.tool_versions,
+                "hidden_versions": self.hidden_tool_versions,
                 "requirements": [{"name": r.name, "version": r.version} for r in self.requirements],
                 "credentials": [credential.to_dict() for credential in self.credentials] if self.credentials else [],
                 "errors": state_errors,
@@ -3224,9 +3197,8 @@ class Tool(UsesDictVisibleKeys, ToolParameterBundle):
             return None
         message = ""
         try:
-            select_field, tools, tool = self.app.toolbox.get_tool_components(
-                tool_id, tool_version=tool_version, get_loaded_tools_by_lineage=False, set_selected=True
-            )
+            tools = self.app.toolbox.get_tool(tool_id, tool_version=tool_version, get_all_versions=True) or []
+            tool = self.app.toolbox.get_tool(tool_id, tool_version=tool_version) if tools else None
             if tool is None:
                 raise exceptions.MessageException(
                     f"This dataset was created by an obsolete tool ({tool_id}). Can't re-run."
@@ -3490,8 +3462,10 @@ class DataSourceTool(OutputParameterJSONTool):
         return True
 
     def _build_GALAXY_URL_parameter(self):
+        assert self.id, "Tool id must be set to build GALAXY_URL parameter for data_source tool"
         return ToolParameter.build(
-            self, XML(f'<param name="GALAXY_URL" type="baseurl" value="/tool_runner?tool_id={self.id}" />')
+            self,
+            XML(f'<param name="GALAXY_URL" type="baseurl" value="/tool_runner?tool_id={uri_safe_tool_id(self.id)}" />'),
         )
 
     def parse_inputs(self, tool_source):
@@ -3563,7 +3537,10 @@ class AsyncDataSourceTool(DataSourceTool):
     tool_type = "data_source_async"
 
     def _build_GALAXY_URL_parameter(self):
-        return ToolParameter.build(self, XML(f'<param name="GALAXY_URL" type="baseurl" value="/async/{self.id}" />'))
+        assert self.id, "Tool id must be set to build GALAXY_URL parameter for data_source_async tool"
+        return ToolParameter.build(
+            self, XML(f'<param name="GALAXY_URL" type="baseurl" value="/async/{uri_safe_tool_id(self.id)}" />')
+        )
 
 
 class DataDestinationTool(Tool):
@@ -3809,6 +3786,9 @@ class DatabaseOperationTool(Tool):
         def check_dataset_state(input_key, state):
             if self.require_terminal_states and state in model.Dataset.non_ready_states:
                 raise ToolInputsNotReadyException("An input dataset is pending.")
+
+            if state == model.Dataset.states.PAUSED and not self.require_terminal_or_paused_states:
+                raise ToolInputsNotReadyException(f"Input '{input_key}' is paused; the file is not yet available.")
 
             if self.require_dataset_ok:
                 if state != model.Dataset.states.OK:

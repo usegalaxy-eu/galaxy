@@ -92,7 +92,7 @@ dependencies = [
     "refgenconf>=0.12.0",
     "regex",
     "requests",
-    "rocrate",
+    "rocrate<0.15.0",  # https://github.com/crs4/rocrate-validator/issues/107
     "Routes",
     "s3fs>=2023.1.0",
     "schema-salad>=8.7.20240905150001",  # Python 3.13 support
@@ -123,6 +123,7 @@ Repository = "https://github.com/galaxyproject/galaxy"
 
 [dependency-groups]
 test = [
+    "aiocop",
     "ase>=3.18.1",
     "axe-selenium-python",
     "boto3",
