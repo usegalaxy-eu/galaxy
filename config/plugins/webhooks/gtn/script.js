@@ -94,7 +94,7 @@
                                 ${message}
                             </div>
                         </div>
-                    </div>`
+                    </div>`,
                 );
 
                 // Clicking outside of GTN closes it
@@ -147,7 +147,11 @@
                             if (tool_id === "upload1" || tool_id === "upload") {
                                 document.getElementById("tool-panel-upload-button").click();
                             } else {
-                                Galaxy.router.push({ path: `/?tool_id=${encodeURIComponent(tool_id)}` });
+                                if (window.Galaxy && window.Galaxy.router) {
+                                    Galaxy.router.push({ path: `/?tool_id=${encodeURIComponent(tool_id)}` });
+                                } else {
+                                    window.location.href = `/?tool_id=${encodeURIComponent(tool_id)}`;
+                                }
                             }
                             removeOverlay();
                         });
@@ -168,9 +172,13 @@
                             }
 
                             trs_url = target.dataset.workflow;
-                            Galaxy.router.push({
-                                path: `/workflows/trs_import?trs_url=${encodeURIComponent(trs_url)}&run_form=true`,
-                            });
+                            if (window.Galaxy && window.Galaxy.router) {
+                                Galaxy.router.push({
+                                    path: `/workflows/trs_import?trs_url=${encodeURIComponent(trs_url)}&run_form=true`,
+                                });
+                            } else {
+                                window.location.href = `/workflows/trs_import?trs_url=${encodeURIComponent(trs_url)}&run_form=true`;
+                            }
                             removeOverlay();
                         });
                     });
