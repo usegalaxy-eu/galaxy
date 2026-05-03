@@ -6,6 +6,7 @@ except ImportError:
 import tempfile
 from typing import (
     Annotated,
+    Any,
     Optional,
     Union,
 )
@@ -64,6 +65,16 @@ class WebDavFilesSource(PyFilesystem2FilesSource[WebDavFileSourceTemplateConfigu
 
     template_config_class = WebDavFileSourceTemplateConfiguration
     resolved_config_class = WebDavFileSourceConfiguration
+
+    def _serialize_config(self, config: WebDavFileSourceConfiguration) -> dict[str, Any]:
+        result = super()._serialize_config(config)
+        # 'url' is in COMMON_FILE_SOURCE_PROP_NAMES so it is excluded by the base class
+        # _serialize_config. For WebDAV, 'url' is the server endpoint (not a display URL),
+        # so it must be preserved in the serialized form used to reconstruct the plugin on
+        # job runners. Without it, url defaults to None and WebDAVFS raises AttributeError.
+        if config.url is not None:
+            result["url"] = config.url
+        return result
 
     def _open_fs(self, context: FilesSourceRuntimeContext[WebDavFileSourceConfiguration]):
         if WebDAVFS is None:
