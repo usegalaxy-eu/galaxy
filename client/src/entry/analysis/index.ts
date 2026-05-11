@@ -26,6 +26,9 @@ window.addEventListener("load", async () => {
 
     // Build router
     const router = getRouter(Galaxy);
+    // Keep router available on the global app object for legacy integrations
+    // such as webhooks that are injected outside of Vue component context.
+    Galaxy.router = router;
 
     // Initialize globals
     await initSentry(Galaxy, router);
