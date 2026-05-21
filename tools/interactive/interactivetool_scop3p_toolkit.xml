@@ -1,0 +1,136 @@
+<tool id="interactive_tool_scop3p_toolkit" name="Scop3P Toolkit" tool_type="interactive" version="0.2.0" license="Apache-2.0">
+    <description>an interactive framework for exploring and extending Scop3P across sequence, structure, proteomics and variant evidence.</description>
+    <icon src="scop3p_toolkit.png" />
+    <requirements>
+        <container type="docker">scop3p-toolkit:v0.2.5</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Scop3PToolkit App" requires_domain="true">
+            <port>8000</port>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="MPLCONFIGDIR">\$TMPDIR/matplotlib-cache</environment_variable>
+    </environment_variables>
+    <command><![CDATA[
+        mkdir -p /var/log/scop3p_toolkit &&
+        ln -sf '$metadata' /var/log/scop3p_toolkit/metadata.yml &&
+        shiny run --host 0.0.0.0 --port 8000 /apps/portal/main.py 2>&1 &&
+        echo "Finishing ShinyApp Server on port 8000"
+    ]]>
+    </command>
+    <stdio>
+        <exit_code range="1:" level="fatal" />
+    </stdio>
+    <outputs>
+        <data name="metadata" format="yaml" label="Interactive tool execution" help="Context metadata will be saved after stopping the interactive tool"/>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1">
+            <output name="metadata" file="metadata.yml" ftype="yaml"/>
+        </test>
+    </tests>
+    <help><![CDATA[
+About Scop3P and the Scop3P Toolkit
+===================================
+
+The Scop3P toolkit is a set of tools for exploring and extending Scop3P
+features written as a Shiny App in Python.
+
+Scop3P: Phosphosites on Protein 3D Structure
+--------------------------------------------
+
+Scop3P provides a unique and powerful resource for exploring and understanding
+the impact of phosphosites on human protein structure and function. It serves as
+a platform for researchers seeking to analyse and interpret phosphosites or
+phosphoproteins within a structural, biophysical, and biological context.
+
+The resource reuses public-domain data from leading international resources,
+including UniProtKB and the PDB. It also incorporates reprocessed
+mass spectrometry-based phosphoproteomics data from PRIDE/ProteomeXchange,
+a globally curated and internationally supported repository.
+
+Scop3P Toolkit
+--------------
+
+The Scop3P Toolkit is a collection of tools designed to explore and extend
+Scop3P functionalities, implemented as a Python-based Shiny application.
+
+----
+
+Using this Toolkit
+=================
+
+This interactive tool launches a web-based environment containing three
+applications that extend the capabilities of Scop3P through the integration of
+Bio2Byte tools and interactive visualisation frameworks.
+
+Peptide Mapper
+--------------
+
+Map phosphopeptide coverage from *Scop3P* onto *AlphaFold2* structures for a
+given *UniProt* accession, and inspect peptide overlap and modification context.
+
+1. Loads peptide and modification data from Scop3P.
+2. Filters and selects peptide regions.
+3. Maps selected regions onto AlphaFold structures.
+4. Exports a styled HTML session.
+
+Structure Visualisation
+-----------------------
+
+Explore PTMs, disease-associated variants, structures, biophysical predictions,
+residue interaction networks, and structural alignments for a *UniProt* protein.
+
+1. Retrieves PTMs and disease-associated variants.
+2. Renders PDB or AlphaFold structures.
+3. Runs Bio2Byte predictions and applies 3D colouring.
+4. Builds residue interaction networks.
+5. Performs TM-align structural comparisons.
+
+Mutation Effect
+---------------
+
+Predict sequence-based biophysical properties for proteins using a *UniProt* ID
+and visualise the results through interactive plots. Users can introduce one or
+more amino acid mutations, recompute predictions for the mutated sequence, and
+directly compare wild-type and mutant profiles.
+
+1. Retrieves the wild-type UniProt sequence and Scop3P PTMs.
+2. Runs Bio2Byte tools to generate wild-type and mutant predictions.
+3. Compares residue-level features between wild-type and mutant proteins.
+4. Generates mutation-centred inference summaries.
+
+-----
+
+Contact Us
+==========
+
+*Scop3P* is developed at Ghent University (UGent) and has been online since
+June 2019. The publication describing *Scop3P* is listed in the citations
+below.
+
+The *Scop3P Toolkit* has been developed by *CompOmics* (UGent), in
+collaboration with the *Bio2Byte* Lab (VUB) and the *VIB Data Core* team (VIB).
+
+For questions, feedback, or suggestions, please contact:
+
+* pathmanaban.ramasamy@ugent.be
+* bio2byte@vub.be
+
+Find us online: `Scop3P: Phosphosites on Protein 3D Structure <https://iomics.ugent.be/scop3p/>`__
+   ]]></help>
+    <citations>
+        <citation type="doi">10.1021/acs.jproteome.0c00306</citation>
+        <citation type="doi">10.5281/zenodo.18889471</citation>
+        <citation type="doi">10.5281/zenodo.18242776</citation>
+    </citations>
+    <creator>
+        <person name="Pathmanaban Ramasamy" email="pathmanaban.ramasamy@ugent.be" identifier="0000-0003-4039-5230" url="https://orcid.org/0000-0003-4039-5230"/>
+        <person name="Natalia Tichshenko" email="natalia.tichshenko@ugent.be" identifier="0000-0001-7914-0759" url="https://orcid.org/0000-0001-7914-0759"/>
+        <person name="Adrián Díaz" email="adrian.diaz@vub.be" identifier="0000-0003-0165-1318" url="https://orcid.org/0000-0003-0165-1318"/>
+        <organization name="CompOmics" url="https://compomics.com" email="lennart.martens@ugent.be"/>
+        <organization name="Bio2Byte" url="https://bio2byte.be" email="bio2byte@vub.be"/>
+        <organization name="VIB Data Core" url="https://datacore.sites.vib.be" email="datacore.help@vib.be"/>
+    </creator>
+</tool>
