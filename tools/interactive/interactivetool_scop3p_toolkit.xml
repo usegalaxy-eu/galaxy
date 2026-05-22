@@ -1,22 +1,25 @@
-<tool id="interactive_tool_scop3p_toolkit" name="Scop3P Toolkit" tool_type="interactive" version="0.2.0" license="Apache-2.0">
+<tool id="interactive_tool_scop3p_toolkit" name="Scop3P Toolkit" tool_type="interactive" version="@VERSION@" license="Apache-2.0">
     <description>an interactive framework for exploring and extending Scop3P across sequence, structure, proteomics and variant evidence.</description>
     <icon src="scop3p_toolkit.png" />
+    <macros>
+        <token name="@VERSION@">0.2.5</token>
+        <token name="@SHINYAPP_PORT@">8000</token>
+    </macros>
     <requirements>
-        <container type="docker">scop3p-toolkit:v0.2.5</container>
+        <container type="docker">bio2byte/scop3p-toolkit:v@VERSION@</container>
     </requirements>
     <entry_points>
-        <entry_point name="Scop3PToolkit App" requires_domain="true">
+        <entry_point name="Scop3P Toolkit" requires_domain="true">
             <port>8000</port>
         </entry_point>
     </entry_points>
     <environment_variables>
         <environment_variable name="MPLCONFIGDIR">\$TMPDIR/matplotlib-cache</environment_variable>
+        <environment_variable name="SHINYAPP_PORT">@SHINYAPP_PORT@</environment_variable>
     </environment_variables>
     <command><![CDATA[
-        mkdir -p /var/log/scop3p_toolkit &&
         ln -sf '$metadata' /var/log/scop3p_toolkit/metadata.yml &&
-        shiny run --host 0.0.0.0 --port 8000 /apps/portal/main.py 2>&1 &&
-        echo "Finishing ShinyApp Server on port 8000"
+        shiny run --host 0.0.0.0 --port \$SHINYAPP_PORT /apps/portal/main.py 2>&1
     ]]>
     </command>
     <stdio>
