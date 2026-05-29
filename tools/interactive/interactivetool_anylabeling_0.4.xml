@@ -1,0 +1,91 @@
+<tool id="interactive_tool_anylabeling" tool_type="interactive" name="AnyLabeling Interactive" version="0.4.30" profile="24.2">
+    <description>Effortless data labeling with AI support from YOLO and Segment Anything!</description>
+    <icon src="anylabeling.png"/>
+    <requirements>
+        <container type="docker">quay.io/bgruening/anylabeling:0.4.30</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="AnyLabeling" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    <command detect_errors="exit_code">
+       <![CDATA[
+	export HOME=\$PWD &&
+
+	mkdir -p ./home/workspace
+
+	#for $i,$img in enumerate($input_images):
+		#if $img.element_identifier.endswith($img.ext)
+			&& cp '$img' './home/workspace/${img.element_identifier}'
+        #else:
+        	&& cp '$img' './home/workspace/${img.element_identifier}.${img.ext}'
+        #end if
+	#end for
+
+    #if $class_file:
+        #if $class_file.element_identifier.endswith($class_file.ext)
+            && cp '$class_file' './home/workspace/${class_file.element_identifier}'
+        #else:
+            && cp '$class_file' './home/workspace/${class_file.element_identifier}.${class_file.ext}'
+        #end if
+    #end if
+
+    #if $annotations:
+        #for $i,$ann in enumerate($annotations):
+            #if $ann.element_identifier.endswith($ann.ext)
+                && cp '$ann' './home/workspace/${ann.element_identifier}'
+            #else:
+                && cp '$ann' './home/workspace/${ann.element_identifier}.${ann.ext}'
+            #end if
+        #end for
+    #end if
+
+    #if $models:
+        #import glob,os
+        && mkdir -p ./home/input_models
+        && tar -C ./home/input_models -xvf '$models'
+        #for $f in sorted(glob.glob("./home/input_models/*")):
+            && ln -s '$f' './home/input_models/${os.path.basename($f)}'
+        #end for    
+    #end if 
+
+    && chmod -R 777 ./home ## after all copies so files are writable by the app user (fails silently on NFS with root-squash)
+    && /init
+    ]]>
+    </command>
+    <inputs>
+        <param name="input_images" type="data" format="jpg,png,tiff,bmp,gif,pcx,ppm,psd,pbm,pgm,eps" multiple="true"  label="Input images"/>
+        <param name="annotations" type="data" format="txt,json" optional="true" multiple="true" label="Pre-existing annotations"/>
+        <param name="class_file" type="data" format="txt,json" optional="true" multiple="false" label="Classes file (one class per line)"/>
+        <param name="models" type="data" format="tar" optional="true" label="A tarball containing custom model files and yaml files"/>
+    </inputs>
+    <outputs>
+        <collection name="annotations_json" type="list" label="AnyLabeling output (JSON)" format="json">
+            <discover_datasets pattern="(?P&lt;name&gt;.+)\.json" ext="json" directory="./home/workspace" />
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+	**What it is**:
+           AnyLabeling = LabelImg + Labelme + Improved UI + Auto-labeling
+
+	**Features**:
+          - Image annotation for polygon, rectangle, circle, line and point.
+          - Auto-labeling YOLOv8, Segment Anything (SAM, SAM2).
+          - Text detection, recognition and KIE (Key Information Extraction) labeling.
+	  - Multiple languages availables: English, Vietnamese, Chinese.
+
+	**Custom Models**:
+	  - Loading custom models will enable you to use your own models for auto labeling. This is useful if you have a custom model that you have trained on your own data and want to use it for auto labeling.The supported model formats for YOLOv5, YOLOv8 and SegmentAnything is ONNX.
+          - Sample models could be download from https://github.com/vietanhdev/anylabeling-assets/releases/tag/v0.4.0
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">@Manual{github,
+            title = {AnyLabeling},
+            url = {https://github.com/vietanhdev/anylabeling}}
+        </citation>
+    </citations>
+</tool>
