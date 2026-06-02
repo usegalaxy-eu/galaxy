@@ -1613,11 +1613,6 @@ class DistributedObjectStore(NestedObjectStore):
                     log.warning(
                         f"{obj.__class__.__name__} object with ID {obj.id} found in backend object store with ID {id}"
                     )
-                    try:
-                        obj.object_store_id = id
-                    except AttributeError:
-                        # obj is likely a namedtuple (/scripts/cleanup_datasets/pgcleanup.py::RemovesDatasets)
-                        log.info("Unable to set object_store_id on a readonly dataset object: %s", obj)
                     return id
         return None
 
@@ -2106,13 +2101,18 @@ class ObjectStorePopulator:
         # Create an empty file immediately.  The first dataset will be
         # created in the "default" store, all others will be created in
         # the same store as the first.
+        previous_object_store_id = dataset.object_store_id
         dataset.object_store_id = self.object_store_id
         try:
             concrete_store = self.object_store.create(dataset)
             if concrete_store.private and require_shareable:
                 raise ObjectCreationProblemSharingDisabled()
         except ObjectInvalid:
+            dataset.object_store_id = previous_object_store_id
             raise ObjectCreationProblemStoreFull()
+        except Exception:
+            dataset.object_store_id = previous_object_store_id
+            raise
         self.object_store_id = dataset.object_store_id  # these will be the same thing after the first output
 
 

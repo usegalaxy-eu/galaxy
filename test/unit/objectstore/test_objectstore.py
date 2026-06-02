@@ -501,6 +501,55 @@ def test_distributed_store():
             assert device_source_map.get_device_id("files2") == "primary_disk"
 
 
+def test_distributed_store_search_for_missing_does_not_mutate_object_store_id():
+    """search_for_missing must not set obj.object_store_id as a side-effect.
+
+    If it did, SQLAlchemy would see the Dataset as dirty and could commit a
+    wrong object_store_id (e.g. a weight=0 legacy backend that happens to be
+    first in insertion order) during an unrelated session flush.
+    """
+    # Config with files1 (weight=0, listed first) and files2 (weight=1).
+    # files1 must not be selected for new datasets, and search_for_missing
+    # must not leak it onto the dataset object.
+    config_str = """<?xml version="1.0"?>
+<object_store type="distributed" search_for_missing="true">
+    <backends>
+        <backend id="files1" type="disk" weight="0">
+            <files_dir path="${temp_directory}/files1"/>
+            <extra_dir type="temp" path="${temp_directory}/tmp1"/>
+            <extra_dir type="job_work" path="${temp_directory}/job_working_directory1"/>
+        </backend>
+        <backend id="files2" type="disk" weight="1">
+            <files_dir path="${temp_directory}/files2"/>
+            <extra_dir type="temp" path="${temp_directory}/tmp2"/>
+            <extra_dir type="job_work" path="${temp_directory}/job_working_directory2"/>
+        </backend>
+    </backends>
+</object_store>"""
+    with TestConfig(config_str) as (directory, object_store):
+        # Force creation in files1 by pre-setting object_store_id.
+        # _create() uses the pre-set id when it is a known backend, even if
+        # weight=0 (weight only affects random selection for new datasets).
+        dataset = MockDataset(42)
+        dataset.object_store_id = "files1"
+        object_store.create(dataset)
+        assert dataset.object_store_id == "files1"
+
+        # Reset object_store_id to None — simulates a dataset that has not yet
+        # been through enqueue() / _set_object_store_ids().
+        dataset.object_store_id = None
+
+        # Calling exists() triggers search_for_missing since object_store_id is None.
+        found = object_store.exists(dataset)
+        assert found  # files1 contains the file
+
+        # THE KEY ASSERTION: search_for_missing must NOT have mutated the object.
+        assert dataset.object_store_id is None, (
+            "search_for_missing must not set object_store_id — "
+            "doing so marks the SQLAlchemy object dirty and can commit a wrong value"
+        )
+
+
 def test_distributed_store_empty_cache_targets():
     for config_str in [DISTRIBUTED_TEST_CONFIG, DISTRIBUTED_TEST_CONFIG_YAML]:
         with TestConfig(config_str) as (directory, object_store):
