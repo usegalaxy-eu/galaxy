@@ -1,54 +1,145 @@
 from __future__ import annotations
 
-try:
-    from gitlab_arc_fs.arc_fs import ARCfs
-except ImportError:
-    ARCfs = None
+from typing import Optional, Union
 
-from typing import (
-    Optional,
-    Union,
-)
+from fsspec.asyn import sync
 
-from galaxy.files.models import (
-    BaseFileSourceConfiguration,
-    BaseFileSourceTemplateConfiguration,
-    FilesSourceRuntimeContext,
+from galaxy.exceptions import AuthenticationRequired, MessageException
+from galaxy.files.models import AnyRemoteEntry, FilesSourceRuntimeContext
+from galaxy.files.sources._fsspec import (
+    CacheOptionsDictType,
+    FsspecBaseFileSourceConfiguration,
+    FsspecBaseFileSourceTemplateConfiguration,
+    FsspecFilesSource,
 )
 from galaxy.util.config_templates import TemplateExpansion
-from ._pyfilesystem2 import PyFilesystem2FilesSource
+
+try:
+    from arcfs.fs import GitLabARCFileSystem
+except ImportError:
+    GitLabARCFileSystem = None
 
 
-class ARCfsTemplateConfiguration(BaseFileSourceTemplateConfiguration):
-    token: Optional[Union[str, TemplateExpansion]] = None
-    server_url: Union[str, TemplateExpansion]
+REQUIRED_PACKAGE = "arcfs-fsspec"
+FS_PLUGIN_TYPE = "arc"
 
 
-class ARCfsResolvedConfiguration(BaseFileSourceConfiguration):
+class ARCTemplateConfiguration(FsspecBaseFileSourceTemplateConfiguration):
+    base_url: Union[str, TemplateExpansion]
+    token: Union[str, TemplateExpansion, None] = None
+
+
+class ARCResolvedConfiguration(FsspecBaseFileSourceConfiguration):
+    base_url: str
     token: Optional[str] = None
-    server_url: str
 
 
-class ARCfsFilesSource(PyFilesystem2FilesSource[ARCfsTemplateConfiguration, ARCfsResolvedConfiguration]):
-    plugin_type = "arcfs"
-    required_module = ARCfs
-    required_package = "gitlab_arc_fs"
-    template_config_class = ARCfsTemplateConfiguration
-    resolved_config_class = ARCfsResolvedConfiguration
+class ARCFilesSource(
+    FsspecFilesSource[ARCTemplateConfiguration, ARCResolvedConfiguration]
+):
+    plugin_type = FS_PLUGIN_TYPE
+    required_module = GitLabARCFileSystem
+    required_package = REQUIRED_PACKAGE
+    template_config_class = ARCTemplateConfiguration
+    resolved_config_class = ARCResolvedConfiguration
 
-    def _open_fs(self, context: FilesSourceRuntimeContext[ARCfsResolvedConfiguration]):
-        if ARCfs is None:
+    def _open_fs(
+        self,
+        context: FilesSourceRuntimeContext[ARCResolvedConfiguration],
+        cache_options: CacheOptionsDictType,
+    ):
+        if GitLabARCFileSystem is None:
             raise self.required_package_exception
 
-        cfg = context.config
+        config = context.config
+        return GitLabARCFileSystem(
+            base_url=config.base_url,
+            token=config.token,
+            asynchronous=False,
+            **cache_options,
+        )
 
-        token = (cfg.token or "").strip()
+    def _list(
+        self,
+        context: FilesSourceRuntimeContext[ARCResolvedConfiguration],
+        path: str = "/",
+        recursive: bool = False,
+        write_intent: bool = False,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        query: Optional[str] = None,
+        sort_by: Optional[str] = None,
+    ) -> tuple[list[AnyRemoteEntry], int]:
+        """
+        Use ARCfs paginated filesystem listing when offset/limit are specified.
 
-        server_url = (cfg.server_url or "").strip().rstrip("/")
-        if not server_url:
-            raise ValueError("server_url must be configured for ARCfs")
+        If recursive listing, query-based listing, or sorting is requested, fall
+        back to generic fsspec implementation.
 
-        return ARCfs(token=token, server_url=server_url)
+        For the paginated ARC path, the plugin only calls filesystem methods. If
+        real backend pagination is not possible, the fallback is handled inside
+        the ARCfs filesystem class rather than here.
+        """
+        fs_path = path
+
+        try:
+            if recursive or query or sort_by:
+                return super()._list(
+                    context=context,
+                    path=path,
+                    recursive=recursive,
+                    write_intent=write_intent,
+                    limit=limit,
+                    offset=offset,
+                    query=query,
+                    sort_by=sort_by,
+                )
+
+            if limit is None and offset is None:
+                return super()._list(
+                    context=context,
+                    path=path,
+                    recursive=recursive,
+                    write_intent=write_intent,
+                    limit=limit,
+                    offset=offset,
+                    query=query,
+                    sort_by=sort_by,
+                )
+
+            cache_options = self._get_cache_options(context.config)
+            fs = self._open_fs(context, cache_options)
+            fs_path = self._to_filesystem_path(path, context.config)
+
+            try:
+                infos, total_count = sync(
+                    fs.loop,
+                    fs._list_page,
+                    fs_path,
+                    True,
+                    offset=offset or 0,
+                    limit=limit or 50,
+                )
+                entries = [
+                    self._info_to_entry(info, context.config)
+                    for info in infos
+                ]
+                return entries, total_count
+            finally:
+                try:
+                    sync(fs.loop, fs._close)
+                except Exception:
+                    pass
+
+        except PermissionError as e:
+            # Unauthenticated access without a token is possible, but an invalid token will raise PermissionError.
+            raise AuthenticationRequired(
+                f"Permission Denied. Reason: {e}. Please check your credentials in your preferences for {self.label}."
+            )
+        except Exception as e:
+            raise MessageException(
+                f"Problem listing file source path {fs_path}. Reason: {e}"
+            ) from e
 
 
-__all__ = ("ARCfsFilesSource",)
+__all__ = ("ARCFilesSource",)
