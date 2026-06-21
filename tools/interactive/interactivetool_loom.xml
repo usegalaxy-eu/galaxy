@@ -1,0 +1,43 @@
+<tool id="interactive_tool_loom" tool_type="interactive" name="Loom" version="0.5" profile="25.0">
+    <description>conversational AI analysis workbench</description>
+    <requirements>
+        <!-- Replace with the published image, or a locally-built tag for a dev
+             instance (see gxit/README.md). -->
+        <container type="docker">quay.io/galaxy/loom:0.5</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Orbit" requires_domain="True">
+            <port>3000</port>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <!-- Per-user Galaxy context: the server URL and a SCOPED, time/instance-
+             limited API key minted for this user+session (not their personal key). -->
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_API_KEY" inject="api_key" />
+        <!-- Galaxy's interactivetool proxy authenticates the user and routes only
+             them to this container; a Galaxy-controlled entry-point URL can't carry
+             LOOM_WEB_TOKEN, so the proxy is the trust boundary. The image already
+             defaults LOOM_MODE=remote / NODE_ENV=production / PORT=3000 /
+             LOOM_WEB_HOST=0.0.0.0. -->
+        <environment_variable name="LOOM_WEB_ALLOW_INSECURE">1</environment_variable>
+        <!-- Provider defaults to anthropic. The admin LLM provider key (e.g.
+             ANTHROPIC_API_KEY) is a SECRET and is NOT set here; inject it via the
+             job destination env in job_conf (see gxit/README.md). If omitted, the
+             user is prompted for their own key once BYO-key (Plan 2) lands. -->
+    </environment_variables>
+    <!-- Galaxy runs the tool command inside the container; start the server
+         explicitly (mirrors the image CMD) rather than depending on the job
+         runner honoring the container's default CMD. -->
+    <command><![CDATA[
+        TMPDIR=/tmp node /app/web/build/server.js
+    ]]></command>
+    <inputs/>
+    <outputs/>
+    <help><![CDATA[
+Orbit is a conversational AI analysis workbench for Galaxy. The agent runs in this
+container against your Galaxy account (a per-user scoped API key is injected),
+drives tools and workflows as Galaxy jobs, and keeps an analysis notebook as a
+Galaxy Page in your current history.
+    ]]></help>
+</tool>
