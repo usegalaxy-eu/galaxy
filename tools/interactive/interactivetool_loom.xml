@@ -21,10 +21,8 @@
              defaults LOOM_MODE=remote / NODE_ENV=production / PORT=3000 /
              LOOM_WEB_HOST=0.0.0.0. -->
         <environment_variable name="LOOM_WEB_ALLOW_INSECURE">1</environment_variable>
-        <!-- Provider defaults to anthropic. The admin LLM provider key (e.g.
-             ANTHROPIC_API_KEY) is a SECRET and is NOT set here; inject it via the
-             job destination env in job_conf (see gxit/README.md). If omitted, the
-             user is prompted for their own key once BYO-key (Plan 2) lands. -->
+        <!-- LOOM_GALAXY_IT_MODE will re-use the Galaxy LLM Proxy and skip the Loom Provider configuration -->
+        <environment_variable name="LOOM_GALAXY_IT_MODE">1</environment_variable>
     </environment_variables>
     <!-- Galaxy runs the tool command inside the container; start the server
          explicitly (mirrors the image CMD) rather than depending on the job
