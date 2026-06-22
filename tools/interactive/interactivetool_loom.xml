@@ -31,7 +31,9 @@
         TMPDIR=/tmp node /app/web/build/server.js
     ]]></command>
     <inputs/>
-    <outputs/>
+    <outputs>
+        <data name="outfile" format="txt" label="${tool.name} on ${on_string}" />
+    </outputs>
     <help><![CDATA[
 Orbit is a conversational AI analysis workbench for Galaxy. The agent runs in this
 container against your Galaxy account (a per-user scoped API key is injected),
