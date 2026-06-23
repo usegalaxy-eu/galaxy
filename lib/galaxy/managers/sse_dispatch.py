@@ -101,7 +101,7 @@ class SSEEventDispatcher:
         # Only fan out to webapp processes — job handlers and workflow schedulers
         # don't have browser SSE connections to push to.
         declare_queues = self._get_declare_queues()
-        log.debug(
+        log.warn(
             "SSE dispatch task=%s addressed to %d webapp worker(s): %s",
             task,
             len(declare_queues),
