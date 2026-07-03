@@ -93,7 +93,7 @@ class ToolDataPathFiles:
 
     @property
     def tool_data_path_files(self) -> Set[str]:
-        if time.time() - self.update_time > 1800:
+        if time.time() - self.update_time > 600:
             self.update_files()
         return self._tool_data_path_files
 
