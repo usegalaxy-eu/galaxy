@@ -13093,7 +13093,8 @@ export interface components {
                 | "iiif"
                 | "omero"
                 | "ssh"
-                | "commoncrawl";
+                | "commoncrawl"
+                | "ckan";
             /** Variables */
             variables?:
                 | (
@@ -25591,7 +25592,8 @@ export interface components {
                 | "iiif"
                 | "omero"
                 | "ssh"
-                | "commoncrawl";
+                | "commoncrawl"
+                | "ckan";
             /** Uri Root */
             uri_root: string;
             /**
