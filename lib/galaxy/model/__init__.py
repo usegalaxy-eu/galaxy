@@ -87,8 +87,8 @@ from sqlalchemy import (
     Numeric,
     or_,
     PrimaryKeyConstraint,
-    select,
     Select,
+    select,
     String,
     Table,
     TEXT,
@@ -160,7 +160,9 @@ from galaxy.model.custom_types import (
     UUIDType,
 )
 from galaxy.model.database_object_names import NAMING_CONVENTION
-from galaxy.model.database_utils import supports_skip_locked as _check_supports_skip_locked
+from galaxy.model.database_utils import (
+    supports_skip_locked as _check_supports_skip_locked,
+)
 from galaxy.model.item_attrs import (
     get_item_annotation_str,
     UsesAnnotations,
@@ -1648,6 +1650,7 @@ class Job(Base, JobLike, UsesCreateAndUpdateTime, Dictifiable, Serializable):
     destination_id: Mapped[Optional[str]] = mapped_column(String(255))
     destination_params: Mapped[Optional[dict[str, Any]]] = mapped_column(MutableJSONType)
     object_store_id: Mapped[Optional[str]] = mapped_column(TrimmedString(255), index=True)
+    working_directory: Mapped[Optional[str]] = mapped_column(String(1024))
     imported: Mapped[Optional[bool]] = mapped_column(default=False, index=True)
     handler: Mapped[Optional[str]] = mapped_column(TrimmedString(255), index=True)
     preferred_object_store_id: Mapped[Optional[str]] = mapped_column(String(255))
