@@ -124,7 +124,8 @@ class CacheShardManager:
         """Serialize shard config for backend ``to_dict`` / reconstruction.
 
         Emits ``dirs`` when there are multiple shards, otherwise the legacy
-        single ``path`` / ``size`` keys.
+        single ``path`` / ``size`` keys.  ``weight`` is intentionally omitted
+        for the single-shard case because it is meaningless with only one shard.
         """
         if len(self.shards) == 1:
             s = self.shards[0]
@@ -260,16 +261,7 @@ def parse_caching_config_dict_from_xml(config_xml):
     return cache_dict
 
 
-def configured_cache_size(config, config_dict) -> int:
-    cache_config_dict = config_dict.get("cache") or {}
-    cache_size = cache_config_dict.get("size") or config.object_store_cache_size
-    if cache_size != -1:
-        # Convert admin-set GBs to bytes internally for quick comparison
-        cache_size = cache_size * ONE_GIGA_BYTE
-    return cache_size
-
-
-def enable_cache_monitor(config, config_dict) -> Tuple[bool, int]:
+def enable_cache_monitor(config, config_dict) -> tuple[bool, int]:
     cache_config_dict = config_dict.get("cache") or {}
     default_interval = getattr(config, "object_store_cache_monitor_interval", 600)
     interval = cache_config_dict.get("monitor_interval") or default_interval
