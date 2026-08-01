@@ -23,6 +23,9 @@
         <param name="input" multiple="true" type="data" optional="true" label="Include data into the environment"/>
     </inputs>
     <command><![CDATA[
+        # When a user exits an RStudio Pro Session they need to choose whether to save their R workspace. We deactivate this here, as it can blow up the storage on the hosts.
+        echo 'session-save-action-default=no' >> /etc/rstudio/rsession.conf &&
+        
         #import re
         echo "[`date`] - Setting up for RStudio as \$(id)." &&
         ## Match the container user id to the host user/group id if supplied
