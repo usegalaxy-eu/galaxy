@@ -45,7 +45,7 @@ def init():
     return init_models_from_config(config, object_store=object_store).context, object_store, engine
 
 
-def quotacheck(sa_session, users, engine, object_store):
+def quotacheck(sa_session, user, engine, object_store):
     sa_session.refresh(user)
     current = user.get_disk_usage()
     print(user.username, "<" + user.email + ">:", end=" ")
@@ -75,9 +75,31 @@ if __name__ == "__main__":
     if not args.username and not args.email:
         user_count = sa_session.query(model.User).count()
         print(f"Processing {user_count} users...")
-        for i, user in enumerate(sa_session.query(model.User).enable_eagerloads(False).yield_per(1000)):
-            print(f"{int(float(i) / user_count * 100):3d}%", end=" ")
-            quotacheck(sa_session, user, engine, object_store)
+        # Load user IDs in batches instead of yield_per to avoid PostgreSQL
+        # named cursor invalidation when calculate_and_set_disk_usage executes
+        # UPDATE statements on the same connection.
+        batch_size = 1000
+        processed = 0
+        last_user_id = 0
+        while True:
+            user_ids = [
+                r[0]
+                for r in sa_session.query(model.User.id)
+                .enable_eagerloads(False)
+                .filter(model.User.id > last_user_id)
+                .order_by(model.User.id)
+                .limit(batch_size)
+                .all()
+            ]
+            if not user_ids:
+                break
+            for user_id in user_ids:
+                print(f"{int(float(processed) / user_count * 100):3d}%", end=" ")
+                user = sa_session.get(model.User, user_id)
+                quotacheck(sa_session, user, engine, object_store)
+                sa_session.expunge(user)
+                processed += 1
+            last_user_id = user_ids[-1]
         print("100% complete")
         object_store.shutdown()
         sys.exit(0)
