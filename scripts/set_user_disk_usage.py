@@ -41,12 +41,10 @@ def init():
     app_properties = app_properties_from_args(args)
     config = galaxy.config.Configuration(**app_properties)
     object_store = build_object_store_from_config(config)
-    engine = config.database_connection.split(":")[0]
-    return init_models_from_config(config, object_store=object_store).context, object_store, engine
+    return init_models_from_config(config, object_store=object_store).context, object_store
 
 
-def quotacheck(sa_session, user, engine, object_store):
-    sa_session.refresh(user)
+def quotacheck(user, object_store):
     current = user.get_disk_usage()
     print(user.username, "<" + user.email + ">:", end=" ")
 
@@ -70,7 +68,7 @@ def quotacheck(sa_session, user, engine, object_store):
 
 if __name__ == "__main__":
     print("Loading Galaxy model...")
-    sa_session, object_store, engine = init()
+    sa_session, object_store = init()
 
     if not args.username and not args.email:
         user_count = sa_session.query(model.User).count()
@@ -93,10 +91,16 @@ if __name__ == "__main__":
             ]
             if not user_ids:
                 break
-            for user_id in user_ids:
+            users = (
+                sa_session.query(model.User)
+                .enable_eagerloads(False)
+                .filter(model.User.id.in_(user_ids))
+                .order_by(model.User.id)
+                .all()
+            )
+            for user in users:
                 print(f"{int(float(processed) / user_count * 100):3d}%", end=" ")
-                user = sa_session.get(model.User, user_id)
-                quotacheck(sa_session, user, engine, object_store)
+                quotacheck(user, object_store)
                 sa_session.expunge(user)
                 processed += 1
             last_user_id = user_ids[-1]
@@ -110,5 +114,5 @@ if __name__ == "__main__":
     if not user:
         print("User not found")
         sys.exit(1)
-    quotacheck(sa_session, user, engine, object_store)
+    quotacheck(user, object_store)
     object_store.shutdown()
