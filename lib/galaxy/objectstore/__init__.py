@@ -480,7 +480,13 @@ class BaseObjectStore(ObjectStore):
         if hasattr(obj, self.store_by):
             obj_id = getattr(obj, self.store_by)
             if obj_id is None:
-                obj.flush()
+                # obj_id may be None for objects that have not yet been assigned
+                # an identifier (e.g. a freshly created Dataset without a UUID).
+                # Flushing the object's session assigns it; for lightweight
+                # objects without a session (such as the namedtuples used by the
+                # pgcleanup script) we fall back to the object's id.
+                if hasattr(obj, "flush"):
+                    obj.flush()
                 return obj.id
             return obj_id
         else:
