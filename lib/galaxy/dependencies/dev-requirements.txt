@@ -137,7 +137,7 @@ pydantic-core==2.46.4
 pyee==13.0.1
 pygithub==2.9.1
 pygments==2.20.0
-pyjwt==2.12.1
+pyjwt==2.13.0
 pynacl==1.6.2
 pyparsing==3.3.2
 pyproject-hooks==1.2.0
