@@ -2,7 +2,7 @@
     <description>an interactive framework for exploring and extending Scop3P across sequence, structure, proteomics and variant evidence.</description>
     <icon src="scop3p_toolkit.png" />
     <macros>
-        <token name="@VERSION@">0.2.5</token>
+        <token name="@VERSION@">0.3.3</token>
         <token name="@SHINYAPP_PORT@">8000</token>
     </macros>
     <requirements>
