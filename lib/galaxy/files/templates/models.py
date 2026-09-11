@@ -55,6 +55,7 @@ FileSourceTemplateType = Literal[
     "iiif",
     "omero",
     "ssh",
+    "commoncrawl",
 ]
 
 
@@ -485,6 +486,18 @@ class OmeroFileSourceConfiguration(StrictModel):
     writable: bool = False
 
 
+class CommonCrawlFileSourceTemplateConfiguration(StrictModel):
+    type: Literal["commoncrawl"]
+    writable: Union[bool, TemplateExpansion] = False
+    template_start: Optional[str] = None
+    template_end: Optional[str] = None
+
+
+class CommonCrawlFileSourceConfiguration(StrictModel):
+    type: Literal["commoncrawl"]
+    writable: bool = False
+
+
 FileSourceTemplateConfiguration = Annotated[
     Union[
         PosixFileSourceTemplateConfiguration,
@@ -508,6 +521,7 @@ FileSourceTemplateConfiguration = Annotated[
         IIIFFileSourceTemplateConfiguration,
         OmeroFileSourceTemplateConfiguration,
         SshFileSourceTemplateConfiguration,
+        CommonCrawlFileSourceTemplateConfiguration,
     ],
     Field(discriminator="type"),
 ]
@@ -535,6 +549,7 @@ FileSourceConfiguration = Annotated[
         IIIFFileSourceConfiguration,
         OmeroFileSourceConfiguration,
         SshFileSourceConfiguration,
+        CommonCrawlFileSourceConfiguration,
     ],
     Field(discriminator="type"),
 ]
@@ -620,6 +635,7 @@ TypesToConfigurationClasses: dict[FileSourceTemplateType, type[FileSourceConfigu
     "iiif": IIIFFileSourceConfiguration,
     "omero": OmeroFileSourceConfiguration,
     "ssh": SshFileSourceConfiguration,
+    "commoncrawl": CommonCrawlFileSourceConfiguration,
 }
 
 

@@ -1,5 +1,5 @@
 import { faAws, faDropbox, faGoogleDrive, faHubspot } from "@fortawesome/free-brands-svg-icons";
-import { faCloud, faFolderTree, faNetworkWired, type IconDefinition } from "font-awesome-6";
+import { faCloud, faFolderTree, faGlobe, faNetworkWired, type IconDefinition } from "font-awesome-6";
 
 import type { components } from "@/api/schema";
 import { contains } from "@/utils/filtering";
@@ -94,6 +94,10 @@ export const templateTypes: FileSourceTypesDetail = {
     irods: {
         icon: faNetworkWired,
         message: "This is a file repository plugin that connects with an iRODS server.",
+    },
+    commoncrawl: {
+        icon: faGlobe,
+        message: "This is a read-only file repository plugin that connects with the Common Crawl archive.",
     },
 };
 
