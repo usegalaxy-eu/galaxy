@@ -158,7 +158,7 @@ test = [
     "seletools",
     "statsd",
     "testfixtures",
-    "total-perspective-vortex>=3.1.1,<4",  # https://github.com/galaxyproject/total-perspective-vortex/pull/173
+    "total-perspective-vortex>=3.3.0,<4",  # https://github.com/usegalaxy-eu/infrastructure-playbook/pull/2311
     "tuspy",
     "watchdog",
     "Werkzeug",
