@@ -166,6 +166,9 @@
     <datatype extension="vitessce.json" type="galaxy.datatypes.text:VitessceJson" mimetype="application/json" display_in_upload="True">
       <visualization plugin="vitessce" />
     </datatype>
+    <datatype extension="varri.json" type="galaxy.datatypes.text:Json" mimetype="application/json" subclass="true" display_in_upload="True" description="Annotated RNA-RNA interactions in a JSON object.">
+      <visualization plugin="varri" />
+    </datatype>
     <datatype extension="auspice.json" type="galaxy.datatypes.text:AuspiceJson" mimetype="application/json" display_in_upload="True" />
     <datatype extension="data_manager_json" type="galaxy.datatypes.text:DataManagerJson" mimetype="application/json" subclass="true" display_in_upload="false"/>
     <datatype extension="dbn" type="galaxy.datatypes.sequence:DotBracket" display_in_upload="true" description="Dot-Bracket format is a text-based format for storing both an RNA sequence and its corresponding 2D structure." description_url="https://wiki.galaxyproject.org/Learn/Datatypes#Dbn"/>
