@@ -99,6 +99,10 @@ export const templateTypes: FileSourceTypesDetail = {
         icon: faGlobe,
         message: "This is a read-only file repository plugin that connects with the Common Crawl archive.",
     },
+    ckan: {
+        icon: faNetworkWired,
+        message: "This is a repository plugin that connects with a CKAN instance.",
+    },
 };
 
 export const FileSourcesValidFilters = {
