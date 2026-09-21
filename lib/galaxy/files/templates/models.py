@@ -56,6 +56,7 @@ FileSourceTemplateType = Literal[
     "omero",
     "ssh",
     "commoncrawl",
+    "ckan",
 ]
 
 
@@ -498,6 +499,22 @@ class CommonCrawlFileSourceConfiguration(StrictModel):
     writable: bool = False
 
 
+class CKANFileSourceTemplateConfiguration(StrictModel):
+    type: Literal["ckan"]
+    url: Union[str, TemplateExpansion]
+    token: Optional[Union[str, TemplateExpansion]] = None
+    writable: Union[bool, TemplateExpansion] = True
+    template_start: Optional[str] = None
+    template_end: Optional[str] = None
+
+
+class CKANFileSourceConfiguration(StrictModel):
+    type: Literal["ckan"]
+    url: str
+    token: Optional[str] = None
+    writable: bool = True
+
+
 FileSourceTemplateConfiguration = Annotated[
     Union[
         PosixFileSourceTemplateConfiguration,
@@ -522,6 +539,7 @@ FileSourceTemplateConfiguration = Annotated[
         OmeroFileSourceTemplateConfiguration,
         SshFileSourceTemplateConfiguration,
         CommonCrawlFileSourceTemplateConfiguration,
+        CKANFileSourceTemplateConfiguration,
     ],
     Field(discriminator="type"),
 ]
@@ -550,6 +568,7 @@ FileSourceConfiguration = Annotated[
         OmeroFileSourceConfiguration,
         SshFileSourceConfiguration,
         CommonCrawlFileSourceConfiguration,
+        CKANFileSourceConfiguration,
     ],
     Field(discriminator="type"),
 ]
@@ -636,6 +655,7 @@ TypesToConfigurationClasses: dict[FileSourceTemplateType, type[FileSourceConfigu
     "omero": OmeroFileSourceConfiguration,
     "ssh": SshFileSourceConfiguration,
     "commoncrawl": CommonCrawlFileSourceConfiguration,
+    "ckan": CKANFileSourceConfiguration,
 }
 
 
