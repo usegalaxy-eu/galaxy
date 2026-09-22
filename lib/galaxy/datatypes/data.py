@@ -243,6 +243,10 @@ class Data(metaclass=DataMeta):
     # "download" (always triggers download), or None (default behavior)
     display_behavior: Optional[Literal["inline", "download"]] = None
 
+    # Keep-compressed datatypes whose payload legitimately embeds HTML (e.g. web archives)
+    # bypass the compressed-upload HTML check, but only when their sniffer claims the file.
+    allow_compressed_html_content = False
+
     # Trackster track type.
     track_type: Optional[str] = None
 
