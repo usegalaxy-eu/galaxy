@@ -78,6 +78,9 @@ niivue:
 nora:
     package: "@galaxyproject/nora"
     version: 1.2.4
+olit:
+    package: "@galaxyproject/olit"
+    version: 0.0.2
 openlayers:
     package: "@galaxyproject/openlayers"
     version: 0.0.9
