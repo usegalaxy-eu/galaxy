@@ -3,9 +3,6 @@
 aceeditor:
     package: "@galaxyproject/aceeditor"
     version: 0.0.4
-olit:
-    package: "@galaxyproject/olit"
-    version: 0.0.1
 aequatus:
     package: "@galaxyproject/aequatus"
     version: 0.0.0
@@ -80,7 +77,7 @@ nora:
     version: 1.2.4
 olit:
     package: "@galaxyproject/olit"
-    version: 0.0.5
+    version: 0.0.6
 openlayers:
     package: "@galaxyproject/openlayers"
     version: 0.0.9
