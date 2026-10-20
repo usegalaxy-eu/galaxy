@@ -112,14 +112,6 @@ What this tool provides:
 #. Quality control, alpha/beta diversity, clustering and ordination
 #. Interactive exploration of all panels through iSEE, with export to
    TreeSE, phyloseq, BIOM, Mothur and QIIME2 formats
-
-.. class:: infomark
-
-**Citation**
-
-Benedetti G, Seraidarian E, Pralas T, Jeba A, Borman T, Lahti L (2025).
-iSEEtree: interactive explorer for hierarchical data. *Bioinformatics
-Advances*. doi: https://doi.org/10.1093/bioadv/vbaf107
 ]]></help>
     <citations>
         <citation type="doi">10.1093/bioadv/vbaf107</citation>
