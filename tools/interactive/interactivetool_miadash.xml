@@ -43,24 +43,14 @@
         exec /usr/local/bin/miadash-entrypoint
     ]]></command>
     <inputs>
-        <param name="abundance_table" type="data" format="tabular,txt" optional="true"
-            label="Abundance table (optional)"
-            help="Tab-separated table with taxa in the rows: the first column holds the taxon ids and the header row holds the sample ids, e.g. OTU/S1/S2. It is imported as the assay of a TreeSummarizedExperiment. Leave this empty to upload from the browser or start from the example data that ships with the application."/>
-        <param name="coldata_table" type="data" format="tabular,txt" optional="true"
-            label="Sample data / colData (optional)"
-            help="Tab-separated table with samples in the rows: the first column holds the sample ids, which must match the header of the abundance table, and the remaining columns are sample variables (group, batch, ...). Leave this empty to start with an empty colData derived from the sample ids."/>
-        <param name="rowdata_table" type="data" format="tabular,txt" optional="true"
-            label="Taxa data / rowData (optional)"
-            help="Tab-separated table with taxa in the rows: the first column holds the taxon ids, which must match the row names of the abundance table, and the remaining columns are taxon variables (taxonomy ranks, ...). Leave this empty and tick 'Derive taxa from row names' if the row names of the abundance table are semicolon-separated taxonomy strings."/>
-        <param name="row_tree" type="data" format="txt,tabular,newick" optional="true"
-            label="Taxa tree (optional, Newick)"
-            help="A phylogenetic tree in Newick format whose tip labels match the taxon ids of the abundance table. Needed for analyses that use the phylogeny (unifrac distances, philr transformation, tree-aware panels). Convert the dataset to plain text if this selector does not offer it."/>
-        <param name="taxa_from_rownames" type="boolean" label="Derive taxa from row names" checked="false"
-            help="Parse the row names of the abundance table as taxonomy strings (like k__Bacteria;p__Firmicutes;c__Bacilli) into taxonomy ranks, the same option as the 'Raw Data' tab inside the application."/>
+        <param name="abundance_table" type="data" format="tabular,txt" optional="true" label="Abundance table (optional)" help="Tab-separated table with taxa in the rows: the first column holds the taxon ids and the header row holds the sample ids, e.g. OTU/S1/S2. It is imported as the assay of a TreeSummarizedExperiment. Leave this empty to upload from the browser or start from the example data that ships with the application."/>
+        <param name="coldata_table" type="data" format="tabular,txt" optional="true" label="Sample data / colData (optional)" help="Tab-separated table with samples in the rows: the first column holds the sample ids, which must match the header of the abundance table, and the remaining columns are sample variables (group, batch, ...). Leave this empty to start with an empty colData derived from the sample ids."/>
+        <param name="rowdata_table" type="data" format="tabular,txt" optional="true" label="Taxa data / rowData (optional)" help="Tab-separated table with taxa in the rows: the first column holds the taxon ids, which must match the row names of the abundance table, and the remaining columns are taxon variables (taxonomy ranks, ...). Leave this empty and tick 'Derive taxa from row names' if the row names of the abundance table are semicolon-separated taxonomy strings."/>
+        <param name="row_tree" type="data" format="txt,tabular,newick" optional="true" label="Taxa tree (optional, Newick)" help="A phylogenetic tree in Newick format whose tip labels match the taxon ids of the abundance table. Needed for analyses that use the phylogeny (unifrac distances, philr transformation, tree-aware panels). Convert the dataset to plain text if this selector does not offer it."/>
+        <param name="taxa_from_rownames" type="boolean" label="Derive taxa from row names" checked="false" help="Parse the row names of the abundance table as taxonomy strings (like k__Bacteria;p__Firmicutes;c__Bacilli) into taxonomy ranks, the same option as the 'Raw Data' tab inside the application."/>
     </inputs>
     <outputs>
-        <data name="startup_log" format="txt" from_work_dir="miadash_startup.txt"
-            label="miaDash startup information"/>
+        <data name="startup_log" format="txt" from_work_dir="miadash_startup.txt" label="miaDash startup information"/>
         <collection name="output_collection" type="list" label="miaDash results">
             <discover_datasets pattern="__designation_and_ext__" directory="miadash_outputs" visible="false"/>
         </collection>
