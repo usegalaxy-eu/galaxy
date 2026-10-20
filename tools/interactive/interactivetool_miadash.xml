@@ -122,12 +122,6 @@ iSEEtree: interactive explorer for hierarchical data. *Bioinformatics
 Advances*. doi: https://doi.org/10.1093/bioadv/vbaf107
 ]]></help>
     <citations>
-        <citation type="bibtex">@article{benedetti2025iseetree,
-            author  = {Benedetti, Giulio and Seraidarian, Ely and Pralas, Theotime and Jeba, Akewak and Borman, Tuomas and Lahti, Leo},
-            title   = {iSEEtree: interactive explorer for hierarchical data},
-            journal = {Bioinformatics Advances},
-            year    = {2025},
-            doi     = {10.1093/bioadv/vbaf107}
-        }</citation>
+        <citation type="doi">10.1093/bioadv/vbaf107</citation>
     </citations>
 </tool>
