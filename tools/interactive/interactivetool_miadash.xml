@@ -1,0 +1,132 @@
+<tool id="interactive_tool_miadash" tool_type="interactive" name="miaDash" version="1.0.0">
+    <description>Interactive dashboard for the analysis and exploration of microbiome data</description>
+    <requirements>
+        <container type="docker">quay.io/galaxy/miadash-gxit:latest</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="miaDash" requires_domain="True">
+            <port>8080</port>
+        </entry_point>
+    </entry_points>
+    <!-- Environment variables galaxy_ie_helpers needs to talk back to the API. -->
+    <environment_variables>
+        <environment_variable name="PORT">8080</environment_variable>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="DEBUG">TRUE</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key"/>
+    </environment_variables>
+    <!-- The inputs are staged here, before the container sees them, and handed
+         to the application as environment variables. The entry point exports
+         only the variables whose staged file is non-empty, so an untouched
+         optional input simply leaves the application starting empty (ready for
+         a browser upload or the example data). -->
+    <command detect_errors="exit_code"><![CDATA[
+        mkdir -p miadash_inputs miadash_outputs ;
+        export MIADASH_OUTPUT_DIR=\$PWD/miadash_outputs ;
+#if $abundance_table
+        cp -f '$abundance_table' miadash_inputs/assay.tsv ;
+#end if
+#if $coldata_table
+        cp -f '$coldata_table' miadash_inputs/coldata.tsv ;
+#end if
+#if $rowdata_table
+        cp -f '$rowdata_table' miadash_inputs/rowdata.tsv ;
+#end if
+#if $row_tree
+        cp -f '$row_tree' miadash_inputs/row.tree ;
+#end if
+        export MIADASH_TAXA_FROM_ROWNAMES='$taxa_from_rownames' ;
+        exec /usr/local/bin/miadash-entrypoint
+    ]]></command>
+    <inputs>
+        <param name="abundance_table" type="data" format="tabular,txt" optional="true"
+            label="Abundance table (optional)"
+            help="Tab-separated table with taxa in the rows: the first column holds the taxon ids and the header row holds the sample ids, e.g. OTU/S1/S2. It is imported as the assay of a TreeSummarizedExperiment. Leave this empty to upload from the browser or start from the example data that ships with the application."/>
+        <param name="coldata_table" type="data" format="tabular,txt" optional="true"
+            label="Sample data / colData (optional)"
+            help="Tab-separated table with samples in the rows: the first column holds the sample ids, which must match the header of the abundance table, and the remaining columns are sample variables (group, batch, ...). Leave this empty to start with an empty colData derived from the sample ids."/>
+        <param name="rowdata_table" type="data" format="tabular,txt" optional="true"
+            label="Taxa data / rowData (optional)"
+            help="Tab-separated table with taxa in the rows: the first column holds the taxon ids, which must match the row names of the abundance table, and the remaining columns are taxon variables (taxonomy ranks, ...). Leave this empty and tick 'Derive taxa from row names' if the row names of the abundance table are semicolon-separated taxonomy strings."/>
+        <param name="row_tree" type="data" format="txt,tabular,newick" optional="true"
+            label="Taxa tree (optional, Newick)"
+            help="A phylogenetic tree in Newick format whose tip labels match the taxon ids of the abundance table. Needed for analyses that use the phylogeny (unifrac distances, philr transformation, tree-aware panels). Convert the dataset to plain text if this selector does not offer it."/>
+        <param name="taxa_from_rownames" type="boolean" label="Derive taxa from row names" checked="false"
+            help="Parse the row names of the abundance table as taxonomy strings (like k__Bacteria;p__Firmicutes;c__Bacilli) into taxonomy ranks, the same option as the 'Raw Data' tab inside the application."/>
+    </inputs>
+    <outputs>
+        <data name="startup_log" format="txt" from_work_dir="miadash_startup.txt"
+            label="miaDash startup information"/>
+        <collection name="output_collection" type="list" label="miaDash results">
+            <discover_datasets pattern="__designation_and_ext__" directory="miadash_outputs" visible="false"/>
+        </collection>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="2"/>
+    </tests>
+    <help><![CDATA[
+`miaDash <https://github.com/microbiome/miaDash>`_ is the Microbiome Analysis
+Dashboard, an R Shiny application for building and exploring
+TreeSummarizedExperiment objects without writing code. It is built on `iSEE
+<https://isee.github.io/iSEE/>`_ and the `miaverse
+<https://microbiome.github.io/>`_ ecosystem: import data, manipulate it
+(subset, agglomerate, transform), compute quality and diversity summaries, and
+explore the result in interactive iSEE panels.
+
+.. class:: infomark
+
+**Input datasets.** All inputs are optional and the tool starts whether or not
+you provide them. The tables you select here are staged and pre-loaded into the
+application at launch, so the session starts from your data:
+
+#. *Abundance table* - tab-separated, taxa in rows, first column the taxon ids,
+   header row the sample ids.
+#. *Sample data (colData)* - tab-separated, samples in rows, first column the
+   sample ids matching the abundance table header.
+#. *Taxa data (rowData)* - tab-separated, taxa in rows, first column the taxon
+   ids matching the abundance table row names.
+#. *Taxa tree* - Newick, tip labels matching the taxon ids.
+
+Anything you leave empty can still be added inside the application: the *Import*
+panel accepts uploads from the browser and its *Raw Data* tab takes the same
+table layouts, and the application ships with example datasets.
+
+.. class:: infomark
+
+**Results are sent to your Galaxy history.** The export download in the
+application has a *Send to Galaxy* button next to it. It saves the file in the
+*miaDash results* collection and starts a direct history upload in the
+background. The collection becomes available in the history when the
+interactive job ends, even if direct upload is unavailable, so anything you
+sent during the session is kept either way.
+
+What this tool provides:
+
+#. Import of raw tables or R objects into a TreeSummarizedExperiment
+#. Manipulation: subset by prevalence, agglomerate by rank, transform assays
+   (including PhILR), all recorded as a reproducible R script
+#. Quality control, alpha/beta diversity, clustering and ordination
+#. Interactive exploration of all panels through iSEE, with export to
+   TreeSE, phyloseq, BIOM, Mothur and QIIME2 formats
+
+.. class:: infomark
+
+**Citation**
+
+Benedetti G, Seraidarian E, Pralas T, Jeba A, Borman T, Lahti L (2025).
+iSEEtree: interactive explorer for hierarchical data. *Bioinformatics
+Advances*. doi: https://doi.org/10.1093/bioadv/vbaf107
+]]></help>
+    <citations>
+        <citation type="bibtex">@article{benedetti2025iseetree,
+            author  = {Benedetti, Giulio and Seraidarian, Ely and Pralas, Theotime and Jeba, Akewak and Borman, Tuomas and Lahti, Leo},
+            title   = {iSEEtree: interactive explorer for hierarchical data},
+            journal = {Bioinformatics Advances},
+            year    = {2025},
+            doi     = {10.1093/bioadv/vbaf107}
+        }</citation>
+    </citations>
+</tool>
