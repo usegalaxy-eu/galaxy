@@ -1,0 +1,166 @@
+<tool id="interactive_tool_gephi-lite" tool_type="interactive" name="Gephi Lite" version="1.0.0" profile="23.1">
+    <description>Graph visualization and exploration</description>
+    <icon src="gephi-lite.png"/>
+    <requirements>
+        <container type="docker">quay.io/galaxy/gephi-lite-gxit:1.0.0</container>
+    </requirements>
+    <entry_points>
+        <!-- Gephi Lite builds root-absolute URLs (Tornado, no X-Forwarded-Prefix
+             support), so it has to be served from its own host. With a
+             path-based entry point every in-app redirect lands on the Galaxy
+             root instead of the tool. -->
+        <entry_point name="Gephi Lite" requires_domain="True">
+            <port>80</port>
+        </entry_point>
+    </entry_points>
+    <configfiles>
+        <configfile name="gephi-lite_server_config" filename="gephi-lite_server_config.py"><![CDATA[
+# Gephi Lite configuration for the Galaxy interactive tool. `gephi-lite server`
+# execs this file before the application is built, so it can also adjust
+# application classes (see the Galaxy adaptation at the end).
+
+import os
+import secrets
+
+import taguette.web.base
+import tornado.web
+
+# --- Gephi Lite settings ---
+
+NAME = 'Gephi Lite'
+PORT = 80
+BIND_ADDRESS = '0.0.0.0'
+SECRET_KEY = secrets.token_hex(32)
+
+# Everything Gephi Lite stores lives in this single SQLite database: projects,
+# documents, highlights, tags and codebooks. It is written straight into the
+# Galaxy output dataset ($database_out), which is copied to the history when the
+# session ends, so nothing has to be collected from the working directory.
+_OUTPUT_DB = os.path.abspath('$database_out')
+DATABASE = 'sqlite:///' + _OUTPUT_DB
+
+# No terms-of-service page, no outgoing mail and no cookie banner: there is a
+# single pre-authenticated user (see UNIX_SOCKET below).
+TOS_FILE = None
+X_HEADERS = False
+EMAIL = 'Gephi Lite <noreply@localhost>'
+MAIL_SERVER = dict(ssl=False, host='localhost', port=25)
+COOKIES_PROMPT = False
+MULTIUSER = False
+
+# Upstream reads this flag as "I run behind an authenticating reverse proxy":
+# it skips the application access token, which is otherwise printed once to
+# stdout and has to be appended to the URL as ?token=... Galaxy's interactive
+# tool URL is already unguessable and authenticated, so the token only adds
+# friction. This does NOT move the listener to a unix socket; the application
+# keeps listening on TCP (see BIND_ADDRESS and PORT above).
+UNIX_SOCKET = True
+
+
+# --- Galaxy adaptation ---
+#
+# Galaxy embeds the entry point in an iframe on a different origin. Three
+# upstream defaults defeat that embed. They are only changed when UNIX_SOCKET
+# is set, so upstream behaviour is untouched otherwise.
+
+if UNIX_SOCKET:
+    # 1. Cookies are emitted without a SameSite attribute, which browsers
+    #    treat as Lax. Lax cookies are never sent on a cross-origin iframe
+    #    navigation, so the "no session yet, log in and redirect to /" branch
+    #    loops forever (ERR_TOO_MANY_REDIRECTS).
+    def _galaxy_cookies(original):
+        def set_cookie(handler, name, value, *args, **kwargs):
+            kwargs.setdefault('samesite', 'None')
+            kwargs.setdefault('secure', True)
+            return original(handler, name, value, *args, **kwargs)
+
+        return set_cookie
+
+    tornado.web.RequestHandler.set_cookie = _galaxy_cookies(
+        tornado.web.RequestHandler.set_cookie)
+
+    # 2. In UNIX_SOCKET mode every request is pre-authenticated by the trusted
+    #    proxy, so the current user is always "admin" instead of coming from a
+    #    session cookie round trip. This also keeps the application usable when
+    #    the browser blocks third-party cookies.
+    taguette.web.base.BaseHandler.get_current_user = lambda self: 'admin'
+
+    # 3. Headers send X-Frame-Options: DENY and CSP frame-ancestors 'none'
+    #    (clickjacking protection), which makes browsers refuse to render the
+    #    application inside the Galaxy iframe. The unguessable interactive tool
+    #    host remains the access boundary.
+    def _galaxy_frame_headers(original):
+        def set_default_headers(handler):
+            original(handler)
+            handler.clear_header('X-Frame-Options')
+            handler.set_header('Content-Security-Policy', 'frame-ancestors *')
+
+        return set_default_headers
+
+    taguette.web.base.BaseHandler.set_default_headers = _galaxy_frame_headers(
+        taguette.web.base.BaseHandler.set_default_headers)
+]]></configfile>
+    </configfiles>
+    <command detect_errors="exit_code"><![CDATA[
+        mkdir -p gephi-lite_data ;
+        #if $database
+            cp '$database' '$database_out' ;
+        #end if
+        export HOME=\$PWD/gephi-lite_data ;
+        exec gephi-lite --no-browser server gephi-lite_server_config.py
+    ]]></command>
+    <inputs>
+        <param name="database" type="data" format="sqlite" optional="true" label="Gephi Lite database with previous work" help="A database saved by an earlier session (the dataset this tool writes to the history when a session ends) or by the Gephi Lite desktop application. Leave empty to start with an empty project."/>
+    </inputs>
+    <outputs>
+        <data name="database_out" format="sqlite" label="${tool.name} database with all projects, documents and codes"/>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1"/>
+    </tests>
+    <help><![CDATA[
+`Gephi Lite <https://gitlab.com/bin-cirst/gephi-lite/libre-qda>`_ is a free and
+open-source qualitative data analysis (QDA) tool developed by the Plateforme
+en humanités numériques (PHuN) at Université de Sherbrooke. It is a fork of
+`Taguette <https://taguette.org/>`_ with additions developed together with
+qualitative-analysis researchers: document collections, code hierarchies,
+overlaid coding stripes, drag-and-drop coding, an integrated search engine and
+faster multi-file import.
+
+.. class:: infomark
+
+**How to use it**
+
+- Leave *Gephi Lite database with previous work* empty to start a new project,
+  or pick a database from an earlier session to continue where you left off.
+- Import your documents (PDF, DOCX, ODT, TXT, HTML, EPUB, MOBI, RTF), create
+  tags and code the text inside the application, in your browser.
+- Exports (tagged excerpts, coded documents, ...) are downloaded through your
+  browser as usual.
+
+**Saving your work**
+
+Everything you do is stored in one SQLite database (projects, documents,
+highlights, tags and codebooks). When the session ends, that database is
+written to your history as *Gephi Lite database with all projects, documents and
+codes*. To continue the work later, start the tool again and select that
+dataset as *Gephi Lite database with previous work* - nothing else has to be
+exported or re-imported.
+
+.. class:: warning
+
+The database is only copied to your history when the session ends. Documents
+that you import into the session are part of that database, so they are kept
+as well.
+]]>
+</help>
+    <citations>
+        <citation type="bibtex">@misc{gephi-lite,
+            author = {Jacomy, Mathieu and Heymann, Sebastien and Venturini, Tommaso and Bastian, Mathieu},
+            title = {Gephi Lite: Visualize and explore graphs},
+            year = {2024},
+            publisher = {GitHub},
+            howpublished = {\url{https://github.com/gephi/gephi-lite}},
+        }</citation>
+    </citations>
+</tool>
