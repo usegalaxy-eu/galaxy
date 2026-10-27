@@ -1,0 +1,86 @@
+<tool id="interactive_tool_cminet" tool_type="interactive" name="CMiNet" version="1.0.0">
+    <description>Construct consensus microbiome networks from abundance tables</description>
+    <icon src="cminet.png"/>
+    <requirements>
+        <container type="docker">quay.io/galaxy/cminet-gxit:v1</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="CMiNet" requires_domain="True">
+            <port>8080</port>
+        </entry_point>
+    </entry_points>
+    <!-- Environment variables galaxy_ie_helpers needs to talk back to the API. -->
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="DEBUG">TRUE</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key"/>
+    </environment_variables>
+    <!-- The inputs are staged here, before the container sees them. The
+         abundance matrix is the only required input; the weighted network is
+         optional and only used by the network visualisation and final network
+         tabs. Both are handed to the application as environment variables
+         (CMINET_INPUT and CMINET_WEIGHTED_NETWORK, set by the entry point from
+         these staged copies). -->
+    <command detect_errors="exit_code"><![CDATA[
+        mkdir -p cminet_inputs cminet_outputs ;
+        export CMINET_OUTPUT_DIR=\$PWD/cminet_outputs ;
+#if $abundance_table
+        cp -f '$abundance_table' cminet_inputs/abundance ;
+#end if
+#if $weighted_network
+        cp -f '$weighted_network' cminet_inputs/weighted_network ;
+#end if
+        exec /usr/local/bin/cminet-entrypoint
+    ]]></command>
+    <inputs>
+        <param name="abundance_table" type="data" format="tabular,csv" optional="true" label="Abundance table (optional)" help="Microbiome abundance matrix in CMiNet layout: samples in the rows, the first column holding the sample ids, and one column per taxon. Comma or tab separated, and the separator is taken from the header, so a semicolon separated file works as well. Tick 'Is the data count-based?' inside the application unless the values are relative abundances, in which case they are shifted by a small constant to keep them strictly positive. Leave this empty to upload from the browser, import from the history, or start from the example data that ships with the application."/>
+        <param name="weighted_network" type="data" format="tabular,csv" optional="true" label="Weighted network (optional)" help="A previously computed weighted network, used by the 'Network Visualization' and 'Final Weighted Network' tabs so that they can be opened without running the full analysis again. Comma or tab separated, the separator is taken from the header, taxa in the rows and taxa in the columns. Leave this empty to use the network the analysis itself produces."/>
+    </inputs>
+    <outputs>
+        <data name="startup_log" format="txt" from_work_dir="cminet_startup.txt" label="CMiNet startup information"/>
+        <collection name="output_collection" type="list" label="CMiNet results">
+            <discover_datasets pattern="__designation_and_ext__" directory="cminet_outputs" visible="false"/>
+        </collection>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="2"/>
+    </tests>
+    <help><![CDATA[
+`CMiNet <https://github.com/solislemuslab/CMiNet>`_ is a browser based R Shiny
+application for constructing consensus microbiome networks. It estimates
+pairwise networks with several algorithms, combines them into a single weighted
+consensus network and lets you explore and export the result.
+
+.. class:: infomark
+
+**Results are sent to your Galaxy history.** Every download has a *Send to
+Galaxy* button next to it. It saves the file in the *CMiNet results* collection
+and starts a direct history upload in the background. The collection becomes
+available in the history when the interactive job ends, even if direct upload is
+unavailable, so anything you sent during the session is kept either way.
+
+**Input datasets.** Both inputs are optional, and the tool starts and serves the
+application whether or not you provide them. The abundance table you select here
+is staged and pre-loaded into the application. You can also import a dataset or
+collection element that is already in the current history straight from the
+application's sidebar, which is useful when the data comes out of another tool in
+the same analysis. Uploading a file from the browser works as usual, and the
+application ships with a small example dataset.
+
+What this tool provides:
+
+#. Network estimation with SparCC, SpiecEasi, SPRING, gCoda, CMIMN, CCLasso,
+   Spearman, Pearson and Bicor, including the parameters each of them takes
+#. Weighted consensus network from the selected algorithms
+#. Network exploration in the 'Network Visualization' and 'Final Weighted
+   Network' tabs
+#. Export of the weighted network, the edge list, and the network and binary
+   network folders as ZIP archives
+]]></help>
+    <citations>
+        <citation type="doi">10.1111/2041-210X.70198</citation>
+    </citations>
+</tool>
