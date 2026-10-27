@@ -1,8 +1,8 @@
-<tool id="interactive_tool_miadash" tool_type="interactive" name="miaDash" version="1.0.0">
+<tool id="interactive_tool_miadash" tool_type="interactive" name="miaDash" version="1.0.1">
     <description>Interactive dashboard for the analysis and exploration of microbiome data</description>
     <icon src="miadash.png"/>
     <requirements>
-        <container type="docker">quay.io/galaxy/miadash-gxit:latest</container>
+        <container type="docker">quay.io/galaxy/miadash-gxit:1.0.1</container>
     </requirements>
     <entry_points>
         <entry_point name="miaDash" requires_domain="True">
@@ -27,6 +27,15 @@
     <command detect_errors="exit_code"><![CDATA[
         mkdir -p miadash_inputs miadash_outputs ;
         export MIADASH_OUTPUT_DIR=\$PWD/miadash_outputs ;
+        ## The upload log is a diagnostic, not a result: keep it next to the
+        ## inputs and the startup log rather than in the discovered output
+        ## directory, which Galaxy turns into a dataset of the results collection.
+        export MIADASH_LOG_DIR=\$PWD ;
+        ## Written by the entry point straight into the declared dataset. Galaxy
+        ## collects a declared output at the end of an interactive job, so the file
+        ## has to be the dataset rather than a copy of a file in the job
+        ## directory.
+        export MIADASH_STARTUP_LOG='$startup_log' ;
 #if $abundance_table
         cp -f '$abundance_table' miadash_inputs/assay.tsv ;
 #end if
@@ -50,7 +59,7 @@
         <param name="taxa_from_rownames" type="boolean" label="Derive taxa from row names" checked="false" help="Parse the row names of the abundance table as taxonomy strings (like k__Bacteria;p__Firmicutes;c__Bacilli) into taxonomy ranks, the same option as the 'Raw Data' tab inside the application."/>
     </inputs>
     <outputs>
-        <data name="startup_log" format="txt" from_work_dir="miadash_startup.txt" label="miaDash startup information"/>
+        <data name="startup_log" format="txt" label="miaDash startup information"/>
         <collection name="output_collection" type="list" label="miaDash results">
             <discover_datasets pattern="__designation_and_ext__" directory="miadash_outputs" visible="false"/>
         </collection>
