@@ -2,7 +2,7 @@
     <description>Qualitative data analysis: import documents, highlight and tag excerpts, export</description>
     <icon src="libreqda.png"/>
     <requirements>
-        <container type="docker">quay.io/galaxy/libreqda-gxit:latest</container>
+        <container type="docker">quay.io/galaxy/libreqda-gxit:v0.1</container>
     </requirements>
     <entry_points>
         <!-- LibreQDA builds root-absolute URLs (Tornado, no X-Forwarded-Prefix
