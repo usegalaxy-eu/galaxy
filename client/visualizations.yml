@@ -3,6 +3,9 @@
 aceeditor:
     package: "@galaxyproject/aceeditor"
     version: 0.0.4
+rustgis:
+    package: "@galaxyproject/rustgis"
+    version: 0.0.1
 aequatus:
     package: "@galaxyproject/aequatus"
     version: 0.0.0
