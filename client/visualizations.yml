@@ -3,6 +3,9 @@
 aceeditor:
     package: "@galaxyproject/aceeditor"
     version: 0.0.4
+warc:
+    package: "@galaxyproject/warc"
+    version: 0.0.1
 rustgis:
     package: "@galaxyproject/rustgis"
     version: 0.0.1
