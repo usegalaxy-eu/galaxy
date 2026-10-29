@@ -14,7 +14,9 @@
         </entry_point>
     </entry_points>
     <command detect_errors="exit_code"><![CDATA[
-        export HOME=\$PWD &&
+        ##export HOME=\$PWD &&
+        export HOME=/config &&
+        GALAXY_WORKDIR="\$PWD" &&
         mkdir -p ./inputs ./outputs &&
         chown 1000:1000 ./inputs || true && ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
         chown 1000:1000 ./outputs || true && ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
@@ -23,6 +25,18 @@
         id -u &&
         echo "Group ID: " &&
         id -g &&
+        echo "=== Galaxy working directory ===" &&
+        echo "\$GALAXY_WORKDIR" &&
+
+        mkdir -p "\$GALAXY_WORKDIR/inputs" "\$GALAXY_WORKDIR/outputs" &&
+
+        if [ "\$GALAXY_WORKDIR" != "/config" ]; then
+            if [ -e /config/outputs ] || [ -L /config/outputs ]; then
+                echo "ERROR: /config/outputs already exists" >&2;
+                exit 1;
+            fi;
+            ln -s "\$GALAXY_WORKDIR/outputs" /config/outputs;
+        fi &&
 
         echo "=== Current directory ===" &&
         pwd &&

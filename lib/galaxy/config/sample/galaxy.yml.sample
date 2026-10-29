@@ -198,6 +198,7 @@ gravity:
 
     # Set to true to start gx-it-proxy
     # enable: false
+    enable: true
 
     # gx-it-proxy version
     # version: '>=0.0.6'
@@ -206,7 +207,7 @@ gravity:
     # ip: localhost
 
     # Public-facing port of the proxy
-    # port: 4002
+    port: 4002
 
     # Database to monitor.
     # Should be set to the same value as ``interactivetools_map`` (or ``interactivetoolsproxy_map``) in the ``galaxy:`` section. This is
@@ -379,13 +380,6 @@ gravity:
   # See https://docs.galaxyproject.org/en/latest/admin/scaling.html#dynamically-defined-handlers for details.
   # handlers: {}
 galaxy:
-
-  # Change this default when running independent Gunicorn instances on
-  # the same hostname, assigning each instance a distinct base server
-  # name to avoid sharing control queues. See the deployment guidance
-  # at:
-  # https://docs.galaxyproject.org/en/master/admin/scaling.html#unique-server-names-for-independent-gunicorn-instances
-  #server_name: main
 
   # The directory that will be prepended to relative paths in options
   # specifying other Galaxy config files (e.g. datatypes_config_file).
@@ -629,14 +623,14 @@ galaxy:
 
   # conda channels to enable by default
   # (https://conda.io/docs/user-guide/tasks/manage-channels.html)
-  #conda_ensure_channels: conda-forge,bioconda
+  # conda_ensure_channels: file:///home/ivo/projects/ufr/conda-forge/conda-forge-nltk_data-feedstock/build_artifacts,conda-forge,bioconda
 
   # Use locally-built conda packages.
   #conda_use_local: false
 
   # Set to true to instruct Galaxy to look for and install missing tool
   # dependencies before each job runs.
-  #conda_auto_install: false
+  # conda_auto_install: true
 
   # Set to true to instruct Galaxy to install Conda from the web
   # automatically if it cannot find a local copy and conda_exec is not
@@ -1453,15 +1447,18 @@ galaxy:
 
   # Enable InteractiveTools.
   #interactivetools_enable: false
+  interactivetools_enable: true
 
   # Set this to false to redirect users of Interactive tools directly to
   # the Interactive tools proxy. `interactivetools_upstream_proxy`
   # should only be set to false in development.
-  #interactivetools_upstream_proxy: true
+  # interactivetools_upstream_proxy: true
+  interactivetools_upstream_proxy: false
 
   # Hostname and port of Interactive tools proxy. It is assumed to be
   # hosted on the same hostname and port as Galaxy by default.
   #interactivetools_proxy_host: null
+  interactivetools_proxy_host: localhost:4002
 
   # Base path for interactive tools running at a subpath without a
   # subdomain. Defaults to "/".
@@ -1474,6 +1471,7 @@ galaxy:
   # The value of this option will be resolved with respect to
   # <data_dir>.
   #interactivetools_map: interactivetools_map.sqlite
+  interactivetools_map: database/interactivetools_map.sqlite
 
   # Use a database supported by SQLAlchemy as map for the
   # interactivetool proxy. When this option is set, the value of
@@ -1559,7 +1557,7 @@ galaxy:
   # with Galaxy via the API.
   # If you plan to run Interactive Tools make sure the docker container
   # can reach this URL.
-  #galaxy_infrastructure_url: http://localhost:8080
+  galaxy_infrastructure_url: http://localhost:8080
 
   # If the above URL cannot be determined ahead of time in dynamic
   # environments but the port which should be used to access Galaxy can
@@ -2225,17 +2223,6 @@ galaxy:
   # registration.
   #prefer_oidc_login: false
 
-  # Comma-separated list of other sites' hosts that Galaxy may send
-  # users to after they log in, e.g.
-  # ``tools.example.org,portal.example.org:8443``.
-  # A listed site can send its users to Galaxy's login page with
-  # ``/login/start?redirect=<url>``, where ``<url>`` is the
-  # percent-encoded page to return to. Hosts must match exactly (no
-  # wildcards); add the port if it is not 443. Only https URLs are
-  # followed. Every page on a listed host is trusted, so read the
-  # authentication documentation before adding one.
-  #allowed_login_redirect_hosts: null
-
   # Allow unregistered users to create new local (non-OIDC) accounts
   # (otherwise, they will have to be created by an admin). This option
   # will be overridden to false in case disable_local_accounts is set to
@@ -2391,57 +2378,11 @@ galaxy:
   # potentially unlimited number of output datasets, such as tools that
   # split a file into a collection of datasets for each line in an input
   # dataset.
-  # Collection operation tools that multiply their inputs (cross
-  # product, duplicate file to collection, apply rules) are subject to
-  # the same limit and refuse to run if they would create more datasets
-  # than this.
   #max_discovered_files: 10000
 
   # Force serial scheduling of workflows within the context of a
   # particular history
   #history_local_serial_workflow_scheduling: false
-
-  # Optionally wrap workflow ``when`` JavaScript workers in an OS-level
-  # jail. JavaScript always runs in a separate Python worker using
-  # QuickJS, with no host bindings, a 200 MiB QuickJS allocator limit, a
-  # 1 MiB stack limit, and a parent-enforced wall-clock timeout (the
-  # expression timeout plus 10 seconds). Requests and responses are
-  # limited to 16 MiB each. These limits do not cap total Python RSS or
-  # aggregate memory across concurrent workers; parent-side JSON
-  # decoding also adds overhead. Simple parameter references resolve in
-  # Python without starting a worker. When empty (the default), the
-  # worker runs without an OS-level jail.
-  # Full JavaScript evaluation requires Python 3.10+ and the quickjs-ng
-  # package. Without QuickJS, expressions requiring JavaScript fail with
-  # an error; literals and simple parameter references continue to work
-  # without it.
-  # Set this to ``bubblewrap`` to use a built-in bubblewrap jail. It
-  # clears the environment, unshares the PID/IPC/UTS namespaces, and
-  # read-only-binds only what the worker needs to run: the Python
-  # runtime, the worker script, and the system library/binary
-  # directories (``/usr``, ``/lib``, ``/lib64``, ...). Galaxy's config,
-  # database and the rest of the filesystem are NOT mounted, so a
-  # compromised worker cannot read secrets from disk; it gets ``/proc``,
-  # a minimal ``/dev`` and a private in-memory ``/tmp`` only. This is
-  # applied only on Linux and only when ``bwrap`` (bubblewrap) is found
-  # on PATH; on any other platform, or if bwrap is missing, an ordinary
-  # worker subprocess is used instead.
-  # bubblewrap requires unprivileged user namespaces. On distributions
-  # that restrict them (Ubuntu >= 24.04,
-  # ``kernel.apparmor_restrict_unprivileged_userns=1``), install the
-  # bubblewrap AppArmor profile (shipped with the package) or relax the
-  # restriction, otherwise bwrap fails with "setting up uid map:
-  # Permission denied" and evaluation would error.
-  # The network namespace is not unshared, because ``--unshare-net``
-  # requires bubblewrap to configure a loopback interface, which fails
-  # on many container and CI hosts. Control egress at the network layer,
-  # or add ``--unshare-net`` via a custom command on hosts that support
-  # it.
-  # Advanced: set this to a full command prefix to use a custom jail
-  # (e.g. a specific bwrap invocation, nsjail, or firejail). The value
-  # is tokenized and used verbatim on all platforms, with the configured
-  # Python interpreter and worker script appended.
-  #expression_evaluation_isolation_command: ''
 
   # Enables and disables OpenID Connect (OIDC) support.
   #enable_oidc: false
@@ -2814,6 +2755,7 @@ galaxy:
   # is mounted read-only or the jobs are run by a different user than
   # the galaxy user).
   #outputs_to_working_directory: false
+  outputs_to_working_directory: true
 
   # If your network filesystem's caching prevents the Galaxy server from
   # seeing the job's stdout and stderr files when it completes, you can
@@ -3054,11 +2996,12 @@ galaxy:
   # the process that handled that particular request will tell all
   # others to also reload, lock jobs, etc. For connection examples, see
   # https://docs.celeryq.dev/projects/kombu/en/stable/userguide/connections.html
-  # When this option is not specified, Galaxy uses the configured
-  # database_connection with the SQLAlchemy transport. If
-  # database_connection is not explicitly configured, Galaxy creates a
-  # separate SQLite database at <data_dir>/control.sqlite.
-  #amqp_internal_connection: null
+  # Without specifying anything here, galaxy will first attempt to use
+  # your specified database_connection above.  If that's not specified
+  # either, Galaxy will automatically create and use a separate sqlite
+  # database located in your <galaxy>/database folder (indicated in the
+  # commented out line below).
+  #amqp_internal_connection: sqlalchemy+sqlite:///./database/control.sqlite?isolation_level=IMMEDIATE
 
   # Offload long-running tasks to a Celery task queue. Activate this
   # only if you have setup a Celery worker for Galaxy and you have
