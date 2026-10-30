@@ -1,7 +1,7 @@
 <tool id="interactive_tool_praat" tool_type="interactive" name="Praat" version="@VERSION@+galaxy0" profile="24.0">
     <description>interactive speech analysis and annotation</description>
     <macros>
-        <token name="@VERSION@">7.0.02-26.04</token>
+        <token name="@VERSION@">7.0.02</token>
     </macros>
     <requirements>
         <!-- Planned publishing location. Build locally with this tag or publish before deployment. -->
