@@ -1,0 +1,71 @@
+<tool id="interactive_tool_praat" tool_type="interactive" name="Praat" version="@VERSION@+galaxy0" profile="24.0">
+    <description>interactive speech analysis and annotation</description>
+    <icon src="praat.png"/>
+    <macros>
+        <token name="@VERSION@">7.0.02-1</token>
+    </macros>
+    <requirements>
+        <container type="docker">quay.io/galaxy/praat-headless:@VERSION@</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Praat desktop" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+<command detect_errors="exit_code"><![CDATA[
+        mkdir -p "\$PWD/praat_workspace/inputs" "\$PWD/praat_workspace/outputs" &&
+        ln -s "\$PWD/praat_workspace" /workspace &&
+
+        ## Tell the container's startup script where to find the Praat workspace.
+        export PRAAT_WORKDIR=/workspace &&
+
+        #from os.path import splitext
+        #from re import sub
+        #for $i, $dataset in enumerate($datasets)
+            #set $stem = sub(r'[^A-Za-z0-9._-]+', '_', splitext(str($dataset.name))[0]).strip('._') or 'sanitized_name_empty'
+            #set $filename = "input_%s_%s_galaxy_hid_%s.%s" % ($i, $stem, $dataset.hid, $dataset.ext)
+
+            printf 'Copying Galaxy dataset into inputs directory as %s\n' '${filename}';
+            cp '$dataset' "\$PRAAT_WORKDIR/inputs/${filename}";
+        #end for
+
+        ## Make only the outputs directory writable by Praat.
+        chown --reference="\$PWD" "\$PRAAT_WORKDIR/outputs" &&
+        /init
+    ]]></command>
+    <inputs>
+        <param name="datasets" type="data" format="data" multiple="true" optional="true"
+            label="Files to open in Praat"
+            help="Select audio, TextGrids, or other Praat-readable files. Files open automatically when the desktop starts." />
+    </inputs>
+    <outputs>
+        <!-- <data name="version" format="txt" label="${tool.name}: version" from_work_dir="version.txt" /> -->
+        <collection name="outputs" type="list" label="Praat outputs">
+            <discover_datasets
+            pattern="(?P&lt;name&gt;.+)\.TextGrid"
+            directory="praat_workspace/outputs"
+            format="textgrid"
+            visible="true" />
+        </collection>
+    </outputs>
+    <help><![CDATA[
+Praat provides interactive speech analysis, visualization, and annotation.
+
+Launch this tool and open the desktop from Active Interactive Tools.
+Selected files are copied into the inputs directory and opened automatically.
+They have numbered filenames; your original Galaxy datasets are not modified.
+
+Save results directly in the outputs directory, then close Praat by clicking
+on the red square under Praat in the Interactive Tools panel.
+The container finishes and Galaxy collects the saved files into a collection.
+Closing the browser tab leaves the desktop running.
+
+Browser audio is enabled in the image. If playback is silent, enable audio in
+the web interface and select PulseAudio under Praat's Sound playing preferences.
+Browser microphone recording is not provided by this setup.
+
+Galaxy currently only supports .wav and .TextGrid files as input files. Output
+is also limited to .TextGrid files. It is also not yet possible to run Praat
+scripts in the interactive tool.
+    ]]></help>
+</tool>
