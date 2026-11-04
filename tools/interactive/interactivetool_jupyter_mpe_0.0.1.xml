@@ -1,5 +1,5 @@
 <tool id="interactive_tool_jupyter_mpe" tool_type="interactive" name="Interactive JupyterLab Notebook (MPE)" version="0.0.1" profile="23.0">
-<description>This is an Interactive JupyterLab Notebook provided by the Max Planck Institute for Extraterrestrial Physics (MPE).</description>
+  <description>provided by the Max Planck Institute for Extraterrestrial Physics (MPE)</description>
   <icon src="jupyter_logo.png"/>
   <requirements>
     <container type="docker">ghcr.io/keponk/mpe-galaxy-notebook:dev</container>
