@@ -1,4 +1,4 @@
-<tool id="interactive_tool_praat" tool_type="interactive" name="Praat" version="@VERSION@+galaxy0" profile="24.0">
+<tool id="interactive_tool_praat" tool_type="interactive" name="Praat" version="@VERSION@+galaxy1" profile="24.0">
     <description>interactive speech analysis and annotation</description>
     <icon src="praat.png"/>
     <macros>
