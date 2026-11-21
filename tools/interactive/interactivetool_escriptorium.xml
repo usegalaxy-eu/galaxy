@@ -9,6 +9,7 @@
     <environment_variables>
         <environment_variable name="DISABLE_AUTH">True</environment_variable>
         <environment_variable name="GALAXY_STOP_BUTTON">True</environment_variable>
+        <environment_variable name="GALAXY_FRAME_ANCESTORS">$__galaxy_url__</environment_variable>
         <environment_variable name="IMPORT_DOCUMENT_NAME">Galaxy import</environment_variable>
         <environment_variable name="USE_X_FORWARDED_HOST">True</environment_variable>
     </environment_variables>
