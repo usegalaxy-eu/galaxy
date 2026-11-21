@@ -1,0 +1,110 @@
+<tool id="interactive_tool_escriptorium" tool_type="interactive" name="eScriptorium" version="26.10" profile="24.2">
+    <description>Segmentation and transcription of manuscripts</description>
+    <requirements>
+        <container type="docker">quay.io/galaxy/escriptorium:26.10</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="eScriptorium" requires_domain="True"><port>80</port></entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="DISABLE_AUTH">True</environment_variable>
+        <environment_variable name="GALAXY_STOP_BUTTON">True</environment_variable>
+        <environment_variable name="IMPORT_DOCUMENT_NAME">Galaxy import</environment_variable>
+        <environment_variable name="USE_X_FORWARDED_HOST">True</environment_variable>
+    </environment_variables>
+    <command detect_errors="exit_code"><![CDATA[
+        export IMPORT_MANIFEST='$input_manifest' &&
+        export EXPORT_DIR="\$PWD/exports" &&
+        export PROJECT_DIR="\$PWD/projects" &&
+        export MODEL_EXPORT_DIR="\$PWD/model-exports" &&
+        #if str($export_format) == 'none':
+            export STOP_EXPORT=false &&
+        #else:
+            export STOP_EXPORT=true &&
+            export STOP_EXPORT_FORMAT='$export_format' &&
+        #end if
+        #if $session_archive:
+            export SESSION_ARCHIVE='$session_archive' &&
+        #end if
+        exec /usr/local/bin/docker-entrypoint.sh
+    ]]></command>
+    <configfiles>
+        <!-- Unwrap names only into JSON data, never into shell commands. -->
+        <configfile name="input_manifest"><![CDATA[
+#import json
+#set manifest = {'inputs': [], 'models': []}
+#if $input:
+    #for $file in $input:
+        #set identifier = $file.element_identifier
+        #set original_name = getattr(identifier, 'unsanitized', identifier)
+        #set ignored = manifest['inputs'].append({'path': str($file), 'name': str(original_name), 'extension': str($file.ext)})
+    #end for
+#end if
+#if $kraken_models:
+    #for $model in $kraken_models:
+        #set identifier = $model.element_identifier
+        #set original_name = getattr(identifier, 'unsanitized', identifier)
+        #set ignored = manifest['models'].append({'path': str($model), 'name': str(original_name), 'extension': str($model.ext)})
+    #end for
+#end if
+#echo json.dumps(manifest)
+        ]]></configfile>
+    </configfiles>
+    <inputs>
+        <param name="input" type="data" multiple="true" optional="true" format="jpg,png,tiff,pdf,xml,zip"
+               label="Images, PDF, XML or image/XML archive to import"
+               help="Original image names are preserved for XML matching. Images load before XML. Leave empty for a new session."/>
+        <param name="kraken_models" type="data" multiple="true" optional="true" format="mlmodel,safetensors"
+               label="Kraken segmentation or recognition models"
+               help="The model type is detected automatically. Models appear in the document process panel."/>
+        <param name="session_archive" type="data" optional="true" format="tar"
+               label="Resume an eScriptorium session"
+               help="Select a session archive produced by this container version. Projects, all transcription layers, annotations, media and model versions are restored. Additional inputs can be imported into the resumed session."/>
+        <param name="export_format" type="select" label="Automatic document exports on exit"
+               help="ALTO and PAGE XML export each transcription layer separately; JSON includes all layers. The complete resumable session archive and OCR model files are always saved. Exports created inside the app are collected regardless of this setting.">
+            <option value="alto" selected="true">ALTO XML</option>
+            <option value="pagexml">PAGE XML</option>
+            <option value="json">JSON</option>
+            <option value="none">No automatic document exports</option>
+        </param>
+    </inputs>
+    <outputs>
+        <data name="session" format="tar" from_work_dir="projects/session.tar" label="eScriptorium resumable session"/>
+        <collection name="exports" type="list" label="eScriptorium document exports">
+            <discover_datasets pattern="(?P&lt;name&gt;[^.].*)\.(?P&lt;ext&gt;zip|json|xml|txt|tar\.gz|data)$" directory="exports"/>
+        </collection>
+        <collection name="models" type="list" label="eScriptorium OCR models">
+            <discover_datasets pattern="(?P&lt;name&gt;[^.].*)\.(?P&lt;ext&gt;mlmodel|safetensors)$" directory="model-exports"/>
+        </collection>
+    </outputs>
+    <help><![CDATA[
+Launch a single-user eScriptorium session. Input datasets and models are loaded
+before the entry point opens your document. Import failures are shown in the UI.
+Leave inputs empty to start with an empty document, or select a previous
+**resumable session** archive to continue working.
+
+Use **Save results and stop session** when finished. The app finishes existing
+work, creates the selected document exports, saves OCR model files and verifies a
+complete database-and-media archive before stopping. If saving fails, the app
+stays available: retry saving or resume editing from the dialog.
+
+Galaxy collects three outputs: a resumable session archive, document exports,
+and OCR models. The session archive preserves project structure, transcription
+history, metadata, annotations and model versions. Restore it with the same
+container version; PAGE/ALTO archives remain available for other tools.
+
+Choose **Automatic document exports on exit** when launching the tool: ALTO XML
+(the default), PAGE XML, JSON, or no automatic document exports. This choice
+does not change the full resumable session archive. Exports created manually
+inside eScriptorium are also collected.
+
+Periodic checkpoints retain the most recent successful session archive if the
+container is killed. External job cancellation cannot guarantee a final export
+or history collection; finish using the app's save-and-stop button.
+
+Administrators must configure this multi-service image to run with
+``docker_set_user: "0"`` and forward the public host and HTTPS scheme. See the
+repository's ``galaxy/job_conf.yml.sample`` and deployment documentation.
+    ]]></help>
+    <citations><citation type="doi">10.5281/zenodo.6642881</citation></citations>
+</tool>
