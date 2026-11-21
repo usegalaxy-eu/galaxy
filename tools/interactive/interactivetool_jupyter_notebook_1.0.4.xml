@@ -1,4 +1,4 @@
-<tool id="interactive_tool_jupyter_notebook" tool_type="interactive" name="Interactive JupyterLab Notebook" version="1.0.3" profile="25.1">
+<tool id="interactive_tool_jupyter_notebook" tool_type="interactive" name="Interactive JupyterLab Notebook" version="1.0.4" profile="25.1">
     <icon src="jupyter_logo.png" />
     <requirements>
         <container type="docker">quay.io/galaxy/docker-jupyter-notebook:26.11</container>
