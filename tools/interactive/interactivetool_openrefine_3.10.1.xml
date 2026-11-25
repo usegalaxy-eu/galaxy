@@ -1,0 +1,154 @@
+<tool id="interactive_tool_openrefine" tool_type="interactive" name="OpenRefine" version="0.5" profile="23.0">
+    <icon src="openrefine.png" />
+    <description>Working with messy data</description>
+    <requirements>
+        <container type="docker">quay.io/galaxy/docker-openrefine:3.10.1</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="OpenRefine" label="openrefine" requires_domain="False" requires_path_in_url="True">
+            <port>80</port>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">443</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+        <environment_variable name="EP_PATH" inject="entry_point_path_for_label">openrefine</environment_variable>
+    </environment_variables>
+    <command detect_errors="aggressive"><![CDATA[
+        #import re
+        mkdir -p /import exports &&
+
+        ## Stage the selected datasets into /import. The running number keeps
+        ## the names unique, the cleaned element identifier keeps them
+        ## meaningful: each file becomes an OpenRefine project of that name.
+        #for $count, $file in enumerate($input):
+            #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\\w\\-\\.\\s]', '_', str($file.element_identifier))
+            cp '$file' '/import/${cleaned_name}' &&
+        #end for
+
+        #if $run_mode.mode == 'headless'
+            #if not $input
+                echo 'ERROR: headless mode requires at least one input dataset' >&2 && exit 1 &&
+            #end if
+            #if $run_mode.recipe
+                cp '$run_mode.recipe' '/import/.galaxy-recipe.json' &&
+            #end if
+            python3 /galaxy_io.py headless --exports-dir "\$(pwd)/exports" --format '$run_mode.export_format'
+        #else
+            export PROXY_PREFIX="\${EP_PATH%/}" &&
+            bash /startup.sh
+        #end if
+    ]]>
+    </command>
+    <inputs>
+        <param name="input" type="data" format="tabular,csv,tsv,xlsx,ods,json" multiple="true" optional="true"
+               label="Datasets to import as OpenRefine projects"
+               help="Each dataset becomes a separate OpenRefine project named after the dataset. In interactive mode more data can be imported later from the 'Galaxy - OpenRefine' page of the running app." />
+        <conditional name="run_mode">
+            <param name="mode" type="select" label="Run mode" display="radio"
+                   help="Interactive opens OpenRefine in your browser. Headless runs without a user interface: data is loaded, the optional recipe is applied and the results are exported.">
+                <option value="interactive" selected="true">Interactive session in the browser</option>
+                <option value="headless">Headless: load data, apply recipe, export</option>
+            </param>
+            <when value="interactive" />
+            <when value="headless">
+                <param name="recipe" type="data" format="json" optional="true"
+                       label="OpenRefine operations JSON (recipe)"
+                       help="The recorded workflow, as exported by OpenRefine's 'Extract operations' dialog or by the 'Operations (.json)' button on the app's Galaxy - OpenRefine page. It is applied to every imported dataset; the columns it references must exist in them." />
+                <param name="export_format" type="select" label="Export results as">
+                    <option value="tsv" selected="true">TSV (tabular)</option>
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                </param>
+            </when>
+        </conditional>
+    </inputs>
+    <outputs>
+        <collection name="refined_output" type="list" label="OpenRefine results">
+            <discover_datasets pattern="__designation_and_ext__" directory="exports" visible="true" />
+        </collection>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1">
+        </test>
+    </tests>
+    <help><![CDATA[
+
+`OpenRefine <https://openrefine.org/>`_ (previously Google Refine) is a powerful tool for working with messy data:
+cleaning it; transforming it from one format into another; and extending it with web services and external data.
+
+**Interactive mode** (default)
+
+A private OpenRefine session is started and opened in your browser.
+
+- *Import:* datasets selected in the tool form are imported as OpenRefine
+  projects when the session starts; the project name is the dataset name.
+  Further datasets from the current Galaxy history can be imported at any
+  time from the *Galaxy - OpenRefine* page of the app: a link at the bottom
+  of the OpenRefine window opens it (it is the entry point URL with ``io/``
+  appended).
+  OpenRefine's own *Import project* menu restores previously exported
+  ``.openrefine.tar.gz`` project archives.
+- *Export:* the *Galaxy - OpenRefine* page exports into your Galaxy history:
+  project **rows** as ``TSV``, ``CSV`` or ``XLSX`` (all current edits are
+  included; facets and filters are not applied - use OpenRefine's own
+  *Export* menu for filtered or custom exports), the native **project
+  archive** (``.openrefine.tar.gz``) as a resumable session, and the recorded
+  **operations JSON** (the re-appliable workflow, see the headless mode
+  below). Uploaded datasets appear directly in your Galaxy history, also
+  while the session is still running. The *OpenRefine results* collection
+  shown in the history stays empty in interactive mode.
+- *Close the app:* use the *Export everything and close* button on the
+  *Galaxy - OpenRefine* page: it exports every project (rows as TSV plus the
+  project archive) to your Galaxy history and then stops the session. If any
+  export fails, the session stays open and can be retried. Wait for running
+  OpenRefine operations to finish before closing; closing the browser tab or
+  an idle-timeout shutdown does **not** perform a final export.
+
+**Headless mode** (no browser needed)
+
+Runs the whole workflow without a user interface: the selected datasets are
+loaded as OpenRefine projects, the optional **operations JSON** recipe is
+applied to every project, and the results are exported and returned as the
+*OpenRefine results* collection - one dataset per input, in the chosen
+format. The job finishes on its own; nothing is left running. This makes the
+step usable inside workflows.
+
+To get a recipe, clean a dataset once in an interactive OpenRefine session and
+export its recorded operations (*Extract operations* dialog in OpenRefine, or
+the *Operations (.json)* button on the *Galaxy - OpenRefine* page). The recipe
+is a list of OpenRefine operations in JSON form and is applied to **every**
+imported dataset, so all of them must contain the columns it references. A
+recipe is optional: without one, the mode simply loads and re-exports the
+data (e.g. to convert XLSX to TSV).
+
+.. class:: infomark
+
+Example input file (TAB separated)::
+
+  "name"	"longitude"	"latitude"	"countryCode"
+  Accipiter striatus Vieillot, 1808	-60.291838	46.328137	CA
+  Accipiter striatus Vieillot, 1808	-114.58927	35.022485	US
+  Accipiter striatus Vieillot, 1808	-93.37406	30.00586	US
+  Accipiter striatus Vieillot, 1808	-79.336288	43.682218	CA
+  Accipiter striatus Vieillot, 1808	-109.156024	31.904185	US
+  Accipiter striatus Vieillot, 1808	-71.098031	42.297408	US
+  Accipiter striatus Vieillot, 1808	-110.927215	32.18203	US
+
+]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+            @book{verbor2013,
+                title = {Using Google Refine},
+                author = {Verbor, Ruben and Speltinck, Mark},
+                publisher = {Packt Publishing},
+                address = {Birmingham, UK},
+                year = {2013}
+            }
+        </citation>
+    </citations>
+</tool>
