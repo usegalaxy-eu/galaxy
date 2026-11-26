@@ -6,7 +6,7 @@
     </requirements>
     <entry_points>
         <entry_point name="OpenRefine" label="openrefine" requires_domain="False" requires_path_in_url="True">
-            <port>80</port>
+            <port>8080</port>
         </entry_point>
     </entry_points>
     <environment_variables>
@@ -46,12 +46,12 @@
     <inputs>
         <param name="input" type="data" format="tabular,csv,tsv,xlsx,ods,json" multiple="true" optional="true"
                label="Datasets to import as OpenRefine projects"
-               help="Each dataset becomes a separate OpenRefine project named after the dataset. In interactive mode more data can be imported later from the 'Galaxy - OpenRefine' page of the running app." />
+               help="Each dataset becomes a separate OpenRefine project named after the dataset. In interactive mode more data can be imported at any later time using the dedicated 'Galaxy - OpenRefine' page." />
         <conditional name="run_mode">
             <param name="mode" type="select" label="Run mode" display="radio"
                    help="Interactive opens OpenRefine in your browser. Headless runs without a user interface: data is loaded, the optional recipe is applied and the results are exported.">
                 <option value="interactive" selected="true">Interactive session in the browser</option>
-                <option value="headless">Headless: load data, apply recipe, export</option>
+                <option value="headless">Run as normal tool: load data, apply recipe, export</option>
             </param>
             <when value="interactive" />
             <when value="headless">
@@ -108,7 +108,7 @@ A private OpenRefine session is started and opened in your browser.
   OpenRefine operations to finish before closing; closing the browser tab or
   an idle-timeout shutdown does **not** perform a final export.
 
-**Headless mode** (no browser needed)
+**Tool mode** (no browser needed)
 
 Runs the whole workflow without a user interface: the selected datasets are
 loaded as OpenRefine projects, the optional **operations JSON** recipe is
