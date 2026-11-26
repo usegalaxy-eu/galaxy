@@ -19,14 +19,19 @@
     </environment_variables>
     <command detect_errors="aggressive"><![CDATA[
         #import re
-        mkdir -p /import exports &&
+        export IMPORT_DIR="\$(pwd)/imports" &&
+        mkdir -p imports exports &&
 
-        ## Stage the selected datasets into /import. The running number keeps
+        ## Stage datasets in the job directory. The running number keeps
         ## the names unique, the cleaned element identifier keeps them
         ## meaningful: each file becomes an OpenRefine project of that name.
+        ## With multiple="true" and no dataset selected Galaxy still yields a
+        ## list with one None-like entry, so each item must be truth-checked.
         #for $count, $file in enumerate($input):
-            #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\\w\\-\\.\\s]', '_', str($file.element_identifier))
-            cp '$file' '/import/${cleaned_name}' &&
+            #if $file
+                #set $cleaned_name = str($count + 1) + '_' + re.sub('[^\\w\\-\\.\\s]', '_', str($file.element_identifier))
+                cp '$file' 'imports/${cleaned_name}.${file.file_ext}' &&
+            #end if
         #end for
 
         #if $run_mode.mode == 'headless'
@@ -34,7 +39,7 @@
                 echo 'ERROR: headless mode requires at least one input dataset' >&2 && exit 1 &&
             #end if
             #if $run_mode.recipe
-                cp '$run_mode.recipe' '/import/.galaxy-recipe.json' &&
+                cp '$run_mode.recipe' 'imports/.galaxy-recipe.json' &&
             #end if
             python3 /galaxy_io.py headless --exports-dir "\$(pwd)/exports" --format '$run_mode.export_format'
         #else
@@ -124,6 +129,9 @@ is a list of OpenRefine operations in JSON form and is applied to **every**
 imported dataset, so all of them must contain the columns it references. A
 recipe is optional: without one, the mode simply loads and re-exports the
 data (e.g. to convert XLSX to TSV).
+
+For XLSX and ODS inputs, all sheets are imported into one project. The first
+row of each sheet is used as its column header.
 
 .. class:: infomark
 
