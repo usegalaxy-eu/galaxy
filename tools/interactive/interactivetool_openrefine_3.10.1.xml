@@ -20,6 +20,7 @@
     <command detect_errors="aggressive"><![CDATA[
         #import re
         export IMPORT_DIR="\$(pwd)/imports" &&
+        export GALAXY_EXPORTS_DIR="\$(pwd)/exports" &&
         mkdir -p imports exports &&
 
         ## Stage datasets in the job directory. The running number keeps
@@ -34,6 +35,10 @@
             #end if
         #end for
 
+        #if $session_archive
+            cp '$session_archive' 'imports/.galaxy-session.tar.gz' &&
+        #end if
+
         #if $run_mode.mode == 'headless'
             #if not $input
                 echo 'ERROR: headless mode requires at least one input dataset' >&2 && exit 1 &&
@@ -43,6 +48,7 @@
             #end if
             python3 /galaxy_io.py headless --exports-dir "\$(pwd)/exports" --format '$run_mode.export_format'
         #else
+            export GALAXY_CLOSE_FORMAT='$run_mode.close_format' &&
             export PROXY_PREFIX="\${EP_PATH%/}" &&
             bash /startup.sh
         #end if
@@ -52,13 +58,23 @@
         <param name="input" type="data" format="tabular,csv,tsv,xlsx,ods,json" multiple="true" optional="true"
                label="Datasets to import as OpenRefine projects"
                help="Each dataset becomes a separate OpenRefine project named after the dataset. In interactive mode more data can be imported at any later time using the dedicated 'Galaxy - OpenRefine' page." />
+        <param name="session_archive" type="data" format="gz,tar" optional="true"
+               label="Resume a previous session"
+               help="Select a native OpenRefine project archive (.openrefine.tar.gz) as produced by this tool's 'OpenRefine session archives' output or by OpenRefine's own 'Export project' menu. All projects it contains are restored with their data, history and recorded operations when the session starts." />
         <conditional name="run_mode">
             <param name="mode" type="select" label="Run mode" display="radio"
                    help="Interactive opens OpenRefine in your browser. Headless runs without a user interface: data is loaded, the optional recipe is applied and the results are exported.">
                 <option value="interactive" selected="true">Interactive session in the browser</option>
                 <option value="headless">Run as normal tool: load data, apply recipe, export</option>
             </param>
-            <when value="interactive" />
+            <when value="interactive">
+                <param name="close_format" type="select" label="Rows export format when closing"
+                       help="Format of the per-project row exports collected as the 'OpenRefine results' output when you use 'Export everything and close' on the app's Galaxy - OpenRefine page.">
+                    <option value="tsv" selected="true">TSV (tabular)</option>
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                </param>
+            </when>
             <when value="headless">
                 <param name="recipe" type="data" format="json" optional="true"
                        label="OpenRefine operations JSON (recipe)"
@@ -74,6 +90,12 @@
     <outputs>
         <collection name="refined_output" type="list" label="OpenRefine results">
             <discover_datasets pattern="__designation_and_ext__" directory="exports" visible="true" />
+        </collection>
+        <collection name="session_archives" type="list" label="OpenRefine session archives">
+            <discover_datasets pattern="(?P&lt;designation&gt;.*)\.openrefine\.tar\.gz" directory="exports/archives" ext="gz" visible="true" />
+        </collection>
+        <collection name="openrefine_operations" type="list" label="OpenRefine operations JSON">
+            <discover_datasets pattern="(?P&lt;designation&gt;.*)\.json" directory="exports/operations" ext="json" visible="true" />
         </collection>
     </outputs>
     <tests>
@@ -104,14 +126,20 @@ A private OpenRefine session is started and opened in your browser.
   archive** (``.openrefine.tar.gz``) as a resumable session, and the recorded
   **operations JSON** (the re-appliable workflow, see the headless mode
   below). Uploaded datasets appear directly in your Galaxy history, also
-  while the session is still running. The *OpenRefine results* collection
-  shown in the history stays empty in interactive mode.
+  while the session is still running.
 - *Close the app:* use the *Export everything and close* button on the
-  *Galaxy - OpenRefine* page: it exports every project (rows as TSV plus the
-  project archive) to your Galaxy history and then stops the session. If any
-  export fails, the session stays open and can be retried. Wait for running
-  OpenRefine operations to finish before closing; closing the browser tab or
-  an idle-timeout shutdown does **not** perform a final export.
+  *Galaxy - OpenRefine* page: it exports every project (rows in the chosen
+  format plus the project archive and the recorded operations JSON) as this
+  job's **output collections** - *OpenRefine results*, *OpenRefine session
+  archives* and *OpenRefine operations JSON* - and then stops the session.
+  If any export fails, the session stays open and can be retried. Wait for
+  running OpenRefine operations to finish before closing; closing the
+  browser tab or an idle-timeout shutdown does **not** perform a final
+  export.
+- *Resume:* pass a previous session's *OpenRefine session archives* output
+  as the *Resume a previous session* input; all projects it contains are
+  restored when the new session starts. This is how a long cleaning job can
+  be split across several sessions with predictable hand-offs.
 
 **Tool mode** (no browser needed)
 
