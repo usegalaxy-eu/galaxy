@@ -1,7 +1,7 @@
-<tool id="interactive_tool_cellxgene_vip" tool_type="interactive" name="Interactive CELLxGENE VIP Environment" version="3.1.2">
+<tool id="interactive_tool_cellxgene_vip" tool_type="interactive" name="Interactive CELLxGENE VIP Environment" version="3.2.1">
     <icon src="cellxgene_vip.png" />
     <requirements>
-        <container type="docker">quay.io/bgruening/cellxgene-vip:3.1.2</container>
+        <container type="docker">quay.io/bgruening/cellxgene-vip:3.2.1.1</container>
     </requirements>
     <entry_points>
         <entry_point name="CELLxGENE-VIP Single Cell Visualization on $infile.display_name" requires_domain="True">
